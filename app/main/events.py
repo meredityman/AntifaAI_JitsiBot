@@ -55,17 +55,6 @@ def handle_disconnect():
     print('Client disconnected')
     clients.remove(request.sid)
 
-@socketio.on('received_private_message')
-def received_private_message(message):
-    id = message['id']
-    text = message['text']
-    client = request.sid
-    print('received_private_message', client, id, text)
-
-    response = engine.getPrivateResponse(client, id, text)
-    if response:
-        send_private_message(id, response)
-
 @socketio.on('received_message')
 def received_message(message):
     id = message['id']
@@ -73,13 +62,23 @@ def received_message(message):
     client = request.sid
     print('received_message', client, id, text)
 
-    response = engine.getPublicResponse(client, id, text)
-    if response:
-        send_message(response)
+    engine.feedEnginePublic(client, id, text)
+
+
+@socketio.on('received_private_message')
+def received_private_message(message):
+    id   = message['id']
+    text = message['text']
+    ids  = message['ids']
+    client = request.sid
+    print('received_private_message', client, id, text)
+
+    engine.feedEnginePrivate(client, id, ids, text)
+
 
 
 @socketio.on('set_interaction_engine')
 def set_interaction_engine(config):
     print('set_interaction_engine', config)
-    engine.setup( config )
+    engine.setup(config, send_message, send_private_message)
     

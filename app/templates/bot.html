@@ -24,8 +24,8 @@
   <script type="text/javascript" charset="utf-8">
 
   let connection = null;
-  let isJoined = false;
-  let room = null;
+  let isJoined   = false;
+  let room       = null;
 
   let socketio = io();
   
@@ -47,6 +47,7 @@
     meetingUrl = 'https://' + config['hosts']['domain'] + '/' + meetingName;
 
     connection = new JitsiMeetJS.JitsiConnection(null, null, config);
+
     socketio.on('disconnect', function() {
       console.info('socket disconnected');
       connection.disconnect();
@@ -62,7 +63,6 @@
       function onConferenceJoined() {
         console.info('onConferenceJoined');
 
-
         $('#meeting-link').attr("href", meetingUrl);
 
         function setupInteractionTypes( name, list) {
@@ -71,13 +71,14 @@
           divEl.append(`<span class='inline-label'>${name}: </span>`)
 
           list.forEach( (interactionName) => {
-            var label = divEl.append(`<label>${interactionName}</label>`);
+            var label = divEl.append(`<label></label>`);
             label.append( $('<input/>', {
               type  : "radio",
               name  : name,
               value : interactionName,
               id    : 'input-' + interactionName + '-' + name
             }));
+            label.append(`${interactionName}`);
           });    
         };
 
@@ -88,17 +89,14 @@
           var selectedInteractionPublic  = $(`input[name='public']:checked`).val()  || 'none';
           var selectedInteractionPrivate = $(`input[name='private']:checked`).val() || 'none';
 
-          let ids = Object.keys(participants);
-          // ids.splice(ids.indexOf(room.myUserId(), 1));
 
           socketio.emit('set_interaction_engine',  {
-            'ids': ids, 
             'public-type': selectedInteractionPublic,
             'private-type': selectedInteractionPrivate
           }); 
         });
     
-
+        // Setup message events
         for (const [name, value] of Object.entries(messageEvents)) {
           console.info(name, value);
           var button = $('<button/>', {
@@ -114,6 +112,7 @@
           $('#event-list').append(button);
         }
 
+        // Init participants
         let participants = {}
 
         function removeUser(id, displayName){
@@ -153,7 +152,7 @@
           addUser(user['_id'], user['_displayName']);
         });
 
-        let messages     = [ ]
+        let publicMessages     = [ ]
 
         socketio.on('send_message', function(message) {
             console.info('send_message', message);
@@ -167,11 +166,37 @@
         });
 
         // Socket io callbacks
+        room.on( JitsiMeetJS.events.conference.MESSAGE_RECEIVED, (id, text, ts) => {
+            console.info('received_message', id, text, ts);
+
+            if (room.myUserId() != id) { 
+              socketio.emit('received_message',  {'id': id, 'text': text} );
+            }
+            
+            publicMessages.push( {
+              'id'   : id,
+              'text' : text,
+              'ts'   : ts
+            });
+            if( id in participants){
+              $('#messages-' + room.myUserId()).append(`<p class="message">${participants[id]['displayName']} - ${text}</p>`);
+            } else {
+              $('#messages-' + room.myUserId()).append(`<p class="message">${id} - ${text}</p>`);
+            }
+          }
+        );
+
         room.on( JitsiMeetJS.events.conference.PRIVATE_MESSAGE_RECEIVED, (id, text, ts) => {
             console.info('received_private_message', id,  text, ts);
+
+   
+            let ids = Object.keys(participants);
+            ids.splice(ids.indexOf(room.myUserId(), 1))
+
             if (room.myUserId() != id) { 
-              socketio.emit('received_private_message',  {'id': id, 'text': text} );
+              socketio.emit('received_private_message',  {'id': id, 'ids': ids, 'text': text} );
             }
+;
 
             if( id in participants){
               participants[id]['messages'].push( {
@@ -187,25 +212,6 @@
           }
         );
 
-        room.on( JitsiMeetJS.events.conference.MESSAGE_RECEIVED, (id, text, ts) => {
-            console.info('received_message', id, text, ts);
-
-            if (room.myUserId() != id) { 
-              socketio.emit('received_message',  {'id': id, 'text': text} );
-            }
-            
-            messages.push( {
-              'id'   : id,
-              'text' : text,
-              'ts'   : ts
-            });
-            if( id in participants){
-              $('#messages-' + room.myUserId()).append(`<p class="message">${participants[id]['displayName']} - ${text}</p>`);
-            } else {
-              $('#messages-' + room.myUserId()).append(`<p class="message">${id} - ${text}</p>`);
-            }
-          }
-        );
 
         room.on( JitsiMeetJS.events.conference.USER_JOINED, function(id, user){
           console.info('participants joined', id, user);
@@ -224,38 +230,35 @@
       );
 
     }
-
-    function onConnectionSuccess() {
-      console.info('onConnectionSuccess');
-      startConference();
-    }
+    
     connection.addEventListener(
       JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
-      onConnectionSuccess,
+      function () {
+        console.info('onConnectionSuccess');
+        startConference();
+      }
     );
 
-    function onConnectionFailed() {
-      console.warn('onConnectionFailed');
-    }
     connection.addEventListener(
       JitsiMeetJS.events.connection.CONNECTION_FAILED,
-      onConnectionFailed,
+      function () {
+        console.warn('onConnectionFailed');
+      }
     );
 
-    function disconnect() {
-      console.info('disconnect');
-    }
     connection.addEventListener(
       JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
-      disconnect,
+      function () {
+        console.info('disconnect');
+      },
     );
 
     connection.connect();
 
-
   };
 
   socketio.on('start_conference', startJitsi);
+
   </script>
 
   <div id="row1" class="row">

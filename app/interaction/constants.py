@@ -1,16 +1,15 @@
-from .interaction import Echo, Survey, StatsBot
+from .interaction import Echo
+from .gpt2 import GPT2
 
 interactionTypesPrivate = {
     'none'  : None,
     'echo'  : Echo,
-    'survey': Survey,
-    'stats' : StatsBot,
+    'gpt2'  : GPT2,
 }
 
 interactionTypesPublic = {
     'none'  : None,
     'echo'  : Echo,
-    'stats' : StatsBot,
 }
 
 INTERACTION_TYPES_PUBLIC  = list(interactionTypesPublic.keys())

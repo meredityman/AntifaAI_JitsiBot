@@ -1,27 +1,27 @@
 
 class InteractionEngine:
     def __init__(self):
-        pass
+
+        self.setup()
+
+    def sendPublicMessage(self, id, message):
+        if self.publicSendCallback:
+            self.publicSendCallback(id, message)
+
+    def sendPrivateMessage(self, id, message):
+        if self.privateSendCallback:
+            self.privateSendCallback(id, message)
 
     def reset(self):
         pass
 
-    def getResponse(self, id, text):
+    def setup(self):
+        pass
+
+    def getResponse(self, id, text, callback, broadcastCallback = None, selected_ids = []):
         raise NotImplementedError()
 
 
 class Echo(InteractionEngine):
-    def getResponse(self, id, text):
-        return text
-
-class Survey(InteractionEngine):
-    def getResponse(self, id, text):
-        return text
-
-
-class StatsBot(InteractionEngine):
-    def getResponse(self, id, text):
-        if text == 'marco':
-            return 'polo!'
-        else:
-            return None
+    def getResponse(self, id, text, callback):
+        callback(text)

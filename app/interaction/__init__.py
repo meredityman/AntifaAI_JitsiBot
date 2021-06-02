@@ -9,14 +9,35 @@ class Engine():
         self.publicInteractionEngine  = None
         self.privateInteractionType   = None
         self.publicInteractionType    = None
-        self.ids = []
         self.setup(DEFAULT_ENGINE_CONFIG)
     
-    def setup(self, args):
+    def setup(self, args, publicSendCallback = None, privateSendCallback = None):
         print(args)
+
+        self.publicSendCallback  = publicSendCallback  
+        self.privateSendCallback = privateSendCallback 
+
         requestedPublicType  = args['public-type']
         requestedPrivateType = args['private-type']
-        self.ids = args['ids']
+
+        print(f"Requesting public {requestedPublicType}")
+        print(f"Requesting private {requestedPrivateType}")
+
+        if requestedPublicType:
+            if requestedPublicType in interactionTypesPublic:
+                if self.publicInteractionType == requestedPublicType:
+                    print(f"Reseting Public Engine - {requestedPublicType}")
+                    if self.publicInteractionEngine is not None:
+                        self.publicInteractionEngine.reset()
+                else:
+                    print(f"Creating public Engine - {requestedPublicType}")
+                    c = interactionTypesPublic[requestedPublicType]
+                    if c:
+                        self.publicInteractionEngine  = c()
+                self.publicInteractionType = requestedPublicType
+
+            else:
+                print(f"Interaction type '{requestedPublicType}' not recognized")
 
         if requestedPrivateType:
             if requestedPrivateType in interactionTypesPrivate:
@@ -32,37 +53,22 @@ class Engine():
 
                 self.privateInteractionType = requestedPrivateType
 
-        if requestedPublicType:
-            if requestedPublicType in interactionTypesPublic:
-                if self.publicInteractionType == requestedPublicType:
-                    print(f"Reseting Public Engine - {requestedPublicType}")
-                    if self.publicInteractionEngine is not None:
-                        self.publicInteractionEngine.reset()
-                else:
-                    print(f"Creating public Engine - {requestedPublicType}")
-                    c = interactionTypesPublic[requestedPublicType]
-                    if c:
-                        self.publicInteractionEngine  = c()
-                self.publicInteractionType = requestedPublicType
+            else:
+                print(f"Interaction type '{requestedPrivateType}' not recognized")
 
 
-    def getPrivateResponse(self, client, id, text):
-        if self.privateInteractionEngine is None:
-            return None
 
-        if( id not in self.ids ):
-            print(f"Participant {id} not selected fro private chat")
-            return None
-
-        return self.privateInteractionEngine.getResponse(id, text)
-
-
-    def getPublicResponse(self, client, id, text):
-        if self.publicInteractionEngine:
-            return self.publicInteractionEngine.getResponse(id, text)
+    def feedEnginePublic(self, client, id, text):
+        if self.publicInteractionEngine is not None:
+            self.publicInteractionEngine.getResponse(id, text, self.publicSendCallback)
         else:
-            print("No public engine")
-            return None
+            print(f"No engine for public message from {id}")
 
+
+    def feedEnginePrivate(self, client, id, selected_ids, text):
+        if self.privateInteractionEngine is not None:
+            self.privateInteractionEngine.getResponse(id, text, lambda message : self.privateSendCallback(id, message), self.publicSendCallback, selected_ids)
+        else:
+            print(f"No engine for private message from {id}")
 
 engine = Engine()
