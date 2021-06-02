@@ -1,0 +1,21 @@
+
+button.selected {
+    background-color: darksalmon;
+}
+
+
+div.messages {
+    overflow-x: scroll;
+}
+
+p.message {
+    width: 200pt;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+div.message-list {
+    float: left;
+    margin-left: 4pt;
+    margin-right: 4pt;
+}
