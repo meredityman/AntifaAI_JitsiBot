@@ -23,10 +23,11 @@ def send_message(message):
         print('sending message "{}" to client "{}".'.format(message, client_id))
 
 
-def send_private_message(message, id):
+def send_private_message(id, message):
     for client_id in clients:
+        print(f'sending private message "{message}" to user {id} on client "{client_id}".')
         socketio.emit('send_private_message', { 'id' : id, 'message' : message}, room=client_id)
-        print('sending private message "{}" to client "{}".'.format(message, client_id))
+
 
 
 def send_date_time():

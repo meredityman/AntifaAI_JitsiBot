@@ -21,8 +21,6 @@ class Survey(InteractionEngine):
 
 class StatsBot(InteractionEngine):
     def getResponse(self, id, text):
-        print("!!!!!!!!!!!!!1")
-        print(text)
         if text == 'marco':
             return 'polo!'
         else:

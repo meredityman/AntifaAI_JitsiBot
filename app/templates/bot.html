@@ -87,8 +87,12 @@
         $('#interaction-submit').click( function() {
           var selectedInteractionPublic  = $(`input[name='public']:checked`).val()  || 'none';
           var selectedInteractionPrivate = $(`input[name='private']:checked`).val() || 'none';
+
+          let ids = Object.keys(participants);
+          // ids.splice(ids.indexOf(room.myUserId(), 1));
+
           socketio.emit('set_interaction_engine',  {
-            'ids': [], 
+            'ids': ids, 
             'public-type': selectedInteractionPublic,
             'private-type': selectedInteractionPrivate
           }); 
@@ -109,7 +113,6 @@
           });
           $('#event-list').append(button);
         }
-
 
         let participants = {}
 
@@ -158,9 +161,9 @@
         });
 
 
-        socketio.on('send_private_message', function(message, id) {
-            console.info('send_message', message);
-            room.sendPrivateTextMessage(id, message)
+        socketio.on('send_private_message', function(data) {
+            console.info('send_private_message', data['id'], data['message']);
+            room.sendPrivateTextMessage(data['id'], data['message'])
         });
 
         // Socket io callbacks

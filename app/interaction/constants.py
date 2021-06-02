@@ -3,7 +3,8 @@ from .interaction import Echo, Survey, StatsBot
 interactionTypesPrivate = {
     'none'  : None,
     'echo'  : Echo,
-    'survey': Survey
+    'survey': Survey,
+    'stats' : StatsBot,
 }
 
 interactionTypesPublic = {
