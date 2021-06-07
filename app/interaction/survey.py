@@ -1,45 +1,14 @@
 import json
 import numpy as np
 from .interaction import InteractionEngine
-
+from ..horror import  draw_map
+#from ..horror import send_data
         
-# OUTPUT_MAP_PATH  = "output/map_latest.jpg"
+OUTPUT_MAP_PATH  = "app/static/map_latest.jpg"
 
 QUESTION_PATH = "app/interaction/survey.json"
 
 
-
-# def printMap(route):
-#     route.insert(0, "Questionaire")
-
-#     print(f"{'->'.join(route)}")
-
-#     draw_map(route, OUTPUT_MAP_PATH)
-#     # img = Image.open(OUTPUT_MAP_PATH)
-#     # #img.show()
-
-
-def get_route(scores, stations, metrics, number = 4):
-    route = None
-
-    point = [ ]
-    for m in metrics:
-        metric = m["name"]
-        try:
-            point.append(scores[metric])
-        except:
-            point.append(0.0) 
-    point = 0.5 * (np.asarray(point) + 0.5)         
-    point = point/np.linalg.norm(point)
-    distances = {}
-    for station in stations:
-        target = np.asarray(station["score"])
-
-        target  = target/np.linalg.norm(target)
-        dist = np.linalg.norm(point - target)
-        distances[station["name"]] = dist
-    route = sorted(distances, key=distances.get, reverse=True)[:number]
-    return route
 
 class Survey(InteractionEngine):
     def setup(self):
@@ -63,7 +32,6 @@ class Survey(InteractionEngine):
             next(self.generator)
         except StopIteration:
             print("Survey Complete")
-            self.reset()
 
     def getQuestionText(self, qIndex):
         question = self.questions[qIndex]
@@ -111,8 +79,6 @@ class Survey(InteractionEngine):
         if qIndex not in self.responses:
             return False
         try:
-            print(self.ids)
-            print(self.responses[qIndex])
             return set(self.ids) <= set(self.responses[qIndex].keys())
         except IndexError:
             return False
@@ -121,9 +87,14 @@ class Survey(InteractionEngine):
         pass
 
     def finalizeAllQuestions(self):
-        route = get_route(self.responses, self.stations, self.metrics)
+        route = self.getRoute()
         message = f"{' -> '.join(route)}"
+        # send_data("map-decision", message)
         self.sendBroadcastMessage(message)
+
+        route.insert(0, "Questionaire")
+        print(f"{'->'.join(route)}")
+        draw_map(route, OUTPUT_MAP_PATH)
 
 
 
@@ -131,7 +102,6 @@ class Survey(InteractionEngine):
         self.sendBroadcastMessage(self.intro)
 
         for qIndex in range(len(self.questions)):
-            responses = {}
 
             self.sendQuestion(qIndex)
             yield
@@ -147,6 +117,43 @@ class Survey(InteractionEngine):
             self.finalizeQuestion()
 
         self.finalizeAllQuestions()
+
+    def getRoute(self, number = 4):
+
+        scores = { m["name"] : 0.0 for m in self.metrics }
+        for qIndex, response in self.responses.items():
+            question = self.questions[qIndex]
+            metric   = question['metric']
+
+            score = [question['choices'][r] ['score'] for r in response.values()]
+
+            score = sum(score) / len(score)
+            scores[metric] += score
+
+        route = None
+
+        point = [ ]
+        for m in self.metrics:
+            metric = m["name"]
+            try:
+                point.append(scores[metric])
+            except:
+                point.append(0.0) 
+        point = 0.5 * (np.asarray(point) + 0.5)         
+        point = point/np.linalg.norm(point)
+
+        print(point)
+
+        distances = {}
+        for station in self.stations:
+            target = np.asarray(station["score"])
+
+            target  = target/np.linalg.norm(target)
+            dist = np.linalg.norm(point - target)
+            distances[station["name"]] = dist
+        route = sorted(distances, key=distances.get, reverse=True)[:number]
+        return route
+
 
     def loadQuestions(self):
         survey_def = json.load(open(QUESTION_PATH, "r"))

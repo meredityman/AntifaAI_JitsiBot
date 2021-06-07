@@ -31,5 +31,5 @@ class InteractionEngine:
 
 
 class Echo(InteractionEngine):
-    def getResponse(self, id, text, callback):
+    def getResponse(self, id, text):
         self.callback(text)

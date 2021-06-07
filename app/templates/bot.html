@@ -86,9 +86,9 @@
         let participants = {}
 
         function removeUser(id, displayName){
+          console.log("Removing user " + id);
           delete participants[id];
-          $('#user-btn-' + id).parent().remove();
-          $('messages-' + id).remove();
+          $('#user-btn-' + id).remove();
         }
 
         function addUser(id, displayName){
@@ -202,7 +202,6 @@
             if (room.myUserId() != id) { 
               socketio.emit('received_private_message',  {'id': id, 'ids': ids, 'text': text} );
             }
-;
 
             if( id in participants){
               participants[id]['messages'].push( {
@@ -225,7 +224,7 @@
         });
 
         room.on( JitsiMeetJS.events.conference.USER_LEFT, function(id, user){
-          console.info('participants joined', id, user);
+          console.info('participants left', id, user);
           removeUser(id);
         });
       }
