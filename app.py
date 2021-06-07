@@ -4,7 +4,7 @@ import argparse
 import json
 from app import socketio, create_app
 
-PERFORMANCES_FILE = "performances.json"
+PERFORMANCES_FILE = "app/static/performances.json"
 performances = json.load(open(PERFORMANCES_FILE, 'r'))['performances']
 
 def get_args():
@@ -26,4 +26,4 @@ if __name__ == "__main__":
 
     app = create_app(args)
 
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0')

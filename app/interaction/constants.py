@@ -1,10 +1,12 @@
 from .interaction import Echo
 from .gpt2 import GPT2
+from .survey import Survey
 
 interactionTypesPrivate = {
     'none'  : None,
     'echo'  : Echo,
     'gpt2'  : GPT2,
+    'survey': Survey
 }
 
 interactionTypesPublic = {

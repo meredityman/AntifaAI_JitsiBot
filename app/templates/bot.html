@@ -65,36 +65,6 @@
 
         $('#meeting-link').attr("href", meetingUrl);
 
-        function setupInteractionTypes( name, list) {
-          var divEl = $(`<div id=${'#interaction-list-' + name}/>`).appendTo('#interaction-lists')
-
-          divEl.append(`<span class='inline-label'>${name}: </span>`)
-
-          list.forEach( (interactionName) => {
-            var label = divEl.append(`<label></label>`);
-            label.append( $('<input/>', {
-              type  : "radio",
-              name  : name,
-              value : interactionName,
-              id    : 'input-' + interactionName + '-' + name
-            }));
-            label.append(`${interactionName}`);
-          });    
-        };
-
-        setupInteractionTypes( 'public' , availableInteractionTypes['public'] );
-        setupInteractionTypes( 'private', availableInteractionTypes['private']);
-
-        $('#interaction-submit').click( function() {
-          var selectedInteractionPublic  = $(`input[name='public']:checked`).val()  || 'none';
-          var selectedInteractionPrivate = $(`input[name='private']:checked`).val() || 'none';
-
-
-          socketio.emit('set_interaction_engine',  {
-            'public-type': selectedInteractionPublic,
-            'private-type': selectedInteractionPrivate
-          }); 
-        });
     
         // Setup message events
         for (const [name, value] of Object.entries(messageEvents)) {
@@ -136,7 +106,6 @@
                 if(id in participants){
                   participants[id]['selected'] = !participants[id]['selected']
                   $( this ).toggleClass( "selected" );
-                } else {
                   console.error("No participant for button (" + id +")");
                   console.error(participants);
                 }
@@ -150,6 +119,43 @@
         addUser(room.myUserId(), displayName);
         room.getParticipants().forEach( function(user){
           addUser(user['_id'], user['_displayName']);
+        });
+
+        // Setup interactions
+        function setupInteractionTypes( name, list) {
+          var divEl = $(`<div id=${'#interaction-list-' + name}/>`).appendTo('#interaction-lists')
+
+          divEl.append(`<span class='inline-label'>${name}: </span>`)
+
+          list.forEach( (interactionName) => {
+            var label = divEl.append(`<label></label>`);
+            label.append( $('<input/>', {
+              type  : "radio",
+              name  : name,
+              value : interactionName,
+              id    : 'input-' + interactionName + '-' + name
+            }));
+            label.append(`${interactionName}`);
+          });    
+        };
+
+        setupInteractionTypes( 'public' , availableInteractionTypes['public'] );
+        setupInteractionTypes( 'private', availableInteractionTypes['private']);
+
+        function getSelectedUsers(){
+          let users = Object.keys(participants).filter( item => item != room.myUserId());
+          return users
+        }
+
+        $('#interaction-submit').click( function() {
+          var selectedInteractionPublic  = $(`input[name='public']:checked`).val()  || 'none';
+          var selectedInteractionPrivate = $(`input[name='private']:checked`).val() || 'none';
+
+          socketio.emit('set_interaction_engine',  {
+            'public-type': selectedInteractionPublic,
+            'private-type': selectedInteractionPrivate,
+            'ids': getSelectedUsers(),
+          }); 
         });
 
         let publicMessages     = [ ]

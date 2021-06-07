@@ -19,6 +19,7 @@ class Engine():
 
         requestedPublicType  = args['public-type']
         requestedPrivateType = args['private-type']
+        ids = args['ids']
 
         print(f"Requesting public {requestedPublicType}")
         print(f"Requesting private {requestedPrivateType}")
@@ -33,7 +34,9 @@ class Engine():
                     print(f"Creating public Engine - {requestedPublicType}")
                     c = interactionTypesPublic[requestedPublicType]
                     if c:
-                        self.publicInteractionEngine  = c()
+                        self.publicInteractionEngine  = c(publicSendCallback)
+                    else:
+                        self.publicInteractionEngine = None
                 self.publicInteractionType = requestedPublicType
 
             else:
@@ -49,7 +52,9 @@ class Engine():
                     print(f"Creating private Engine - {requestedPrivateType}")
                     c = interactionTypesPrivate[requestedPrivateType]
                     if c:
-                        self.privateInteractionEngine = c()
+                        self.privateInteractionEngine = c(callback = privateSendCallback,  broadcastCallback = publicSendCallback, ids = ids)
+                    else:
+                        self.privateInteractionEngine = None
 
                 self.privateInteractionType = requestedPrivateType
 
@@ -60,14 +65,14 @@ class Engine():
 
     def feedEnginePublic(self, client, id, text):
         if self.publicInteractionEngine is not None:
-            self.publicInteractionEngine.getResponse(id, text, self.publicSendCallback)
+            self.publicInteractionEngine.getResponse(id, text)
         else:
             print(f"No engine for public message from {id}")
 
 
-    def feedEnginePrivate(self, client, id, selected_ids, text):
+    def feedEnginePrivate(self, client, id, text):
         if self.privateInteractionEngine is not None:
-            self.privateInteractionEngine.getResponse(id, text, lambda message : self.privateSendCallback(id, message), self.publicSendCallback, selected_ids)
+            self.privateInteractionEngine.getResponse(id, text)
         else:
             print(f"No engine for private message from {id}")
 

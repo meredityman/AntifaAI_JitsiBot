@@ -12,6 +12,8 @@ class GPT2(InteractionEngine):
         self.pipe = pipeline('text-generation', model="dbmdz/german-gpt2",
                  tokenizer="dbmdz/german-gpt2")
 
-    def getResponse(self, id, text, callback, broadcastCallback = None, selected_ids = []):
+    
+
+    def getResponse(self, id, text):
         response = self.pipe(text, max_length=100)[0]["generated_text"]
-        callback(response)
+        self.sendMessage(response)

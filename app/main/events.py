@@ -73,7 +73,7 @@ def received_private_message(message):
     client = request.sid
     print('received_private_message', client, id, text)
 
-    engine.feedEnginePrivate(client, id, ids, text)
+    engine.feedEnginePrivate(client, id, text)
 
 
 
