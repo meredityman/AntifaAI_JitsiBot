@@ -80,7 +80,7 @@ class Incidents(MultiGeneratorEngine):
                     response = validator(self.text, **args, allow_empty = (not question['compulsory']))
                     break
                 except (ValueError, TypeError) as e:
-                    self.sendMessage(self.id, e)
+                    self.sendMessage(self.id, str(e))
                     self.sendMessage(self.id, question['hint'])
                     yield
 

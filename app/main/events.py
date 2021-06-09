@@ -35,47 +35,54 @@ def handle_bot_connect():
     print('Client connected')
 
     client = request.sid
-    if client != bot_client:
 
-        bot_client = client
+    if bot_client != None and client != bot_client:
+        print("Disconnect old client")
+        socketio.emit('disconnect_now', {'id' : bot_client }, namespace='/bot')
+        
 
-        message = {
-            'displayName'        : botName,
-            'conference'         : conferenceName,
-            'default-engine-config': DEFAULT_ENGINE_CONFIG,
-            'interaction-types'  : {
-                'public'  : INTERACTION_TYPES_PUBLIC,
-                'private' : INTERACTION_TYPES_PRIVATE
-            }
+    bot_client = client      
+    message = {
+        'displayName'        : botName,
+        'conference'         : conferenceName,
+        'default-engine-config': DEFAULT_ENGINE_CONFIG,
+        'interaction-types'  : {
+            'public'  : INTERACTION_TYPES_PUBLIC,
+            'private' : INTERACTION_TYPES_PRIVATE
         }
-        print('Starting Conference "{}"'.format(message))
-        socketio.emit('start_conference', json.dumps(message), namespace='/bot', json=True)
-
+    }
+    print('Starting Conference "{}"'.format(message))
+    socketio.emit('start_conference', json.dumps(message), namespace='/bot', json=True)
 
 
 @socketio.on('disconnect', namespace='/bot')
 def handle_disconnect():
+    global bot_client
+
     print('Client disconnected')
-    bot_client = None
+    client = request.sid
+    if client == bot_client:
+        bot_client = None
 
 @socketio.on('received_message', namespace='/bot')
 def received_message(message):
+    global bot_client
     id = message['id']
     text = message['text']
     client = request.sid
-    print('received_message', client, id, text)
-
-    engine.feedEnginePublic(client, id, text)
+    if client == bot_client:
+        print('received_message', client, id, text)
+        engine.feedEnginePublic(id, text)
 
 @socketio.on('received_private_message', namespace='/bot')
 def received_private_message(message):
+    global bot_client
     id   = message['id']
     text = message['text']
-    ids  = message['ids']
     client = request.sid
-    print('received_private_message', client, id, text)
-
-    engine.feedEnginePrivate(client, id, text)
+    if client == bot_client:
+        print('received_private_message', client, id, text)
+        engine.feedEnginePrivate(id, text)
 
 
 #Engine
@@ -86,8 +93,15 @@ def handle_engine_connect():
 @socketio.on('disconnect', namespace='/engine')
 def handle_engine_disconnect():
     pass
+
 @socketio.on('set_interaction_engine', namespace='/engine')
 def set_interaction_engine(config):
     print('set_interaction_engine', config)
     engine.setup(config, send_message, send_private_message)
-    
+    socketio.emit('interaction_engine_changed', config)
+
+@socketio.on('set_interaction_engine_ids', namespace='/engine')
+def set_interaction_engine_ids(config):
+    print('set_interaction_engins_ids', config)
+    engine.set_ids(config)
+    socketio.emit('interaction_engine_changed', config)

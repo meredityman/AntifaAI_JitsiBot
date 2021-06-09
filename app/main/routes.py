@@ -6,8 +6,6 @@ import json
 
 MAP_DATA_PATH  = "app/data/incidents"
 
-
-
 @main.route('/')
 def bot():
     return render_template('bot.html')
@@ -24,6 +22,9 @@ def get_asset(name):
 def get_meetings():
     return render_template('meetings.html')
 
+@main.route('/map.jpg')
+def get_route():
+    return send_from_directory('static/var', 'map_latest.jpg')
 
 @main.route('/map-data.json')
 def get_map_data():
