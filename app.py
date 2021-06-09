@@ -11,6 +11,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--name" , default="DEBUG")
     parser.add_argument("--bname", default="Bot")
+    parser.add_argument("--aname", default="Avatar")
     parser.add_argument("--ping" , action="store_true")
     parser.add_argument("--debug" , action="store_true")
     args = parser.parse_args()

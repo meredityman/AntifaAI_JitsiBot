@@ -6,7 +6,20 @@ import json
 
 MAP_DATA_PATH  = "app/data/incidents"
 
+
+def getLink(link):
+    return 
+
 @main.route('/')
+def index():
+    links = [
+        {'href' : "bot"     , 'text' : 'Bot'   },
+        {'href' : "avatar"  , 'text' : 'Avatar'},
+        {'href' : "meetings", 'text' : 'MeetingLinks'}
+    ]
+    return render_template('index.html', links = links)
+
+@main.route('/bot')
 def bot():
     return render_template('bot.html')
 
