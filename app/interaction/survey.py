@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from .interaction import InteractionEngine
+from .interaction import SingleGeneratorEngine
 from ..horror import  draw_map
 #from ..horror import send_data
         
@@ -10,28 +10,37 @@ QUESTION_PATH = "app/interaction/survey.json"
 
 
 
-class Survey(InteractionEngine):
-    def setup(self):
-        self.reset()
 
-    def reset(self):
+class Survey(SingleGeneratorEngine):
+
+    def _setup(self):
+        pass
+
+    def _reset(self):
         self.loadQuestions()
-
         self.responses = {}
-        self.generator = self.surveyGenerator()
+        self.iterateGenerator()
 
-        self.iterateSurvey()
+    def _generator(self):
+        self.sendBroadcastMessage(self.intro)
 
-    def getResponse(self, id, text):
-        self.id   = id
-        self.text = text
-        self.iterateSurvey()
+        for qIndex in range(len(self.questions)):
 
-    def iterateSurvey(self):
-        try:
-            next(self.generator)
-        except StopIteration:
-            print("Survey Complete")
+            self.sendQuestion(qIndex)
+            yield
+
+            while True:
+                self.parseResponse(qIndex)
+
+                if self.questionAnswered(qIndex):
+                    break
+                else:
+                    yield
+
+            self.finalizeQuestion()
+
+        self.finalizeAllQuestions()
+
 
     def getQuestionText(self, qIndex):
         question = self.questions[qIndex]
@@ -98,25 +107,6 @@ class Survey(InteractionEngine):
 
 
 
-    def surveyGenerator(self):
-        self.sendBroadcastMessage(self.intro)
-
-        for qIndex in range(len(self.questions)):
-
-            self.sendQuestion(qIndex)
-            yield
-
-            while True:
-                self.parseResponse(qIndex)
-
-                if self.questionAnswered(qIndex):
-                    break
-                else:
-                    yield
-
-            self.finalizeQuestion()
-
-        self.finalizeAllQuestions()
 
     def getRoute(self, number = 4):
 

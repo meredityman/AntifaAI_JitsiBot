@@ -1,12 +1,17 @@
+from app.interaction.hatespeech import HateSpeech
 from .interaction import Echo
 from .gpt2 import GPT2
 from .survey import Survey
+from .incidents import Incidents
+from .hatespeech import HateSpeech
 
 interactionTypesPrivate = {
     'none'  : None,
     'echo'  : Echo,
     'gpt2'  : GPT2,
-    'survey': Survey
+    'survey': Survey,
+    'incidents': Incidents,
+    'hatespeech': HateSpeech
 }
 
 interactionTypesPublic = {

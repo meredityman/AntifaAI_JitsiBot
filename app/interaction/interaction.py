@@ -20,14 +20,93 @@ class InteractionEngine:
         else:
             print("No callback set")
 
-    def reset(self):
-        pass
-
-    def setup(self):
-        pass
 
     def getResponse(self, id, text):
+        return self._getResponse(id, text)
+
+    def reset(self):
+        self._reset()
+
+    def setup(self):
+        self._setup()
+
+    def _reset():
         raise NotImplementedError()
+
+    def _setup(self):
+        raise NotImplementedError()
+
+    def _getResponse(self, id, text):
+        raise NotImplementedError()
+
+
+class SingleGeneratorEngine(InteractionEngine):
+    def reset(self):
+        self.generator = self._generator()
+        self._reset()
+
+
+    def setup(self):
+        self.reset()
+        self._setup()
+
+    def iterateGenerator(self):
+        try:
+            next(self.generator)
+        except StopIteration:
+            print("Generator Complete")   
+
+
+    def _generator(self):
+        yield
+        raise NotImplementedError()
+
+    def _getResponse(self, id, text):
+        self.id   = id
+        self.text = text
+        self.iterateGenerator()
+
+
+
+class MultiGeneratorEngine(InteractionEngine):
+
+
+    def reset(self):
+        self.generators = {}
+        for id in self.ids:
+            self.generators[id] = self._generator()
+        self._reset()
+
+    def setup(self):
+        self.reset()
+        self._setup()
+
+    def iterateAllGenerators(self):
+        for id in self.ids:
+            try:
+                self.id = id
+                next(self.generators[id])
+            except StopIteration:
+                print(f"Generator {id} Complete")   
+
+    def iterateGenerator(self):
+        try:
+            next(self.generators[self.id])
+        except StopIteration:
+            print("Generator Complete")   
+        except NameError:
+            print("No id set")  
+
+
+    def _generator(self):
+        yield
+        raise NotImplementedError()
+
+    def _getResponse(self, id, text):
+        self.id   = id
+        self.text = text
+        self.iterateGenerator()
+
 
 
 class Echo(InteractionEngine):

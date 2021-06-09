@@ -27,12 +27,11 @@
   let isJoined   = false;
   let room       = null;
 
-  let bot_socketio    = io('/bot');
-  let engine_socketio = io('/engine');
+  let socketio = io();
   
   JitsiMeetJS.init();
       // Socket io callbacks
-  bot_socketio.on('connect', function() {
+  socketio.on('connect', function() {
     console.info('socket connected');
   });
   
@@ -49,7 +48,7 @@
 
     connection = new JitsiMeetJS.JitsiConnection(null, null, config);
 
-    bot_socketio.on('disconnect', function() {
+    socketio.on('disconnect', function() {
       console.info('socket disconnected');
       connection.disconnect();
     });
@@ -152,7 +151,7 @@
           var selectedInteractionPublic  = $(`input[name='public']:checked`).val()  || 'none';
           var selectedInteractionPrivate = $(`input[name='private']:checked`).val() || 'none';
 
-          engine_socketio.emit('set_interaction_engine',  {
+          socketio.emit('set_interaction_engine',  {
             'public-type': selectedInteractionPublic,
             'private-type': selectedInteractionPrivate,
             'ids': getSelectedUsers(),
@@ -161,13 +160,13 @@
 
         let publicMessages     = [ ]
 
-        bot_socketio.on('send_message', function(message) {
+        socketio.on('send_message', function(message) {
             console.info('send_message', message);
             room.sendTextMessage(message)
         });
 
 
-        bot_socketio.on('send_private_message', function(data) {
+        socketio.on('send_private_message', function(data) {
             console.info('send_private_message', data['id'], data['message']);
             room.sendPrivateTextMessage(data['id'], data['message'])
         });
@@ -177,7 +176,7 @@
             console.info('received_message', id, text, ts);
 
             if (room.myUserId() != id) { 
-              bot_socketio.emit('received_message',  {'id': id, 'text': text} );
+              socketio.emit('received_message',  {'id': id, 'text': text} );
             }
             
             publicMessages.push( {
@@ -201,7 +200,7 @@
             ids.splice(ids.indexOf(room.myUserId(), 1))
 
             if (room.myUserId() != id) { 
-              bot_socketio.emit('received_private_message',  {'id': id, 'ids': ids, 'text': text} );
+              socketio.emit('received_private_message',  {'id': id, 'ids': ids, 'text': text} );
             }
 
             if( id in participants){
@@ -263,7 +262,7 @@
 
   };
 
-  bot_socketio.on('start_conference', startJitsi);
+  socketio.on('start_conference', startJitsi);
 
   </script>
 

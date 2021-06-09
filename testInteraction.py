@@ -5,7 +5,9 @@ ids = [ 0 ]
 
 config = {
     'public-type': 'none',
-    'private-type': 'survey',
+    # 'private-type': 'hatespeech',
+    # 'private-type': 'survey',
+    'private-type': 'incidents',
     'ids': ids,
 } 
 

@@ -1,3 +1,4 @@
+from app.main.routes import bot
 import time
 import json
 from flask import request
@@ -9,25 +10,16 @@ from ..interaction.constants import *
 from app import interaction
 
 
-interactionEngines = {}
-clients = []
-
-def start_conference(message):
-    for client_id in clients:
-        socketio.emit('start_conference', json.dumps(message), json=True, room=client_id)
-        print('Starting Conference "{}" to client "{}".'.format(message, client_id))
+avatar_client = None
+bot_client   = None
 
 def send_message(message):
-    for client_id in clients:
-        socketio.emit('send_message', message, room=client_id)
-        print('sending message "{}" to client "{}".'.format(message, client_id))
-
+    socketio.emit('send_message', message, namespace='/bot')
+    print('sending message "{}"'.format(message))
 
 def send_private_message(id, message):
-    for client_id in clients:
-        print(f'sending private message "{message}" to user {id} on client "{client_id}".')
-        socketio.emit('send_private_message', { 'id' : id, 'message' : message}, room=client_id)
-
+    print(f'sending private message "{message}" to user {id}".')
+    socketio.emit('send_private_message', { 'id' : id, 'message' : message}, namespace='/bot')
 
 
 def send_date_time():
@@ -35,27 +27,38 @@ def send_date_time():
     send_message(date)
 
 
-@socketio.on('connect')
-def handle_connect():
+# Bot
+@socketio.on('connect', namespace='/bot')
+def handle_bot_connect():
+    global bot_client
+
     print('Client connected')
-    clients.append(request.sid)
 
-    start_conference({
-        'displayName'        : botName,
-        'conference'         : conferenceName,
-        'default-engine-config': DEFAULT_ENGINE_CONFIG,
-        'interaction-types'  : {
-            'public' : INTERACTION_TYPES_PUBLIC,
-            'private' : INTERACTION_TYPES_PRIVATE
+    client = request.sid
+    if client != bot_client:
+
+        bot_client = client
+
+        message = {
+            'displayName'        : botName,
+            'conference'         : conferenceName,
+            'default-engine-config': DEFAULT_ENGINE_CONFIG,
+            'interaction-types'  : {
+                'public'  : INTERACTION_TYPES_PUBLIC,
+                'private' : INTERACTION_TYPES_PRIVATE
+            }
         }
-    })
+        print('Starting Conference "{}"'.format(message))
+        socketio.emit('start_conference', json.dumps(message), namespace='/bot', json=True)
 
-@socketio.on('disconnect')
+
+
+@socketio.on('disconnect', namespace='/bot')
 def handle_disconnect():
     print('Client disconnected')
-    clients.remove(request.sid)
+    bot_client = None
 
-@socketio.on('received_message')
+@socketio.on('received_message', namespace='/bot')
 def received_message(message):
     id = message['id']
     text = message['text']
@@ -64,8 +67,7 @@ def received_message(message):
 
     engine.feedEnginePublic(client, id, text)
 
-
-@socketio.on('received_private_message')
+@socketio.on('received_private_message', namespace='/bot')
 def received_private_message(message):
     id   = message['id']
     text = message['text']
@@ -76,8 +78,15 @@ def received_private_message(message):
     engine.feedEnginePrivate(client, id, text)
 
 
+#Engine
+@socketio.on('connect', namespace='/engine')
+def handle_engine_connect():
+    pass
 
-@socketio.on('set_interaction_engine')
+@socketio.on('disconnect', namespace='/engine')
+def handle_engine_disconnect():
+    pass
+@socketio.on('set_interaction_engine', namespace='/engine')
 def set_interaction_engine(config):
     print('set_interaction_engine', config)
     engine.setup(config, send_message, send_private_message)
