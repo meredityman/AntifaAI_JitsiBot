@@ -8,7 +8,7 @@ class InteractionEngine:
 
     def sendBroadcastMessage(self, message):
         if self.broadcastCallback:
-            print(f"Sending broadcase message to {id}/n'{message}'")
+            print(f"Sending broadcase message/n'{message}'")
             self.broadcastCallback(message)
         else:
             print("No broadcast callback set")
