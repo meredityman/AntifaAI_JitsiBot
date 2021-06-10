@@ -2,9 +2,9 @@ import json
 import numpy as np
 from .interaction import SingleGeneratorEngine
 from ..utils.make_map import draw_map
-from ..utils.cuemanager import send_data
+from ..utils.cuemanager import send_cue
 
-OUTPUT_MAP_PATH  = "app/static/map_latest.jpg"
+OUTPUT_MAP_PATH  = "app/var/map_latest.jpg"
 
 QUESTION_PATH = "app/interaction/survey.json"
 
@@ -97,7 +97,7 @@ class Survey(SingleGeneratorEngine):
         route = self.getRoute()
         message = f"{' -> '.join(route)}"
 
-        send_data("map-decision", message)
+        send_cue("map-decision", message)
 
         self.sendBroadcastMessage(message)
 

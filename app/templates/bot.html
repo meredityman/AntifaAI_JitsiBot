@@ -39,7 +39,7 @@
 
   
     bot_socketio.on('start_conference', function(data) {
-      console.info(data);
+      console.info("data", data);
 
       callConfig = JSON.parse(data);
       const displayName               = callConfig['displayName'];
@@ -53,6 +53,8 @@
       let room       = null;
 
       JitsiMeetJS.init();
+
+      console.info("connecting...", config)
 
       connection = new JitsiMeetJS.JitsiConnection(null, null, config);
 
@@ -69,8 +71,9 @@
         room.join();
 
         function onConferenceJoined() {
-          // engine_socketio.emit( 'set_interaction_engine_ids', {'ids': getSelectedUsers()})
+          console.info('Console Joined!')
 
+          //engine_socketio.emit( 'set_interaction_engine_ids', {'ids': getSelectedUsers()})
           let participants = room.getParticipants();
           console.log(participants);
           let userList = new UserList($('#user-list'), participants, setInteractionEngineIds );
@@ -130,13 +133,6 @@
             }).get();
             console.log(ids);
             return ids
-          }
-
-
-
-          function setupMessageView(){
-
-            }
           }
 
           let publicMessages     = [ ];
@@ -273,7 +269,9 @@
   <div id="main">
     <div id="row1" class="row">
       <div class="col-md-4">
-        <a id="meeting-link" href="" target="_blank">Meeting Link</a>
+        <div id="meeting-details">
+          <a id="meeting-link" href="" target="_blank">Meeting Link</a>
+        </div>
       </div>
       <div class="col-md-4">
         <h2>Users</h2>

@@ -1,4 +1,15 @@
 
+class MeetingDetails{
+  constructor(element, meetingLink){
+    this.element      = element;
+    self.uptime = null;
+
+    this.element.find("#meeting-link").attr("href", meetingLink)
+
+  }
+}
+
+
 
 class EventSelector{
 
@@ -18,15 +29,16 @@ class EventSelector{
           }
       });
       this.element.append(button);
+    }
   }
-}
+};
 
 class InteractionSelector{
   constructor(element){
     this.element      = element;
   }
 
-}
+};
 
 class MessageList{
   constructor(element){
@@ -41,7 +53,7 @@ class MessageList{
 
   }
 
-}
+};
 
 class UserList {
   constructor(element, participants, selectionChangedCallback) {

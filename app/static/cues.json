@@ -1,16 +1,4 @@
 {
-    "cues" : [
-        "morse-switch-on",
-        "morse-switch-off",   
-        "morse-message-begin",
-        "morse-message-end",
-        "map-idle",
-        "map-moving-to-point",
-        "map-fit-data",
-        "map-focus-idle",
-        "map-moving-to-idle",
-        "map-decision"
-    ],
     "targets": {
         "target-sound": {
             "ip"   : "192.168.0.193",
