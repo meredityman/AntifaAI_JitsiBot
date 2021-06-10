@@ -1,7 +1,6 @@
 import json
 import numpy as np
 from .interaction import MultiGeneratorEngine
-from ..horror import  draw_map
 from validator_collection import validators
 from pathlib import PurePath
 import time
@@ -9,8 +8,6 @@ import json
 import googlemaps
 from pyproj import Transformer
 
-#from ..horror import send_data
-        
 OUTPUT_PATH  = "app/data/incidents"
 API_KEY = "AIzaSyAQZQllaEBGRi42pB0YU7nX9hsf_wArSJI"
 

@@ -69,40 +69,19 @@
         room.join();
 
         function onConferenceJoined() {
-          function removeUser(id, displayName){
-            console.log("Removing user " + id);
-            delete participants[id];
-            $('#user-btn-' + id).parent().remove();
+          // engine_socketio.emit( 'set_interaction_engine_ids', {'ids': getSelectedUsers()})
+
+          function setupUsersMenu(){
+            room.getParticipants().map( function(user){
+              addUser(user['_id'], user['_displayName']);
+            });
           }
 
-          function addUser(id, displayName){
-            participants[id] = {
-              'displayName' : displayName,
-              'messages' : [],
-              'color'    : "",
-              'selected' : false
-            };
+          let participants = room.getParticipants();
+          console.log(participants);
+          let userList = new UserList($('#user-list'), participants, setInteractionEngineIds );
 
-            var button = $('<button/>', {
-                text: displayName + " (" + id + ")", 
-                id: 'user-btn-' + id,
-                class : 'user-btn',
-                click: function () { 
-                  if(id in participants){
-                    participants[id]['selected'] = !participants[id]['selected']
-                    $( this ).toggleClass( "selected" );
 
-                    engine_socketio.emit( 'set_interaction_engine_ids', {'ids': getSelectedUsers()})
-                  } else {
-                    console.error("No participant for button (" + id +")");
-                    console.error(participants);
-                  }
-                }
-            }).wrap('<li class="list-group-item"></li>').parent();
-            $('#user-list').append(button);
-
-            $('#messages').append(`<div class="message-list" id="${'messages-' + id}"></div>`);
-          }
 
           function setInteractionEngine(){
             var selectedInteractionPublic  = $(`input[name='public']:checked`).val()  || 'none';
@@ -152,17 +131,10 @@
               return id;
             }).get();
             console.log(ids);
-
-            ids.filter( item => item != room.myUserId());
             return ids
           }
 
-          function setupUsersMenu(){
-            addUser(room.myUserId(), displayName);
-            room.getParticipants().forEach( function(user){
-              addUser(user['_id'], user['_displayName']);
-            });
-          }
+
 
           function setupMessageView(){
             for (const [name, value] of Object.entries(messageEvents)) {
@@ -182,7 +154,6 @@
           }
 
           let publicMessages     = [ ];
-          let participants       = {};
 
           bot_socketio.on('send_message', function(message) {
               console.info('send_message', message);
@@ -237,7 +208,8 @@
           room.on( JitsiMeetJS.events.conference.PRIVATE_MESSAGE_RECEIVED, (id, text, ts) => {
               console.info('received_private_message', id,  text, ts);
 
-    
+              //$('#messages').append(`<div class="message-list" id="${'messages-' + id}"></div>`);
+
               let ids = Object.keys(participants);
               ids.splice(ids.indexOf(room.myUserId(), 1))
 
@@ -308,10 +280,7 @@
 
       connection.connect();
     });
-
   });
-
-
 
   </script>
   
@@ -322,7 +291,7 @@
       </div>
       <div class="col-md-4">
         <h2>Users</h2>
-        <ul id="user-list"></ul>
+        <div id="user-list"></div>
       </div>
       <div class="col-md-4">
         <div id="event-list"></div>

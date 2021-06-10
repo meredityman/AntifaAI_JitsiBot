@@ -8,8 +8,7 @@ from numpy import random
 
 
 
-BASE_MAP_PATH    = "resources/horror.png"
-
+BASE_MAP_PATH    = "data/maps/horror.png"
 
 all_stations = {
     "Questionaire"  : (  35,  40),

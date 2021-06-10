@@ -5,7 +5,7 @@ import uuid
 import json
 import os
 
-from . import cue_sheet
+cue_sheet  = json.load(open("app/static/cues.json", "r"))
 
 osc_channels = {}
 osc_startup()
