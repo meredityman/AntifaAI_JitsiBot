@@ -1,5 +1,48 @@
 
 
+class EventSelector{
+
+  constructor(element){
+    this.element      = element;
+
+    for (const [name, value] of Object.entries(messageEvents)) {
+      console.info(name, value);
+      var button = $('<button/>', {
+          text: name, 
+          id: 'btn_'+ name.replace(/ /g,"_"),
+          click: function () { 
+            if(value['target'] == 'all'){
+              console.info(value['message']);
+              room.sendTextMessage(value['message']);
+            }
+          }
+      });
+      this.element.append(button);
+  }
+}
+
+class InteractionSelector{
+  constructor(element){
+    this.element      = element;
+  }
+
+}
+
+class MessageList{
+  constructor(element){
+    this.element      = element;
+    this.publicMessages = [];
+    this.privateMessage = {};
+
+    
+  };
+
+  addPublicMessage(id, displayName, message){
+
+  }
+
+}
+
 class UserList {
   constructor(element, participants, selectionChangedCallback) {
       this.element      = element;

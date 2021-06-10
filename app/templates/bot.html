@@ -71,17 +71,15 @@
         function onConferenceJoined() {
           // engine_socketio.emit( 'set_interaction_engine_ids', {'ids': getSelectedUsers()})
 
-          function setupUsersMenu(){
-            room.getParticipants().map( function(user){
-              addUser(user['_id'], user['_displayName']);
-            });
-          }
-
           let participants = room.getParticipants();
           console.log(participants);
           let userList = new UserList($('#user-list'), participants, setInteractionEngineIds );
 
+          let messageList = new MessageList();
+  
+          let interactionSelector = new InteractionSelector();
 
+          let eventSelector = new EventSelector($('#event-list'));
 
           function setInteractionEngine(){
             var selectedInteractionPublic  = $(`input[name='public']:checked`).val()  || 'none';
@@ -137,19 +135,7 @@
 
 
           function setupMessageView(){
-            for (const [name, value] of Object.entries(messageEvents)) {
-              console.info(name, value);
-              var button = $('<button/>', {
-                  text: name, 
-                  id: 'btn_'+ name.replace(/ /g,"_"),
-                  click: function () { 
-                    if(value['target'] == 'all'){
-                      console.info(value['message']);
-                      room.sendTextMessage(value['message']);
-                    }
-                  }
-              });
-              $('#event-list').append(button);
+
             }
           }
 
