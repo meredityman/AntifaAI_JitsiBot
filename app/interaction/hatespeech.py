@@ -31,13 +31,14 @@ class HateSpeech(InteractionEngine):
         return loss, probabilities
 
 
-    def getResponse(self, id, text):
-        loss, probabilities = self.forward(text)
+    def _getResponse(self, id, text, isPublic):
+        if not isPublic:
+            loss, probabilities = self.forward(text)
 
-        prediction = LABELS[np.argmax(probabilities)]
-        certainty = np.max(probabilities)
-        
+            prediction = LABELS[np.argmax(probabilities)]
+            certainty = np.max(probabilities)
+            
 
-        response = f"Classified as: {prediction} ({certainty:.0%})"
+            response = f"Classified as: {prediction} ({certainty:.0%})"
 
-        self.sendMessage(id, response)
+            self.sendMessage(id, response)

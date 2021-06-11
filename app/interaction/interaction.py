@@ -21,8 +21,11 @@ class InteractionEngine:
             print("No callback set")
 
 
-    def getResponse(self, id, text):
-        return self._getResponse(id, text)
+    def getResponsePublic(self, id, text):
+        return self._getResponse(id, text, True)
+
+    def getResponsePrivate(self, id, text):
+        return self._getResponse(id, text, False)
 
     def reset(self):
         self._reset()
@@ -36,7 +39,7 @@ class InteractionEngine:
     def _setup(self):
         raise NotImplementedError()
 
-    def _getResponse(self, id, text):
+    def _getResponse(self, id, text, isPublic):
         raise NotImplementedError()
 
 
@@ -61,10 +64,11 @@ class SingleGeneratorEngine(InteractionEngine):
         yield
         raise NotImplementedError()
 
-    def _getResponse(self, id, text):
-        self.id   = id
-        self.text = text
-        self.iterateGenerator()
+    def _getResponse(self, id, text, isPublic):
+        if not isPublic:
+            self.id   = id
+            self.text = text
+            self.iterateGenerator()
 
 
 
@@ -102,13 +106,17 @@ class MultiGeneratorEngine(InteractionEngine):
         yield
         raise NotImplementedError()
 
-    def _getResponse(self, id, text):
-        self.id   = id
-        self.text = text
-        self.iterateGenerator()
+    def _getResponse(self, id, text, isPublic):
+        if not isPublic:
+            self.id   = id
+            self.text = text
+            self.iterateGenerator()
 
 
 
 class Echo(InteractionEngine):
-    def getResponse(self, id, text):
-        self.callback(text)
+    def _getResponse(self, id, text, isPublic):
+        if isPublic:
+            self.broadcastCallback(text)
+        else:
+            self.callback(text)
