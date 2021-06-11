@@ -170,6 +170,27 @@
                     "score"  : 0.5
                 }
             ]
+        },           {
+            "prompt" : "Nach Jahrelangen rechtsextremen Skandalen in der Bundeswehr fanden Ermittlungen bei dem KSK (Kommando - Spezialkräfte) der Bundeswehr statt. Was haben die Ermittlungen ergeben? ",
+            "metric"    : "knowledge",
+            "choices"  : [
+                {
+                    "option" : "48.000 Schuss Munition fehlten.",
+                    "score"  : 0.5
+                },
+                {
+                    "option" : "62 Kilogramm Sprengstoff waren verschwunden.",
+                    "score"  : 0.5
+                },
+                {
+                    "option" : "37.000 Schuss Muniton konnten nicht zugeordnet werden.",
+                    "score"  : 0.5
+                },
+                {
+                    "option" : "All of the above.",
+                    "score"  : 1.0
+                }
+            ]
         }
 
 
