@@ -1,10 +1,22 @@
+String.prototype.hashCode = function() {
+  var hash = 0;
+  if (this.length == 0) {
+      return hash;
+  }
+  for (var i = 0; i < this.length; i++) {
+      var char = this.charCodeAt(i);
+      hash = ((hash<<5)-hash)+char;
+      hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash;
+}
 
 class MeetingDetails{
-  constructor(element, meetingLink){
+  constructor(element, meetingUrl){
     this.element      = element;
-    self.uptime = null;
+    this.uptime = null;
 
-    this.element.find("#meeting-link").attr("href", meetingLink)
+    this.element.find("#meeting-link").attr("href", meetingUrl)
 
   }
 }
@@ -13,9 +25,8 @@ class MeetingDetails{
 
 class EventSelector{
 
-  constructor(element){
+  constructor(element, sendPublicMessageCallback){
     this.element      = element;
-
     for (const [name, value] of Object.entries(messageEvents)) {
       console.info(name, value);
       var button = $('<button/>', {
@@ -24,7 +35,7 @@ class EventSelector{
           click: function () { 
             if(value['target'] == 'all'){
               console.info(value['message']);
-              room.sendTextMessage(value['message']);
+              sendPublicMessageCallback(value['message']);
             }
           }
       });
@@ -34,82 +45,170 @@ class EventSelector{
 };
 
 class InteractionSelector{
-  constructor(element){
+  constructor(element, interactionList, setInteractionEngine){
     this.element      = element;
+    this.setInteractionEngine = setInteractionEngine;
+
+    interactionList.forEach( (interactionName) => {
+
+      var button = $('<button/>', {
+        text: interactionName, 
+        id: 'btn-' + interactionName,
+        click: function () { 
+          setInteractionEngine(interactionName);
+          this.attr('class', 'selected');
+        }
+      });
+      
+      this.element.append(button);
+    });  
+
   }
 
+  
 };
 
 class MessageList{
-  constructor(element){
+  constructor(element, ownUid){
     this.element      = element;
+    this.ownUid = ownUid;
     this.publicMessages = [];
-    this.privateMessage = {};
+    this.privateMessages = {};
 
-    
+
+    this.publicMessageElement  = $(`<div id="public-messages"></div>`).appendTo(element);
+    this.privateMessageElement = $(`<div id="private-messages"></div>`).appendTo(element);
   };
 
-  addPublicMessage(id, displayName, message){
+  addPublicMessage(uid, displayName, message){
+
+    this.publicMessages.push({
+      'uid'  : uid,
+      'text' : message
+    });
+
+    this.publicMessageElement.append(`<p class="message">${displayName} - ${message}</p>`);
+  };
+
+  addPrivateMessage(uid, displayName, message){
+    if(!(uid in this.privateMessages)){
+      this.privateMessages[uid] = [];
+    }
+
+    this.privateMessages[uid].push( {
+      'uid'  : uid,
+      'text' : message
+    });
+
+    let messageEl = $('#private-messages-' + uid);
+    if(!messageEl.length){
+      messageEl = $(`<div id="${'#private-messages-' + uid}"></div>`).appendTo(this.privateMessageElement);
+    }
+    messageEl.append(`<p class="message">${displayName} - ${message}</p>`);
 
   }
+
+  // addPrivateReply(uid, displayName, message, ts){
+
+  //   if(uid != this.ownUid){
+  //     this.privateMessages[uid] = {};
+  //   }
+  //   let hash = (uid+ts).hashCode();
+
+  //   if (!(hash in this.privateMessages)){
+
+  //     this.privateMessages[uid][hash] = {
+  //       'uid'   : this.ownUid,
+  //       'text' : text,
+  //       'ts'   : ts
+  //     };
+
+  //     let messageEl = this.publicMessageElement.find('#messages-' + uid);
+  //     if(!messageEl.length){
+  //       this.publicMessageElement.append(messageEl)
+  //     }
+
+  //     messageEl.append(`<p class="message">${displayName} - ${message}</p>`);
+  //   }
+  // }
 
 };
 
 class UserList {
   constructor(element, participants, selectionChangedCallback) {
-      this.element      = element;
+      this.element      = element
       this.selectionChangedCallback = selectionChangedCallback;
+      this.selectedUids = new Set();
 
 
-      this.participants = participants;
-
-      this.listEl = $('<ul id="user-list-ul"></ul>');
+      // this.participants = Object.assign({}, ...participants.map((x) => ({[x._id]: x})));
+      this.participants = {};
+      this.listEl = $('<ul id="element-list-ul"></ul>');
       this.element.append(this.listEl);
-
-      this.participants.array.forEach(element => {
-        let button = this.addButton(element.displayName, element.id, element.selected);
-        button = button.wrap('<li class="list-group-item"></li>').parent();
-        this.listEl.append(button);
+      Object.values(participants).forEach(user => {
+        this.addUser(user);
       });
 
   };
 
-  addButton(displayName, uid, selected){
-    let text = displayName + " (" + uid + ")";
-    let id = 'user-btn-' + uid
+  getSelectedIds(){
+    return Array.from(this.selectedUids);
+  }
+
+
+  addButton(element){
+    let uid = element._id
+    let text = element._displayName + " (" + uid + ")";
+    let id = 'element-btn-' + uid;
+
+    let userList = this;
 
     function callback(){
-        if(id in self.participants){
-            participants[id]['selected'] = !participants[uid]['selected']
-            $( this ).toggleClass( "selected" );
-            self.selectionChangedCallback( {'ids': getSelectedUsers()});
-        } else {
-            console.error("No participant for button (" + uid +")");
-            console.error(participants);
-        };
+      userList.participants[uid]['selected'] = !userList.participants[uid]['selected']
+      $( this ).toggleClass( "selected" );
+
+      if(userList.participants[uid]['selected']){
+        userList.selectedUids.add(uid);
+      } else {
+        userList.selectedUids.delete(uid);
+      }
+      userList.selectionChangedCallback(userList.getSelectedIds());
     }
 
     return $('<button/>', {
         text: text, 
         id: id,
-        class : 'user-btn',
+        class : 'element-btn',
         click: callback
     });
   }
 
-  addUser( user, displayName, selected = false){
-    console.log("Adding user " + id);
-    participants[id] = {
-        'displayName' : displayName,
-        'messages' : [],
-        'selected' : selected
-      };
+  addUser( user, selected = false){
+    console.log("Adding element " + user._id);
+    user['selected'] = selected;
+    this.participants[user._id] = user;
+
+    let button = this.addButton(user);
+    button = button.wrap('<li class="list-group-item"></li>').parent();
+    this.listEl.append(button);
   };
 
   removeUser( user){
-    console.log("Removing user " + id);
-    delete participants[id];
-    $('#user-btn-' + id).parent().remove();
+    console.log("Removing element " + user._id);
+    delete this.participants[user._id];
+    this.listEl.find('#element-btn-' + user._id).parent().remove();
+
+    if(this.selectedUids.delete(user._id)){
+      this.selectionChangedCallback(this.selectedUids);
+    };
   };
+
+  getDisplayName(uid){
+    if( uid in this.participants){
+      return this.participants[uid]._displayName;  
+    } else {
+      return null
+    }
+  }
 
 };

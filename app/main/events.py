@@ -46,11 +46,9 @@ def handle_bot_connect():
         'displayName'        : botName,
         'conference'         : conferenceName,
         'default-engine-config': DEFAULT_ENGINE_CONFIG,
-        'interaction-types'  : {
-            'public'  : INTERACTION_TYPES_PUBLIC,
-            'private' : INTERACTION_TYPES_PRIVATE
-        }
+        'types'  :  INTERACTION_TYPES
     }
+
     print('Starting Conference "{}"'.format(message))
     socketio.emit('start_conference', json.dumps(message), namespace='/bot', json=True)
 
@@ -67,7 +65,7 @@ def handle_disconnect():
 @socketio.on('received_message', namespace='/bot')
 def received_message(message):
     global bot_client
-    id = message['id']
+    id = message['uid']
     text = message['text']
     client = request.sid
     if client == bot_client:
@@ -77,7 +75,7 @@ def received_message(message):
 @socketio.on('received_private_message', namespace='/bot')
 def received_private_message(message):
     global bot_client
-    id   = message['id']
+    id   = message['uid']
     text = message['text']
     client = request.sid
     if client == bot_client:

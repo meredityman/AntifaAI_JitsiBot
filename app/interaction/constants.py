@@ -6,7 +6,7 @@ from .incidents import Incidents
 from .hatespeech import HateSpeech
 from .telegram import Telegram
 
-interactionTypesPrivate = {
+interactionTypes = {
     'none'      : None,
     'echo'      : Echo,
     'gpt2'      : GPT2,
@@ -16,17 +16,12 @@ interactionTypesPrivate = {
     'telegram'  : Telegram
 }
 
-interactionTypesPublic = {
-    'none'  : None,
-    'echo'  : Echo,
-}
 
-INTERACTION_TYPES_PUBLIC  = list(interactionTypesPublic.keys())
-INTERACTION_TYPES_PRIVATE = list(interactionTypesPrivate.keys())
+
+INTERACTION_TYPES = list(interactionTypes.keys())
 
 DEFAULT_ENGINE_CONFIG = {
     'ids' : [],
-    'private-type': 'none',
-    'public-type': 'none'
+    'type': 'none',
 }
 
