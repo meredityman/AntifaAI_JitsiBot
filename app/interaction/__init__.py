@@ -11,15 +11,21 @@ class Engine():
         self.publicInteractionType    = None
         self.setup(DEFAULT_ENGINE_CONFIG)
     
+    def set_ids(self, args):
+        self.ids = args['ids']   
+
+        if self.publicInteractionEngine:
+            self.publicInteractionEngine  = self.ids
+            
+        if self.privateInteractionEngine:
+            self.privateInteractionEngine = self.ids
+
     def setup(self, args, publicSendCallback = None, privateSendCallback = None):
         print(args)
 
-        self.publicSendCallback  = publicSendCallback  
-        self.privateSendCallback = privateSendCallback 
-
         requestedPublicType  = args['public-type']
         requestedPrivateType = args['private-type']
-        ids = args['ids']
+        self.ids = args['ids']
 
         print(f"Requesting public {requestedPublicType}")
         print(f"Requesting private {requestedPrivateType}")
@@ -52,7 +58,7 @@ class Engine():
                     print(f"Creating private Engine - {requestedPrivateType}")
                     c = interactionTypesPrivate[requestedPrivateType]
                     if c:
-                        self.privateInteractionEngine = c(callback = privateSendCallback,  broadcastCallback = publicSendCallback, ids = ids)
+                        self.privateInteractionEngine = c(callback = privateSendCallback,  broadcastCallback = publicSendCallback, ids = self.ids)
                     else:
                         self.privateInteractionEngine = None
 
@@ -63,14 +69,14 @@ class Engine():
 
 
 
-    def feedEnginePublic(self, client, id, text):
+    def feedEnginePublic(self, id, text):
         if self.publicInteractionEngine is not None:
             self.publicInteractionEngine.getResponse(id, text)
         else:
             print(f"No engine for public message from {id}")
 
 
-    def feedEnginePrivate(self, client, id, text):
+    def feedEnginePrivate(self, id, text):
         if self.privateInteractionEngine is not None:
             self.privateInteractionEngine.getResponse(id, text)
         else:

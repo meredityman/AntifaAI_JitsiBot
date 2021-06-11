@@ -5,13 +5,11 @@ import atexit
 
 socketio = SocketIO()
 
-botName        = ""
-
 def create_app(args):
     global conferenceName, botName
-    
     conferenceName = args.uuid
     botName        = args.bname
+    avName         = args.aname
 
 
     app = Flask( __name__ )

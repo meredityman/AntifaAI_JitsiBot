@@ -16,4 +16,4 @@ class GPT2(InteractionEngine):
 
     def getResponse(self, id, text):
         response = self.pipe(text, max_length=100)[0]["generated_text"]
-        self.sendMessage(response)
+        self.sendMessage(id, response)

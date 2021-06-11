@@ -16,280 +16,330 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <script src="https://meet.cobratheatercobra.com/libs/lib-jitsi-meet.min.js"></script>
   <script src="static/config.js"></script>
+  <script src="static/utils.js"></script>
   <script src="static/events.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
   
  
   <link rel="stylesheet" href="static/style.css"></link> 
+
   <script type="text/javascript" charset="utf-8">
 
-  let connection = null;
-  let isJoined   = false;
-  let room       = null;
 
-  let socketio = io();
-  
-  JitsiMeetJS.init();
-      // Socket io callbacks
-  socketio.on('connect', function() {
-    console.info('socket connected');
-  });
-  
-  function startJitsi(data) {
-    console.info(data);
-    callConfig = JSON.parse(data);
-    const displayName = callConfig['displayName'];
-    const meetingName = callConfig['conference'].toLowerCase();
-    const availableInteractionTypes = callConfig['interaction-types'];
+  $(document).ready( function(){
 
-    let selectedId = callConfig['default-engine-config']['ids']
+    let bot_socketio    = io('/bot');
+    let engine_socketio = io('/engine');
 
-    meetingUrl = 'https://' + config['hosts']['domain'] + '/' + meetingName;
+    // Socket io callbacks
 
-    connection = new JitsiMeetJS.JitsiConnection(null, null, config);
-
-    socketio.on('disconnect', function() {
-      console.info('socket disconnected');
-      connection.disconnect();
+    bot_socketio.on('connect', function() {
+      console.info('socket connected');
     });
-      
 
-    function startConference(){
+  
+    bot_socketio.on('start_conference', function(data) {
+      console.info(data);
 
-      room = connection.initJitsiConference(meetingName, config);
-      room.setDisplayName(displayName)
-      room.join();
+      callConfig = JSON.parse(data);
+      const displayName               = callConfig['displayName'];
+      const meetingName               = callConfig['conference'].toLowerCase();
+      const availableInteractionTypes = callConfig['interaction-types'];
 
-      function onConferenceJoined() {
-        console.info('onConferenceJoined');
+      let selectedId = callConfig['default-engine-config']['ids']
 
-        $('#meeting-link').attr("href", meetingUrl);
+      let meetingUrl = 'https://' + config['hosts']['domain'] + '/' + meetingName;
+      let connection = null;
+      let room       = null;
 
-    
-        // Setup message events
-        for (const [name, value] of Object.entries(messageEvents)) {
-          console.info(name, value);
-          var button = $('<button/>', {
-              text: name, 
-              id: 'btn_'+ name.replace(/ /g,"_"),
-              click: function () { 
-                if(value['target'] == 'all'){
-                  console.info(value['message']);
-                  room.sendTextMessage(value['message']);
+      JitsiMeetJS.init();
+
+      connection = new JitsiMeetJS.JitsiConnection(null, null, config);
+
+      function disconnect(){
+        bot_socketio.disconnect();
+        engine_socketio.disconnect();
+        connection.disconnect();
+        $("#main").html('<h1>Disconnected</h1>');
+      }
+
+      function startConference(){ 
+        room = connection.initJitsiConference(meetingName, config);
+        room.setDisplayName(displayName)
+        room.join();
+
+        function onConferenceJoined() {
+          function removeUser(id, displayName){
+            console.log("Removing user " + id);
+            delete participants[id];
+            $('#user-btn-' + id).parent().remove();
+          }
+
+          function addUser(id, displayName){
+            participants[id] = {
+              'displayName' : displayName,
+              'messages' : [],
+              'color'    : "",
+              'selected' : false
+            };
+
+            var button = $('<button/>', {
+                text: displayName + " (" + id + ")", 
+                id: 'user-btn-' + id,
+                class : 'user-btn',
+                click: function () { 
+                  if(id in participants){
+                    participants[id]['selected'] = !participants[id]['selected']
+                    $( this ).toggleClass( "selected" );
+
+                    engine_socketio.emit( 'set_interaction_engine_ids', {'ids': getSelectedUsers()})
+                  } else {
+                    console.error("No participant for button (" + id +")");
+                    console.error(participants);
+                  }
                 }
-              }
-          });
-          $('#event-list').append(button);
-        }
+            }).wrap('<li class="list-group-item"></li>').parent();
+            $('#user-list').append(button);
 
-        // Init participants
-        let participants = {}
+            $('#messages').append(`<div class="message-list" id="${'messages-' + id}"></div>`);
+          }
 
-        function removeUser(id, displayName){
-          delete participants[id];
-          $('#user-btn-' + id).parent().remove();
-          $('messages-' + id).remove();
-        }
+          function setInteractionEngine(){
+            var selectedInteractionPublic  = $(`input[name='public']:checked`).val()  || 'none';
+            var selectedInteractionPrivate = $(`input[name='private']:checked`).val() || 'none';
 
-        function addUser(id, displayName){
-          participants[id] = {
-            'displayName' : displayName,
-            'messages' : [],
-            'color'    : "",
-            'selected' : false
+            engine_socketio.emit('set_interaction_engine',  {
+              'public-type': selectedInteractionPublic,
+              'private-type': selectedInteractionPrivate,
+              'ids': getSelectedUsers(),
+            }); 
+          }
+
+          function setInteractionEngineIds(){
+            var selectedInteractionPublic  = $(`input[name='public']:checked`).val()  || 'none';
+            var selectedInteractionPrivate = $(`input[name='private']:checked`).val() || 'none';
+          }
+
+          function setupInteractionTypes( name, list) {
+            var divEl = $(`<div id=${'#interaction-list-' + name}/>`).appendTo('#interaction-lists')
+
+            divEl.append(`<span class='inline-label'>${name}: </span>`)
+
+            list.forEach( (interactionName) => {
+              var label = divEl.append(`<label></label>`);
+              label.append( $('<input/>', {
+                type  : "radio",
+                name  : name,
+                value : interactionName,
+                id    : 'input-' + interactionName + '-' + name
+              }));
+              label.append(`${interactionName}`);
+            });    
           };
 
-          var button = $('<button/>', {
-              text: displayName + " (" + id + ")", 
-              id: 'user-btn-' + id,
-              click: function () { 
-                if(id in participants){
-                  participants[id]['selected'] = !participants[id]['selected']
-                  $( this ).toggleClass( "selected" );
-                  console.error("No participant for button (" + id +")");
-                  console.error(participants);
-                }
-              }
-          }).wrap('<li class="list-group-item"></li>');
-          $('#user-list').append(button);
+          function setupInteractionMenu(){
+            setupInteractionTypes( 'public' , availableInteractionTypes['public'] );
+            setupInteractionTypes( 'private', availableInteractionTypes['private']);
+            $('#interaction-submit').click( setInteractionEngine);
+          }
 
-          $('#messages').append(`<div class="message-list" id="${'messages-' + id}"></div>`);
-        }
-
-        addUser(room.myUserId(), displayName);
-        room.getParticipants().forEach( function(user){
-          addUser(user['_id'], user['_displayName']);
-        });
-
-        // Setup interactions
-        function setupInteractionTypes( name, list) {
-          var divEl = $(`<div id=${'#interaction-list-' + name}/>`).appendTo('#interaction-lists')
-
-          divEl.append(`<span class='inline-label'>${name}: </span>`)
-
-          list.forEach( (interactionName) => {
-            var label = divEl.append(`<label></label>`);
-            label.append( $('<input/>', {
-              type  : "radio",
-              name  : name,
-              value : interactionName,
-              id    : 'input-' + interactionName + '-' + name
-            }));
-            label.append(`${interactionName}`);
-          });    
-        };
-
-        setupInteractionTypes( 'public' , availableInteractionTypes['public'] );
-        setupInteractionTypes( 'private', availableInteractionTypes['private']);
-
-        function getSelectedUsers(){
-          let users = Object.keys(participants).filter( item => item != room.myUserId());
-          return users
-        }
-
-        $('#interaction-submit').click( function() {
-          var selectedInteractionPublic  = $(`input[name='public']:checked`).val()  || 'none';
-          var selectedInteractionPrivate = $(`input[name='private']:checked`).val() || 'none';
-
-          socketio.emit('set_interaction_engine',  {
-            'public-type': selectedInteractionPublic,
-            'private-type': selectedInteractionPrivate,
-            'ids': getSelectedUsers(),
-          }); 
-        });
-
-        let publicMessages     = [ ]
-
-        socketio.on('send_message', function(message) {
-            console.info('send_message', message);
-            room.sendTextMessage(message)
-        });
-
-
-        socketio.on('send_private_message', function(data) {
-            console.info('send_private_message', data['id'], data['message']);
-            room.sendPrivateTextMessage(data['id'], data['message'])
-        });
-
-        // Socket io callbacks
-        room.on( JitsiMeetJS.events.conference.MESSAGE_RECEIVED, (id, text, ts) => {
-            console.info('received_message', id, text, ts);
-
-            if (room.myUserId() != id) { 
-              socketio.emit('received_message',  {'id': id, 'text': text} );
-            }
+          function getSelectedUsers(){
+            let buttons = $( "#user-list" ).find('button.selected');
             
-            publicMessages.push( {
-              'id'   : id,
-              'text' : text,
-              'ts'   : ts
+            ids = buttons.map(function (index,dom){
+              let id = dom.id.split('-').pop();
+              console.log(id)
+              return id;
+            }).get();
+            console.log(ids);
+
+            ids.filter( item => item != room.myUserId());
+            return ids
+          }
+
+          function setupUsersMenu(){
+            addUser(room.myUserId(), displayName);
+            room.getParticipants().forEach( function(user){
+              addUser(user['_id'], user['_displayName']);
             });
-            if( id in participants){
-              $('#messages-' + room.myUserId()).append(`<p class="message">${participants[id]['displayName']} - ${text}</p>`);
-            } else {
-              $('#messages-' + room.myUserId()).append(`<p class="message">${id} - ${text}</p>`);
+          }
+
+          function setupMessageView(){
+            for (const [name, value] of Object.entries(messageEvents)) {
+              console.info(name, value);
+              var button = $('<button/>', {
+                  text: name, 
+                  id: 'btn_'+ name.replace(/ /g,"_"),
+                  click: function () { 
+                    if(value['target'] == 'all'){
+                      console.info(value['message']);
+                      room.sendTextMessage(value['message']);
+                    }
+                  }
+              });
+              $('#event-list').append(button);
             }
           }
-        );
 
-        room.on( JitsiMeetJS.events.conference.PRIVATE_MESSAGE_RECEIVED, (id, text, ts) => {
-            console.info('received_private_message', id,  text, ts);
+          let publicMessages     = [ ];
+          let participants       = {};
 
-   
-            let ids = Object.keys(participants);
-            ids.splice(ids.indexOf(room.myUserId(), 1))
+          bot_socketio.on('send_message', function(message) {
+              console.info('send_message', message);
+              room.sendTextMessage(message)
+          });
 
-            if (room.myUserId() != id) { 
-              socketio.emit('received_private_message',  {'id': id, 'ids': ids, 'text': text} );
-            }
-;
+          bot_socketio.on('send_private_message', function(data) {
+              console.info('send_private_message', data['id'], data['message']);
+              room.sendPrivateTextMessage(data['id'], data['message'])
+          });
 
-            if( id in participants){
-              participants[id]['messages'].push( {
+          bot_socketio.on('disconnect_now', function(data) {
+              console.info('disconnect signal received');
+              disconnect()
+          });
+
+          engine_socketio.on('interaction_engine_changed', function(data){
+
+
+          });
+
+          console.info('onConferenceJoined');
+
+          $('#meeting-link').attr("href", meetingUrl);
+          // Setup message events
+
+          setupMessageView();
+          setupUsersMenu();
+          setupInteractionMenu()
+
+          // Socket io callbacks
+          room.on( JitsiMeetJS.events.conference.MESSAGE_RECEIVED, (id, text, ts) => {
+              console.info('received_message', id, text, ts);
+
+              if (room.myUserId() != id) { 
+                bot_socketio.emit('received_message',  {'id': id, 'text': text} );
+              }
+              
+              publicMessages.push( {
                 'id'   : id,
                 'text' : text,
                 'ts'   : ts
               });
-              
-            $('#messages-' + id).append(`<p class="message">${participants[id]['displayName']} - ${text}</p>`);
-            } else {
-              console.warn('Private message has no owner', id,  text, ts);
+              if( id in participants){
+                $('#messages-' + room.myUserId()).append(`<p class="message">${participants[id]['displayName']} - ${text}</p>`);
+              } else {
+                $('#messages-' + room.myUserId()).append(`<p class="message">${id} - ${text}</p>`);
+              }
             }
-          }
+          );
+
+          room.on( JitsiMeetJS.events.conference.PRIVATE_MESSAGE_RECEIVED, (id, text, ts) => {
+              console.info('received_private_message', id,  text, ts);
+
+    
+              let ids = Object.keys(participants);
+              ids.splice(ids.indexOf(room.myUserId(), 1))
+
+              if (room.myUserId() != id) { 
+                bot_socketio.emit('received_private_message',  {'id': id, 'ids': ids, 'text': text} );
+              }
+
+              if( id in participants){
+                participants[id]['messages'].push( {
+                  'id'   : id,
+                  'text' : text,
+                  'ts'   : ts
+                });
+                
+              $('#messages-' + id).append(`<p class="message">${participants[id]['displayName']} - ${text}</p>`);
+              } else {
+                console.warn('Private message has no owner', id,  text, ts);
+              }
+            }
+          );
+
+          room.on( JitsiMeetJS.events.conference.USER_JOINED, function(id, user){
+            console.info('participants joined', id, user);
+            addUser(id, user['_displayName']);
+          });
+
+          room.on( JitsiMeetJS.events.conference.USER_LEFT, function(id, user){
+            console.info('participants left', id, user);
+            removeUser(id);
+          });
+        }
+
+        room.on( JitsiMeetJS.events.conference.CONFERENCE_JOINED,
+          onConferenceJoined,
         );
 
-
-        room.on( JitsiMeetJS.events.conference.USER_JOINED, function(id, user){
-          console.info('participants joined', id, user);
-          addUser(id, user['_displayName']);
-        });
-
-        room.on( JitsiMeetJS.events.conference.USER_LEFT, function(id, user){
-          console.info('participants joined', id, user);
-          removeUser(id);
-        });
       }
+    
+      bot_socketio.on('disconnect', function() {
+        console.info('socket disconnected');
+        disconnect();
+      });
 
-      room.on(
-        JitsiMeetJS.events.conference.CONFERENCE_JOINED,
-        onConferenceJoined,
+      bot_socketio.on('connect_error', function(err) {
+        disconnect();
+      });
+
+      connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED,
+        function () {
+          console.warn('onConnectionFailed');
+          disconnect();
+        }
       );
 
-    }
+      connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
+        function () {
+          console.info('disconnect');
+          disconnect();
+        },
+      );
     
-    connection.addEventListener(
-      JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
-      function () {
-        console.info('onConnectionSuccess');
-        startConference();
-      }
-    );
+      connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
+        function () {
+          console.info('onConnectionSuccess');
+          startConference();
+        }
+      );
 
-    connection.addEventListener(
-      JitsiMeetJS.events.connection.CONNECTION_FAILED,
-      function () {
-        console.warn('onConnectionFailed');
-      }
-    );
+      connection.connect();
+    });
 
-    connection.addEventListener(
-      JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
-      function () {
-        console.info('disconnect');
-      },
-    );
+  });
 
-    connection.connect();
 
-  };
-
-  socketio.on('start_conference', startJitsi);
 
   </script>
-
-  <div id="row1" class="row">
-    <div class="col-md-4">
-      <a id="meeting-link" href="" target="_blank">Meeting Link</a>
-    </div>
-    <div class="col-md-4">
-      <h2>Users</h2>
-      <ul id="user-list"></ul>
-    </div>
-    <div class="col-md-4">
-      <div id="event-list"></div>
-      <div id="interaction-lists"></div>
-      <button id="interaction-submit">Submit</button>
-    </div>
-  </div>
-  <div id="row1" class="row">
-    <div class="col-md-12">
-      <h2>Chat</h2>
-      <div id="messages">
+  
+  <div id="main">
+    <div id="row1" class="row">
+      <div class="col-md-4">
+        <a id="meeting-link" href="" target="_blank">Meeting Link</a>
       </div>
-
+      <div class="col-md-4">
+        <h2>Users</h2>
+        <ul id="user-list"></ul>
+      </div>
+      <div class="col-md-4">
+        <div id="event-list"></div>
+        <div id="interaction-lists"></div>
+        <button id="interaction-submit">Submit</button>
+      </div>
+    </div>
+    <div id="row1" class="row">
+      <div class="col-md-12">
+        <h2>Chat</h2>
+        <div id="messages">
+        </div>
+      </div>
     </div>
   </div>
-	</body>
+
+</body>
 
 </html>
 
