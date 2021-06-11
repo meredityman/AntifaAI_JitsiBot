@@ -128,7 +128,53 @@
                     "score"  : 0.5
                 }
             ]
+        },           {
+            "prompt" : "Auf welche Demo würdest du gehen? ",
+            "metric"    : "anger",
+            "choices"  : [
+                {
+                    "option" : "In Gedenken an die Opfer des NSU",
+                    "score"  : 0.6
+                },
+                {
+                    "option" : "Öffentlichen Nahverkehr für ummme!",
+                    "score"  : 0.4
+                },
+                {
+                    "option" : "Ich gehe nicht auf DEMOS unabhängig von Corona",
+                    "score"  : -1.0
+                },
+                {
+                    "option" : "1312",
+                    "score"  : 1.0
+                }
+            ]
+        },           {
+            "prompt" : "Spiele, die politische Botschaften haben...  ",
+            "metric"    : "technik",
+            "choices"  : [
+                {
+                    "option" : "...habe ich noch nie gespielt.",
+                    "score"  : 1.0
+                },
+                {
+                    "option" : "...finde ich blöd und unnötig.",
+                    "score"  : 0.0
+                },
+                {
+                    "option" : "...hab ich selber schon entwickelt.",
+                    "score"  : -1.0
+                },
+                {
+                    "option" : "...würde ich gern mal ausprobieren.",
+                    "score"  : 0.5
+                }
+            ]
         }
+
+
+
+
     ],
     "metrics"  : [
         { "name" : "knowledge" },
@@ -168,6 +214,23 @@
             "name"  : "Reading Room",
             "active": false,
             "score" : [1.0, 0.2, 1.0, 0.0, 0.4, 0.0]
+        },
+        {
+            "name" : "antifakitchen",
+            "active": true, 
+            "score": [0.5, 0.0, 0.2, 1.0, 0.6, 0.3]
+
+        },
+        {
+            "name"  : "playstation",
+            "active": true,
+            "score" : [0.1, 0.5, 0.8, 0.3, 0.4, 0.8]
+        },
+        {
+            "name"  : "Fountain",
+            "active": false,
+            "score" : [0.9, 0.2, 0.5, 0.1, 0.4, 0.3]
         }
-    ]
-}
+
+
+    
