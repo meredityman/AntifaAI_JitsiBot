@@ -95,7 +95,7 @@ class Incidents(MultiGeneratorEngine):
 
         geocode_result = self.gmaps.geocode(location)
 
-        print(geocode_result)
+        print("Geocode", geocode_result)
 
         if geocode_result:
             address_components = geocode_result[0]['address_components']
@@ -117,16 +117,17 @@ class Incidents(MultiGeneratorEngine):
             # inProj  = Proj("EPSG:3857")
             # outProj = Proj('PROJCS["unnamed",GEOGCS["Bessel 1841",DATUM["unknown",SPHEROID["bessel",6377397.155,299.1528128]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",3],PARAMETER["scale_factor",1],PARAMETER["false_easting",1500000],PARAMETER["false_northing",0],UNIT["Meter",1]]')
 
-            entry['latitude']    = coords['lat']
-            entry['longitude']   = coords['lng']
+            # entry['latitude']    = coords['lat']
+            # entry['longitude']   = coords['lng']
 
 
-            transformer = Transformer.from_crs('epsg:3857', 'epsg:31491') 
-            entry['coordinates'] = transform.itransform([(coords['lng'], coords['lat'])])[0]
+            # transformer = Transformer.from_crs('epsg:3857', 'esri:31491') 
+            # entry['coordinates'] = transform.itransform([(coords['lng'], coords['lat'])])[0]
 
 
         filename = f"{id}-{time.strftime('%Y%m%d-%H%M%S')}.json"
         path = PurePath(OUTPUT_PATH, filename )
+        print(f"Saving {path}")
         json.dump(entry, open(path, 'w'))
         
             

@@ -1,10 +1,10 @@
 from app.interaction.hatespeech import HateSpeech
-from .interaction import Echo
 from .gpt2 import GPT2
 from .survey import Survey
 from .incidents import Incidents
 from .hatespeech import HateSpeech
 from .telegram import Telegram
+from .echo import Echo
 
 interactionTypes = {
     'none'      : None,

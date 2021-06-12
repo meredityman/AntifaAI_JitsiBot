@@ -6,7 +6,7 @@ from ..utils.cuemanager import send_cue
 
 OUTPUT_MAP_PATH  = "app/var/map_latest.jpg"
 
-QUESTION_PATH = "app/interaction/survey.json"
+QUESTION_PATH = "app/data/survey/survey.json"
 
 
 class Survey(SingleGeneratorEngine):

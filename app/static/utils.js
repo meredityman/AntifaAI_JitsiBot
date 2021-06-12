@@ -45,7 +45,7 @@ class EventSelector{
 };
 
 class InteractionSelector{
-  constructor(element, interactionList, setInteractionEngine){
+  constructor(element, interactionList, setInteractionEngine, defaultEngine){
     this.element      = element;
     this.setInteractionEngine = setInteractionEngine;
 
@@ -69,6 +69,11 @@ class InteractionSelector{
           })
         }
       });
+
+      if (interactionName == defaultEngine){
+        button.addClass('selected');  
+      }
+
 
       buttons.push(button);
       this.element.append(button);
@@ -141,18 +146,18 @@ class MessageList {
 };
 
 class UserList {
-  constructor(element, participants, selectionChangedCallback) {
+  constructor(element, participants, selectionChangedCallback, selectable=true) {
       this.element      = element
       this.selectionChangedCallback = selectionChangedCallback;
       this.selectedUids = new Set();
-
+      this.selectable = selectable;
 
       // this.participants = Object.assign({}, ...participants.map((x) => ({[x._id]: x})));
       this.participants = {};
       this.listEl = $('<ul id="element-list-ul"></ul>');
       this.element.append(this.listEl);
       Object.values(participants).forEach(user => {
-        this.addUser(user);
+        this.addUser(user, false);
       });
 
   };
@@ -169,7 +174,7 @@ class UserList {
     }
   }
 
-  addButton(element, selected){
+  addButton(element){
     let uid = element._id
     let text = element._displayName + " (" + uid + ")";
     let id = 'element-btn-' + uid;
@@ -178,35 +183,55 @@ class UserList {
 
     function callback(){
       userList.participants[uid]['selected'] = !userList.participants[uid]['selected']
-      $( this ).toggleClass( "selected" );
-
       if(userList.participants[uid]['selected']){
+        $(this).addClass('selected');
         userList.selectedUids.add(uid);
-      } else {
+      }else{
+        $(this).removeClass('selected');
         userList.selectedUids.delete(uid);
-      }
+      };
+
       userList.selectionChangedCallback(userList.getSelectedIds());
     }
 
     let button = $('<button/>', {
         text: text, 
+        name: uid,
         id: id,
         class : 'element-btn',
-        click: callback
     });
 
-    if (selected){
-      button.addClass('selected');
-      userList.selectedUids.add(uid);
+    if(this.selectable){
+      button.click(callback);
     }
 
     return button;
+  }
+
+  setSelectedIds(uids){
+    self.selectedUids = uids;
+
+    this.listEl.find("button").each( (i, button) => {
+      if( $(button).attr("name") in uids){
+        $(button).addClass('selected');
+      } else {
+        console.warn("Here");
+        $(button).removeClass('selected');
+      }
+
+    });
+    
+
   }
 
   addUser( user, selected = true){
     console.log("Adding element " + user._id);
     user['selected'] = selected;
     this.participants[user._id] = user;
+
+    if(selected){
+      this.selectedUids.add(user._id);
+    }
 
     let button = this.addButton(user, selected);
     button = button.wrap('<li class="list-group-item"></li>').parent();

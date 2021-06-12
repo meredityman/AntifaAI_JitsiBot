@@ -1,8 +1,20 @@
-
-button.selected {
-    background-color: darksalmon;
+body {
+    background-color: black;
+    color: greenyellow;
 }
 
+
+button.selected {
+    background-color: black;
+}
+
+.list-group-item {
+    background-color: black;
+}
+
+a {
+    color: purple;
+}
 
 div.messages {
     overflow-x: scroll;

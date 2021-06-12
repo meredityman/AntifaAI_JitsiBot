@@ -6,24 +6,16 @@ import atexit
 socketio = SocketIO()
 
 def create_app(args):
-    global conferenceName, botName
+    global conferenceName, botName, avatarName 
     conferenceName = args.uuid
     botName        = args.bname
-    avName         = args.aname
+    avatarName     = args.aname
 
 
     app = Flask( __name__ )
     app.debug = args.debug
 
     socketio.init_app(app)
-
-    # # # Ping
-    # if(args.ping):
-    #     scheduler = BackgroundScheduler()
-    #     scheduler.add_job(func=send_date_time, trigger="interval", seconds=15)
-    #     scheduler.start()
-    #     atexit.register(lambda: scheduler.shutdown())
-
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)

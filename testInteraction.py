@@ -1,13 +1,11 @@
 from app.interaction import engine
 
 
-ids = [ 0 ]
+ids = [ "0" ]
 
 config = {
-    'public-type': 'none',
-    # 'private-type': 'hatespeech',
-    # 'private-type': 'survey',
-    'private-type': 'incidents',
+    # 'type': 'incidents',
+    'type': 'telegram',
     'ids': ids,
 } 
 
@@ -26,7 +24,7 @@ if __name__ == '__main__':
         try:
 
             message = input()
-            engine.feedEnginePrivate(0, 0, message)
+            engine.feedEnginePrivate("0", message)
 
         except KeyboardInterrupt:
             break

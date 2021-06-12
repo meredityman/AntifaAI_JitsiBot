@@ -28,17 +28,17 @@
 
   $(document).ready( function(){
 
-    let bot_socketio    = io('/bot');
+    let socketio    = io('/bot');
     let engine_socketio = io('/engine');
 
     // Socket io callbacks
 
-    bot_socketio.on('connect', function() {
+    socketio.on('connect', function() {
       console.info('socket connected');
     });
 
   
-    bot_socketio.on('start_conference', function(data) {
+    socketio.on('start_conference', function(data) {
       console.info("data", data);
 
       callConfig = JSON.parse(data);
@@ -58,7 +58,7 @@
       connection = new JitsiMeetJS.JitsiConnection(null, null, config);
 
       function disconnect(){
-        bot_socketio.disconnect();
+        socketio.disconnect();
         engine_socketio.disconnect();
         connection.disconnect();
         $("#main").html('<h1>Disconnected</h1>');
@@ -100,7 +100,8 @@
 
           console.info('Console Joined!')
 
-          let userList = new UserList($('#user-list'), room.getParticipants(), setInteractionEngineIds );
+          let userList       = new UserList($('#user-list'), room.getParticipants(), setInteractionEngineIds );
+          userList.setSelectedIds(selectedId);
 
           let meetingDetails = new MeetingDetails( $("#meeting-details"), meetingUrl);
 
@@ -109,23 +110,24 @@
           let interactionSelector = new InteractionSelector(
             $("#interaction-selector"), 
             callConfig['types'],
-            setInteractionEngine
+            setInteractionEngine,
+            callConfig['default-engine-config'].type
             );
 
           let eventSelector    = new EventSelector($('#event-list'), sendPublicMessage);
 
-          bot_socketio.on('send_message', function(message) {
+          socketio.on('send_message', function(message) {
               console.info('send_message', message);
               sendPublicMessage(message)
           });
 
-          bot_socketio.on('send_private_message', function(data) {
+          socketio.on('send_private_message', function(data) {
               console.info('send_private_message', data['id'], data['message']);
               sendPrivateMessage(data['id'], data['message'])
               messageList.addPrivateReply(data['id'], data['message']);
           });
 
-          bot_socketio.on('disconnect_now', function(data) {
+          socketio.on('disconnect_now', function(data) {
               console.info('disconnect signal received');
               disconnect()
           });
@@ -135,7 +137,7 @@
               console.info('received_message', uid, text, ts);
 
               if (room.myUserId() != uid) { 
-                bot_socketio.emit('received_message',  {'uid': uid, 'text': text} );
+                socketio.emit('received_message',  {'uid': uid, 'text': text} );
               }
               messageList.addPublicMessage(uid,  userList.getDisplayName(uid), text);
             }
@@ -144,7 +146,7 @@
           room.on( JitsiMeetJS.events.conference.PRIVATE_MESSAGE_RECEIVED, (uid, text, ts) => {
               console.info('received_private_message', uid, text, ts);
               messageList.addPrivateMessage(uid,  userList.getDisplayName(uid), text);
-              bot_socketio.emit('received_private_message',  {'uid': uid, 'text': text} );
+              socketio.emit('received_private_message',  {'uid': uid, 'text': text} );
             }
           );
 
@@ -165,12 +167,12 @@
 
       }
     
-      bot_socketio.on('disconnect', function() {
+      socketio.on('disconnect', function() {
         console.info('socket disconnected');
         disconnect();
       });
 
-      bot_socketio.on('connect_error', function(err) {
+      socketio.on('connect_error', function(err) {
         disconnect();
       });
 

@@ -8,18 +8,25 @@ class InteractionEngine:
 
     def sendBroadcastMessage(self, message):
         if self.broadcastCallback:
-            print(f"Sending broadcase message/n'{message}'")
+            print(f"Sending broadcase message\n'{message}'")
             self.broadcastCallback(message)
         else:
             print("No broadcast callback set")
 
     def sendMessage(self, id, message):
         if self.callback:
-            print(f"Sending message to {id}/n'{message}'")
+            print(f"Sending message to {id}\n'{message}'")
             self.callback(id, message)
         else:
             print("No callback set")
 
+    def sendMessageAll(self, message):
+        if self.callback:
+            for id in self.ids:
+                print(f"Sending message to {id}\n'{message}'")
+                self.callback(id, message)
+        else:
+            print("No callback set")
 
     def getResponsePublic(self, id, text):
         return self._getResponse(id, text, True)
@@ -114,9 +121,3 @@ class MultiGeneratorEngine(InteractionEngine):
 
 
 
-class Echo(InteractionEngine):
-    def _getResponse(self, id, text, isPublic):
-        if isPublic:
-            self.broadcastCallback(text)
-        else:
-            self.callback(text)
