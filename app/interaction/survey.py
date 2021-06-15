@@ -50,10 +50,10 @@ class Survey(SingleGeneratorEngine):
     def questionAnswered(self, qIndex):
         if qIndex not in self.responses:
             return False
-        try:
-            return set(self.ids) <= set(self.responses[qIndex].keys())
-        except IndexError:
-            return False
+
+        yetToAnswer = set(self.ids) - set(self.responses[qIndex].keys())
+        print("Yet to answer", yetToAnswer)
+        return len(yetToAnswer) == 0
 
     def finalizeAllQuestions(self):
         route = self.getRoute()
@@ -71,7 +71,7 @@ class Survey(SingleGeneratorEngine):
             question = self.questions[qIndex]
             metric   = question['metric']
 
-            score = [question['choices'][r] ['score'] for r in response.values()]
+            score = [question['choices']['score'] for r in response.values()]
 
             score = sum(score) / len(score)
             scores[metric] += score
@@ -105,7 +105,7 @@ class Survey(SingleGeneratorEngine):
         survey_def = json.load(open(QUESTION_PATH, "r"))
 
         self.intro     = survey_def["intro"]
-        self.intro     = survey_def["outro"]
+        self.outro     = survey_def["outro"]
         self.questions = survey_def["questions"]
         self.metrics   = survey_def["metrics"]
         self.stations  = [ s for s in survey_def["stations"] if s["active"] ]

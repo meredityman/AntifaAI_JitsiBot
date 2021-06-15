@@ -139,6 +139,10 @@ class Twitter(SingleGeneratorEngine):
                 else:
                     if self.text:
                         hashtag, response = prompt_option(self.text, hashtags)
+                    
+                    if response:#
+                        self.sendBroadcastMessage(response)
+                        
                     if hashtag:
                         break
                     else:
@@ -150,7 +154,7 @@ class Twitter(SingleGeneratorEngine):
             suspicious_users = set([])
             users = get_users_for_trend(hashtag)
             message = f"Pick {self.num_users} users.\n"
-            message += "\n".join([ f"{i}). User" + user for i, user in enumerate(users)])
+            message += "\n".join([ f"{i+1}). {user}" for i, user in enumerate(users)])
             message += f"\n1-{len(users)}: "
             self.sendBroadcastMessage(message)
             yield

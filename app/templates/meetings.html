@@ -28,6 +28,8 @@
 
         let url = p['url']
 
+        url += "#config.stereo=true"
+
         $("#meeting-links").append( 
           `<a href="${url}">${p['date']} - ${p['time']} - ${p['uuid']}</a></br>`
         );
