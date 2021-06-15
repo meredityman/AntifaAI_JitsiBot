@@ -93,8 +93,8 @@ class MessageList {
     this.privateMessages = {};
 
 
-    this.publicMessageElement  = $(`<div id="public-messages"></div>`).appendTo(element);
-    this.privateMessageElement = $(`<div id="private-messages"></div>`).appendTo(element);
+    this.publicMessageElement  = $(`<div id="public-messages", class="message-list"</div>`).appendTo(element);
+    this.privateMessageElement = $(`<div id="private-messages", class="message-list"></div>`).appendTo(element);
   };
 
   addPublicMessage(uid, displayName, message){
@@ -119,7 +119,7 @@ class MessageList {
 
     let messageEl = $('#private-messages-' + uid);
     if(!messageEl.length){
-      messageEl = $(`<div id="${'#private-messages-' + uid}"></div>`).appendTo(this.privateMessageElement);
+      messageEl = $(`<div id="${'#private-messages-' + uid}", class="message-list"></div>`).appendTo(this.privateMessageElement);
     }
     messageEl.append(`<p class="message">${displayName} - ${message}</p>`);
 
@@ -174,7 +174,7 @@ class UserList {
     }
   }
 
-  addButton(element){
+  addButton(element, selected){
     let uid = element._id
     let text = element._displayName + " (" + uid + ")";
     let id = 'element-btn-' + uid;
@@ -200,6 +200,10 @@ class UserList {
         id: id,
         class : 'element-btn',
     });
+
+    if( selected){
+      button.addClass('selected')
+    }
 
     if(this.selectable){
       button.click(callback);
@@ -244,7 +248,8 @@ class UserList {
     this.listEl.find('#element-btn-' + user._id).parent().remove();
 
     if(this.selectedUids.delete(user._id)){
-      this.selectionChangedCallback(this.selectedUids);
+      console.warn(this.selectedUids);
+      this.selectionChangedCallback(Array.from(this.selectedUids));
     };
   };
 

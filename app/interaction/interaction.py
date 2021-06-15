@@ -6,6 +6,11 @@ class InteractionEngine:
         self.ids = ids
         self.setup()
 
+
+    def setIds(self, ids):
+        self.ids = ids
+        self._onSetIds()
+
     def sendBroadcastMessage(self, message):
         if self.broadcastCallback:
             print(f"Sending broadcase message\n'{message}'")
@@ -29,16 +34,21 @@ class InteractionEngine:
             print("No callback set")
 
     def getResponsePublic(self, id, text):
-        return self._getResponse(id, text, True)
+        self.isPublic = True
+        return self._getResponse(id, text, self.isPublic)
 
     def getResponsePrivate(self, id, text):
-        return self._getResponse(id, text, False)
+        self.isPublic = False
+        return self._getResponse(id, text, self.isPublic)
 
     def reset(self):
         self._reset()
 
     def setup(self):
         self._setup()
+
+    def _onSetIds(self):
+        pass
 
     def _reset():
         raise NotImplementedError()
@@ -67,12 +77,19 @@ class SingleGeneratorEngine(InteractionEngine):
             print("Generator Complete")   
 
 
+
+    def _onSetIds(self):
+        self.text = None
+        self.id = None
+        self.iterateGenerator()
+
     def _generator(self):
         yield
         raise NotImplementedError()
 
     def _getResponse(self, id, text, isPublic):
-        if not isPublic:
+        print(id, text, isPublic)
+        if id in self.ids:
             self.id   = id
             self.text = text
             self.iterateGenerator()
@@ -109,12 +126,17 @@ class MultiGeneratorEngine(InteractionEngine):
             print("No id set")  
 
 
+    def _onSetIds(self):
+        self.text = None
+        self.id = None
+        self.iterateAllGenerators()
+
     def _generator(self):
         yield
         raise NotImplementedError()
 
     def _getResponse(self, id, text, isPublic):
-        if not isPublic:
+        if id in self.ids:
             self.id   = id
             self.text = text
             self.iterateGenerator()

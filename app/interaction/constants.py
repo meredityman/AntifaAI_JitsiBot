@@ -4,16 +4,18 @@ from .survey import Survey
 from .incidents import Incidents
 from .hatespeech import HateSpeech
 from .telegram import Telegram
+from .twitter import Twitter
 from .echo import Echo
 
 interactionTypes = {
     'none'      : None,
-    'echo'      : Echo,
-    'gpt2'      : GPT2,
+    # 'echo'      : Echo,
+    # 'gpt2'      : GPT2,
     'survey'    : Survey,
     'incidents' : Incidents,
     'hatespeech': HateSpeech,
-    'telegram'  : Telegram
+    'telegram'  : Telegram,
+    'twitter'   : Twitter
 }
 
 

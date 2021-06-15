@@ -11,32 +11,45 @@ def prompt_option(message, options, nota = False):
     if nota and "None of these!" not in options:
         options.append("None of these!")
 
-    print(f"{message}")
-    print(f"Options:")
-    for i, opt in enumerate(options):
-        print(f"\t{i+1}). {opt}")
-
-    prompt = f"1-{len(options)}: "
-    ret = input(prompt)
-
     try:
-        selected = options[int(ret)-1]
+        print(len(options))
+        selected = options[int(message)-1]
     except IndexError:
+        print(1)
         selected = None
     except ValueError:
-        if ret in options:
-            selected = ret
+        print(0)
+        if message in options:
+            selected = message
 
     if selected:
-        print(f"You chose '{selected}'.")  
+        response = f"You chose '{selected}'."
     else:
-        print(f"Selection not understood!")  
+        response = f"Selection not understood!" 
 
     if nota and selected == "None of these!":
         selected = None
         
-    return selected
+    return selected, response
 
+# This function asks us to choose from a list of options
+def prompt_choice(message):
+    selected = None
+
+    _true = ['ja', 'j', 'yes', 'y', '1']
+    _false = ['nein', 'n', 'no', '0']
+
+    if message.lower() in _true:
+        selected = True
+    elif message.lower() in _false:
+        selected = False
+
+    if selected is not None:
+        response = f"You chose '{selected}'."
+    else:
+        response = f"Selection not understood!" 
+        
+    return selected, response
 
    # This function asks us to choose from a list of options
 def prompt_rating(message, min, max):

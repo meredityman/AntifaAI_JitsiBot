@@ -7,52 +7,11 @@ import time
 import json
 import googlemaps
 from pyproj import Transformer
+from .prompts import prompt_choice
 
 OUTPUT_PATH  = "app/data/incidents"
 API_KEY = "AIzaSyAQZQllaEBGRi42pB0YU7nX9hsf_wArSJI"
 
-questions = [
-    {
-        'text'           : 'What year did the incident happen?',
-        'hint'           : 'Enter the years as a number, e.g. 1997',
-        'compulsory'     : True,
-        'field'          : 'year',
-        'validator'      : validators.integer,
-        'validator-args' : { 'minimum' : 1900, 'maximum' : 2021 }
-    },
-    {
-        'text'           : 'What month did the incident happen?',
-        'hint'           : 'Enter the month as a number, e.g. "3" for March',
-        'compulsory'     : True,
-        'field'          : 'month',
-        'validator'      : validators.integer,
-        'validator-args' : { 'minimum' : 1, 'maximum' : 12 }
-    },
-    {
-        'text'           : 'What day did the incident happen?',
-        'hint'           : 'Enter the day',
-        'compulsory'     : False,
-        'field'          : 'day',
-        'validator'      : validators.integer,
-        'validator-args' : { 'minimum' : 0, 'maximum' : 31 }
-    },
-    {
-        'text'           : 'Where did the incident happen?',
-        'hint'           : 'Write the address as precisely as you can',
-        'compulsory'     : True,
-        'field'          : 'location',
-        'validator'      : validators.string,
-        'validator-args' : { }
-    },
-    {
-        'text'           : 'What happened?',
-        'hint'           : 'Write between 50-150 words',
-        'compulsory'     : True,
-        'field'          : 'description',
-        'validator'      : validators.string,
-        'validator-args' : {  }
-    }
-]
 
 class Incidents(MultiGeneratorEngine):
 
@@ -61,33 +20,56 @@ class Incidents(MultiGeneratorEngine):
 
     def _reset(self):
         self.responses = {}
+        self.config = json.load(open("app/data/incidents/data/incidents.json", "r"))
+        self.questions = self.config["questions"]
+        self.intro     = self.config["intro"]
+        self.thankyou  = self.config["thankyou"]
+        self.more      = self.config["more"]
+        self.sendBroadcastMessage(self.intro)
         self.iterateAllGenerators()
 
     def _generator(self):
-        for question in questions:
-            self.sendMessage(self.id, question['text'])
-            self.sendMessage(self.id, question['hint'])
-            yield
+        while True:
+            for question in self.questions:
+                self.sendMessage(self.id, question['text'])
+                self.sendMessage(self.id, question['hint'])
+                yield
 
-            validator = question['validator']
-            args = question['validator-args']
+                validator = eval(question['validator'])
+                args = question['validator-args']
+
+                while True:
+                    try:
+                        response = validator(self.text, **args, allow_empty = (not question['compulsory']))
+                        break
+                    except (ValueError, TypeError) as e:
+                        self.sendMessage(self.id, str(e))
+                        self.sendMessage(self.id, question['hint'])
+                        yield
+
+                if self.id not in self.responses:
+                    self.responses[self.id] = {}
+
+                self.responses[self.id][question['field']] = response
+            
+            self.sendMessage(self.id, self.thankyou)
+            self.saveEntry(self.id, self.responses[self.id])
 
             while True:
-                try:
-                    response = validator(self.text, **args, allow_empty = (not question['compulsory']))
+                self.sendMessage(self.id, self.more)
+                yield
+                
+                selected, response = prompt_choice(self.text)
+
+                if response:
+                    self.sendMessage(self.id, response)
+
+                if selected is True:
                     break
-                except (ValueError, TypeError) as e:
-                    self.sendMessage(self.id, str(e))
-                    self.sendMessage(self.id, question['hint'])
+                else:
                     yield
 
-            if self.id not in self.responses:
-                self.responses[self.id] = {}
 
-            self.responses[self.id][question['field']] = response
-        
-        self.sendMessage(self.id, "Thank you we adding your response to out database.")
-        self.saveEntry(self.id, self.responses[self.id])
 
     def saveEntry(self, id, entry):
 

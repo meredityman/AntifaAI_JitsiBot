@@ -13,7 +13,7 @@ class Engine():
         self.ids = args['ids']   
 
         if self.interactionEngine:
-            self.interactionEngine.ids = self.ids
+            self.interactionEngine.setIds(self.ids)
 
     def setup(self, args, publicSendCallback = None, privateSendCallback = None):
         print(args)

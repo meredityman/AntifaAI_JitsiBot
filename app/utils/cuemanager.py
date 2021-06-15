@@ -7,21 +7,20 @@ import os
 
 cue_sheet  = json.load(open("app/static/cues.json", "r"))
 
-cues = [ cue for target in cue_sheet['targets'].values() for cue in target['cues'] ]
+CUES = [ cue for target in cue_sheet['targets'].values() for cue in target['cues'] ]
 
-print(cues)
 
 osc_channels = {}
 osc_startup()
 
 disable = False
 def send_cue(req_cue, data = None):
-
+    
     if(disable):
         print(f"Cues disabled {req_cue}")
         return
 
-    if req_cue not in cue_sheet["cues"]:
+    if req_cue not in CUES:
         print(f"Cue '{req_cue}' not found.")
 
     for target in cue_sheet["targets"].values():
@@ -62,6 +61,6 @@ def send_cue(req_cue, data = None):
 
 
 def test_all_cues():
-    for cue in cue_sheet["cues"]:
+    for cue in CUES:
         input(f"Press enter to send '{cue}'")
         send_cue(cue)

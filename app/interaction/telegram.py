@@ -11,28 +11,6 @@ metrics = json.load(open("app/data/telegram/metrics.json"))
 
 class Telegram(SingleGeneratorEngine):
 
-    def parseHrResponse(self):
-        pass
-        # if self.id not in self.ids:
-        #     self.sendMessage(self.id, "You are not in the survey")
-
-        # try:
-        #     selected = int(self.text) - 1
-        # except ValueError:
-        #     self.sendMessage(self.id, "Response not recognized!")
-        #     return
-
-        # question = self.questions[qIndex]
-        # choices = question["choices"]
-
-        # if( selected >= len(choices) or selected < 0 ):
-        #     self.sendMessage(self.id, "Response not recognized!")
-        #     return
-
-        # if qIndex not in self.responses:
-        #     self.responses[qIndex] = {}
-
-        # self.responses[qIndex][self.id] = selected
 
     def _setup(self):
         pass
@@ -40,13 +18,17 @@ class Telegram(SingleGeneratorEngine):
     def _reset(self):
         self.messages = json.load(open("app/data/telegram/channel_telegram_messages.json", 'r'))
         self.ratings  = json.load(open("app/data/telegram/telegram_rating_data.json", 'r'))
+
+        othertext  = json.load(open("app/data/telegram/text.json", 'r'))
+        self.intro   = othertext['intro']
+        self.thankyou = othertext['thankyou']
+        self.srtend = othertext['srtend']
         self.iterateGenerator()
 
     def saveScores(self, scores, message_id, channel, metrics):
-        response = "Thank you for your responses.\nAverage scores:\n"
+        response = f"{self.thankyou}\nAverage scores:\n"
 
         for name, newRatings in scores.items():
-            print("Ratings", newRatings)
             newRatings = [ r / 10.0 for rs in newRatings.values() for r in rs]
 
             key = f"{message_id}-{channel.split('/')[-1]}"
@@ -66,17 +48,19 @@ class Telegram(SingleGeneratorEngine):
             self.ratings[key][ name + "-mean"] = mean
             self.ratings[key]["hr-std"] = std 
 
-            response += f"\t'{name}'\tmean: {mean}, std: {std}"
+            response += f"'{name}'\tmean: {mean}, std: {std}\n"
 
             json.dump(self.ratings, open("app/data/telegram/telegram_rating_data.json", 'w'))
 
         return response
 
     def _generator(self):
-        while True:
+        self.sendBroadcastMessage(self.intro)
 
+        while True:
             message, message_id, channel = self.getRandomMessage()
 
+            message = f"{self.srtend[0]:_^20}\n" + message + f"\n{self.srtend[1]:_^20}"
             self.sendBroadcastMessage(message)
 
             scores = defaultdict(lambda: defaultdict(list))
@@ -87,8 +71,8 @@ class Telegram(SingleGeneratorEngine):
                 yield
                 
                 while True:
-
-                    rating, response = prompt_rating(self.text, 0.0, 10.0)
+                    if self.text:
+                        rating, response = prompt_rating(self.text, 0.0, 10.0)
 
                     if rating:
                         scores[name][self.id].append(rating)
@@ -104,8 +88,6 @@ class Telegram(SingleGeneratorEngine):
 
             response = self.saveScores(scores, message_id, channel, metrics)
             self.sendBroadcastMessage(response)
-
-            
 
     def getRandomMessage(self):
         message = None
