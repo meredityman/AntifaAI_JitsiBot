@@ -71,7 +71,7 @@ class Telegram(SingleGeneratorEngine):
                 yield
                 
                 while True:
-                    if self.text:
+                    if self.text is not None:
                         rating, response = prompt_rating(self.text, 0.0, 10.0)
 
                     if rating:

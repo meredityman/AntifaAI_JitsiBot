@@ -30,8 +30,6 @@ woeids = {
 #halle :
 }
 
-
-
 def get_trending_hashtags():
     trends = []
     woeid = woeids['hamburg']
@@ -63,7 +61,7 @@ def get_user_summmary(suspicious_user):
     location        = x._json['location']   
 
     responce += f"{suspicious_user} has {followers_count} followers."
-    responce += f"Thier self description is:\n{self_description}"
+    responce += f"Their self description is:\n{self_description}"
 
     ret = api.user_timeline(suspicious_user)
     responce += f"Here are some of their recent tweets:\n"
@@ -85,10 +83,10 @@ def get_results(votes):
         is_nazi = votes_for > votes_against
 
         if is_nazi:
-            message += f"\t{user} has been labled as a nazi\n"
+            message += f"👎\t'{user}' has been labled as a nazi by {votes_for} to {votes_against} votes.\n"
             confirmed_users.append(user)
         else:
-            message += f"\t{user} has not been labled as a nazi\n"
+            message += f"👍\t'{user}' has not been labled as a nazi {votes_against} to {votes_for} votes.\n"
 
     return  message, confirmed_users
 
@@ -116,6 +114,10 @@ class Twitter(SingleGeneratorEngine):
         pass
 
     def _reset(self):
+        othertext  = json.load(open("app/data/twitter/text.json", 'r'))
+
+        self.num_users = othertext ['number-of-users']
+
         self.iterateGenerator()
 
     def _generator(self):
@@ -124,9 +126,9 @@ class Twitter(SingleGeneratorEngine):
         
             # Get a hashtag
             hashtags = get_trending_hashtags()
-            message = [f"\t{i+1}). {hashtag}\n" for i, hashtag in enumerate(hashtags)]
-            message = ''.join(message)
-            message += f"1-{len(hashtags)}: "
+            message = "Pick a hashtag!\n"
+            message += '\n'.join([f"{i+1}). {hashtag}" for i, hashtag in enumerate(hashtags)])
+            message += f"\n1-{len(hashtags)}: "
             self.sendBroadcastMessage(message)
             yield
 
@@ -135,7 +137,8 @@ class Twitter(SingleGeneratorEngine):
                     # Private messages are ignored
                     yield
                 else:
-                    hashtag, response = prompt_option(self.text, hashtags)
+                    if self.text:
+                        hashtag, response = prompt_option(self.text, hashtags)
                     if hashtag:
                         break
                     else:
@@ -146,7 +149,9 @@ class Twitter(SingleGeneratorEngine):
             # Get a users
             suspicious_users = set([])
             users = get_users_for_trend(hashtag)
-            message = ['\n\t' + user for i, user in enumerate(users)]
+            message = f"Pick {self.num_users} users.\n"
+            message += "\n".join([ f"{i}). User" + user for i, user in enumerate(users)])
+            message += f"\n1-{len(users)}: "
             self.sendBroadcastMessage(message)
             yield
 
@@ -155,14 +160,15 @@ class Twitter(SingleGeneratorEngine):
                     # Private messages are ignored
                     yield
                 else:
-                    user, response = prompt_option(self.text, users)
+                    if self.text:
+                        user, response = prompt_option(self.text, users)
 
                     if response:#
                         self.sendBroadcastMessage(response)
 
                     if user:
                         suspicious_users.add(user)
-                        if(len(suspicious_users) >= 3):
+                        if(len(suspicious_users) >= self.num_users):
                             break
                         else:
                             yield
@@ -182,8 +188,8 @@ class Twitter(SingleGeneratorEngine):
                         # Public messages are ignored
                         yield
                     else:
-                        vote, response = prompt_choice(self.text)
-                        print(vote, response)
+                        if self.text:
+                            vote, response = prompt_choice(self.text)
                         if vote is not None:
                             self.votes[suspicious_user][self.id] = vote
                             if response:
@@ -201,7 +207,8 @@ class Twitter(SingleGeneratorEngine):
 
             message, confirmed_users = get_results(self.votes)
             save_data(confirmed_users)
-            self.sendBroadcastMessage(message)   
+            self.sendBroadcastMessage(message)  
+            self.sendBroadcastMessage("Thank you for helping ...")  
 
             running = False
 

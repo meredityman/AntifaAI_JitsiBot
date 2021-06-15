@@ -55,10 +55,9 @@ def prompt_choice(message):
 def prompt_rating(message, min, max):
     rating = None
     response = None
-
     try:
         rating = float(message)
-        if rating <= min or rating >= max:
+        if rating < min or rating > max:
             raise ValueError
     except ValueError:
         response = "Rating not understood."

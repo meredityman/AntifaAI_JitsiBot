@@ -88,7 +88,6 @@ class SingleGeneratorEngine(InteractionEngine):
         raise NotImplementedError()
 
     def _getResponse(self, id, text, isPublic):
-        print(id, text, isPublic)
         if id in self.ids:
             self.id   = id
             self.text = text

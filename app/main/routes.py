@@ -20,7 +20,7 @@ def index():
     return render_template('index.html', links = links)
 
 @main.route('/cue', methods=['POST'])
-def login():
+def cue():
     if request.method == 'POST':
         return send_cue('name', data)
 
