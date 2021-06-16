@@ -1,13 +1,14 @@
 from app.interaction import engine
 
 
-ids = [ 0 ]
+ids = [ "0" ]
 
 config = {
-    'public-type': 'none',
-    # 'private-type': 'hatespeech',
-    # 'private-type': 'survey',
-    'private-type': 'incidents',
+    # 'type': 'incidents',
+    #'type': 'telegram',
+    #'type': 'hatespeech',
+    #'type': 'twitter',
+    'type': 'survey',
     'ids': ids,
 } 
 
@@ -26,7 +27,11 @@ if __name__ == '__main__':
         try:
 
             message = input()
-            engine.feedEnginePrivate(0, 0, message)
+
+            if message[:3] == "p>>":
+                engine.feedEnginePublic("0", message[3:])
+            else: 
+                engine.feedEnginePrivate("0", message)
 
         except KeyboardInterrupt:
             break

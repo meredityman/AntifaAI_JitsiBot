@@ -3,7 +3,7 @@ import time
 import json
 from flask import request
 
-from .. import socketio, conferenceName, botName
+from .. import socketio, conferenceName, botName, avatarName
 
 from ..interaction import engine
 from ..interaction.constants import *
@@ -11,7 +11,7 @@ from app import interaction
 
 
 avatar_client = None
-bot_client   = None
+bot_client    = None
 
 def send_message(message):
     socketio.emit('send_message', message, namespace='/bot')
@@ -46,11 +46,9 @@ def handle_bot_connect():
         'displayName'        : botName,
         'conference'         : conferenceName,
         'default-engine-config': DEFAULT_ENGINE_CONFIG,
-        'interaction-types'  : {
-            'public'  : INTERACTION_TYPES_PUBLIC,
-            'private' : INTERACTION_TYPES_PRIVATE
-        }
+        'types'  :  INTERACTION_TYPES
     }
+
     print('Starting Conference "{}"'.format(message))
     socketio.emit('start_conference', json.dumps(message), namespace='/bot', json=True)
 
@@ -67,7 +65,7 @@ def handle_disconnect():
 @socketio.on('received_message', namespace='/bot')
 def received_message(message):
     global bot_client
-    id = message['id']
+    id = message['uid']
     text = message['text']
     client = request.sid
     if client == bot_client:
@@ -77,13 +75,49 @@ def received_message(message):
 @socketio.on('received_private_message', namespace='/bot')
 def received_private_message(message):
     global bot_client
-    id   = message['id']
+    id   = message['uid']
     text = message['text']
     client = request.sid
     if client == bot_client:
         print('received_private_message', client, id, text)
         engine.feedEnginePrivate(id, text)
 
+
+
+# Avatar
+@socketio.on('connect', namespace='/avatar')
+def handle_avatar_connect():
+    global avatar_client
+
+    print('Client connected')
+
+    client = request.sid
+
+    if avatar_client != None and client != avatar_client:
+        print("Disconnect old client")
+        socketio.emit('disconnect_now', {'id' : avatar_client }, namespace='/avatar')
+        
+
+    avatar_client = client      
+    message = {
+        'displayName'        : avatarName,
+        'conference'         : conferenceName,
+        'default-engine-config': DEFAULT_ENGINE_CONFIG,
+        'types'  :  INTERACTION_TYPES
+    }
+
+    print('Starting Conference "{}"'.format(message))
+    socketio.emit('start_conference', json.dumps(message), namespace='/avatar', json=True)
+
+
+@socketio.on('disconnect', namespace='/avatar')
+def handle_disconnect():
+    global avatar_client
+
+    print('Client disconnected')
+    client = request.sid
+    if client == avatar_client:
+        avatar_client = None
 
 #Engine
 @socketio.on('connect', namespace='/engine')

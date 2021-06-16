@@ -1,32 +1,29 @@
 from app.interaction.hatespeech import HateSpeech
-from .interaction import Echo
 from .gpt2 import GPT2
 from .survey import Survey
 from .incidents import Incidents
 from .hatespeech import HateSpeech
 from .telegram import Telegram
+from .twitter import Twitter
+from .echo import Echo
 
-interactionTypesPrivate = {
+interactionTypes = {
     'none'      : None,
-    'echo'      : Echo,
-    'gpt2'      : GPT2,
+    # 'echo'      : Echo,
+    # 'gpt2'      : GPT2,
     'survey'    : Survey,
     'incidents' : Incidents,
     'hatespeech': HateSpeech,
-    'telegram'  : Telegram
+    'telegram'  : Telegram,
+    'twitter'   : Twitter
 }
 
-interactionTypesPublic = {
-    'none'  : None,
-    'echo'  : Echo,
-}
 
-INTERACTION_TYPES_PUBLIC  = list(interactionTypesPublic.keys())
-INTERACTION_TYPES_PRIVATE = list(interactionTypesPrivate.keys())
+
+INTERACTION_TYPES = list(interactionTypes.keys())
 
 DEFAULT_ENGINE_CONFIG = {
     'ids' : [],
-    'private-type': 'none',
-    'public-type': 'none'
+    'type': 'none',
 }
 

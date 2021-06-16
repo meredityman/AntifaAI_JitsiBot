@@ -19,6 +19,12 @@ def index():
     ]
     return render_template('index.html', links = links)
 
+@main.route('/cue', methods=['POST'])
+def cue():
+    if request.method == 'POST':
+        return send_cue('name', data)
+
+
 @main.route('/bot')
 def bot():
     return render_template('bot.html')

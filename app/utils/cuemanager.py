@@ -5,21 +5,22 @@ import uuid
 import json
 import os
 
-from . import cue_sheet
+cue_sheet  = json.load(open("app/static/cues.json", "r"))
+
+CUES = [ cue for target in cue_sheet['targets'].values() for cue in target['cues'] ]
+
 
 osc_channels = {}
 osc_startup()
 
-
 disable = False
-
-def send_cue(req_cue):
-
+def send_cue(req_cue, data = None):
+    
     if(disable):
         print(f"Cues disabled {req_cue}")
         return
 
-    if req_cue not in cue_sheet["cues"]:
+    if req_cue not in CUES:
         print(f"Cue '{req_cue}' not found.")
 
     for target in cue_sheet["targets"].values():
@@ -42,52 +43,24 @@ def send_cue(req_cue):
                 client_uuid = osc_channels[(ip, port)]
 
             addr = cue["addr"]
-            data = cue["data"]
 
-            msg = oscbuildparse.OSCMessage(addr, None, data)
-            print(msg)
-            osc_send(msg, client_uuid)
-
-    osc_process()
-
-
-def send_data(req_cue, data):
-    
-    if(disable):
-        print(f"Cues disabled {req_cue}")
-        return
-
-    if req_cue not in cue_sheet["cues"]:
-        print(f"Cue '{req_cue}' not found.")
-
-    for target in cue_sheet["targets"].values():
-        ip   = target["ip"]
-        cues = target["cues"]
-
-        if req_cue in cues:
-            cue = cues[req_cue]
-
-            if not cue: 
-                continue
-
-            port = cue["port"]
-
-            if (ip, port) not in osc_channels:
-                client_uuid = str(uuid.uuid4())
-                osc_udp_client(ip, port, client_uuid)
+            if data:
+                pass
+            elif 'data' in cue:
+                data = cue["data"]
             else:
-                client_uuid = osc_channels[(ip, port)]
-
-            addr = cue["addr"]
+                data = None
+                
 
             msg = oscbuildparse.OSCMessage(addr, None, data)
             print(msg)
             osc_send(msg, client_uuid)
 
     osc_process()
+
 
 
 def test_all_cues():
-    for cue in cue_sheet["cues"]:
+    for cue in CUES:
         input(f"Press enter to send '{cue}'")
         send_cue(cue)

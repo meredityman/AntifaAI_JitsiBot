@@ -10,7 +10,6 @@ from numpy import random
 
 BASE_MAP_PATH    = "resources/horror.png"
 
-
 all_stations = {
     "Questionaire"  : (  35,  40),
     "Map"           : ( 100,  70),

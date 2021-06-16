@@ -1,46 +1,20 @@
 import json
 import numpy as np
+from numpy.lib.function_base import select
 from .interaction import SingleGeneratorEngine
-from ..horror import  draw_map
-#from ..horror import send_data
-        
-OUTPUT_MAP_PATH  = "app/static/map_latest.jpg"
+from ..utils.make_map import draw_map
+from ..utils.cuemanager import send_cue
+from .prompts import prompt_option
 
-QUESTION_PATH = "app/interaction/survey.json"
+OUTPUT_MAP_PATH  = "app/var/map_latest.jpg"
 
-
+QUESTION_PATH = "app/data/survey/survey.json"
 
 
 class Survey(SingleGeneratorEngine):
 
     def _setup(self):
         pass
-
-    def _reset(self):
-        self.loadQuestions()
-        self.responses = {}
-        self.iterateGenerator()
-
-    def _generator(self):
-        self.sendBroadcastMessage(self.intro)
-
-        for qIndex in range(len(self.questions)):
-
-            self.sendQuestion(qIndex)
-            yield
-
-            while True:
-                self.parseResponse(qIndex)
-
-                if self.questionAnswered(qIndex):
-                    break
-                else:
-                    yield
-
-            self.finalizeQuestion()
-
-        self.finalizeAllQuestions()
-
 
     def getQuestionText(self, qIndex):
         question = self.questions[qIndex]
@@ -51,61 +25,43 @@ class Survey(SingleGeneratorEngine):
         text = f"{prompt}"
 
         for i, c in enumerate(choices):#here abcd instead of 0 to 3
-            text += f"\t{i+1}. {c['option']}"
+            text += f"\n{i+1}. {c['option']}"
 
         return text
 
 
-    def sendQuestion(self, qIndex):
-        text =  self.getQuestionText(qIndex)
-        for id in self.ids:
-            self.sendMessage(id,text)
-
     def parseResponse(self, qIndex):
         if self.id not in self.ids:
-            self.sendMessage(self.id, "You are not in the survey")
+            response = None
 
-        try:
-            selected = int(self.text) - 1
-        except ValueError:
-            self.sendMessage(self.id, "Response not recognized!")
-            return
 
-        question = self.questions[qIndex]
-        choices = question["choices"]
+        choices = self.questions[qIndex]["choices"]
+        selected, response = prompt_option(self.text, list(range(len(choices))))
+        
+        if selected:
+            if qIndex not in self.responses:
+                self.responses[qIndex] = {}
 
-        if( selected >= len(choices) or selected < 0 ):
-            self.sendMessage(self.id, "Response not recognized!")
-            return
+            self.responses[qIndex][self.id] = selected
 
-        if qIndex not in self.responses:
-            self.responses[qIndex] = {}
-
-        self.responses[qIndex][self.id] = selected
+        return response
 
 
     def questionAnswered(self, qIndex):
         if qIndex not in self.responses:
             return False
-        try:
-            return set(self.ids) <= set(self.responses[qIndex].keys())
-        except IndexError:
-            return False
 
-    def finalizeQuestion(self):
-        pass
+        yetToAnswer = set(self.ids) - set(self.responses[qIndex].keys())
+        print("Yet to answer", yetToAnswer)
+        return len(yetToAnswer) == 0
 
     def finalizeAllQuestions(self):
         route = self.getRoute()
         message = f"{' -> '.join(route)}"
-        # send_data("map-decision", message)
-        self.sendBroadcastMessage(message)
 
         route.insert(0, "Questionaire")
-        print(f"{'->'.join(route)}")
         draw_map(route, OUTPUT_MAP_PATH)
-
-
+        return message
 
 
     def getRoute(self, number = 4):
@@ -114,8 +70,8 @@ class Survey(SingleGeneratorEngine):
         for qIndex, response in self.responses.items():
             question = self.questions[qIndex]
             metric   = question['metric']
-
-            score = [question['choices'][r] ['score'] for r in response.values()]
+            print(response)
+            score = [question['choices'][r-1]['score'] for r in response.values()]
 
             score = sum(score) / len(score)
             scores[metric] += score
@@ -149,9 +105,41 @@ class Survey(SingleGeneratorEngine):
         survey_def = json.load(open(QUESTION_PATH, "r"))
 
         self.intro     = survey_def["intro"]
+        self.outro     = survey_def["outro"]
         self.questions = survey_def["questions"]
         self.metrics   = survey_def["metrics"]
         self.stations  = [ s for s in survey_def["stations"] if s["active"] ]
+
+
+    def _reset(self):
+        self.loadQuestions()
+        self.responses = {}
+        self.iterateGenerator()
+
+    def _generator(self):
+        self.sendBroadcastMessage(self.intro)
+
+        for qIndex in range(len(self.questions)):
+
+            text =  self.getQuestionText(qIndex)
+            self.sendMessageAll(text)
+            yield
+
+            while True:
+                if self.text:
+                    responce = self.parseResponse(qIndex)
+                    if responce:
+                        self.sendMessage(self.id, responce )
+                if self.questionAnswered(qIndex):
+                    break
+                else:
+                    yield
+
+        message = self.finalizeAllQuestions()
+        
+        send_cue("map-decision", message)
+        self.sendBroadcastMessage(message)
+        self.sendBroadcastMessage(self.outro)
 
 
 # def runSurvey(survey_def):
