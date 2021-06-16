@@ -98,14 +98,6 @@
           let meetingDetails = new MeetingDetails( $("#meeting-details"), meetingUrl);
 
           let messageList    = new MessageList($('#messages'), room.myUserId(), ownDisplayName);
-  
-          let interactionSelector = new InteractionSelector(
-            $("#interaction-selector"), 
-            callConfig['types'],
-            setInteractionEngine,
-            callConfig['default-engine-config'].type
-            );
-
 
           socketio.on('disconnect_now', function(data) {
               console.info('disconnect signal received');
@@ -185,28 +177,25 @@
   
   <div id="main">
     <div id="row1" class="row">
-      <div class="col-md-4">
+
+      <!-- Col1 -->
+      <div class="col-md-6">
+        <h2>Chat</h2>
+        <div id="messages"></div>
+
+      </div>
+      <!-- Col2 -->
+      <div class="col-md-6">
         <div id="meeting-details">
           <a id="meeting-link" href="" target="_blank">Meeting Link</a>
         </div>
-      </div>
-      <div class="col-md-4">
+
         <h2>Users</h2>
         <div id="user-list"></div>
-      </div>
-      <div class="col-md-4">
         <div id="event-list"></div>
-        <div id="interaction-selector"></div>
+      </div>
       </div>
     </div>
-    <div id="row1" class="row">
-      <div class="col-md-12">
-        <h2>Chat</h2>
-        <div id="messages">
-        </div>
-      </div>
-    </div>
-  </div>
 
 </body>
 

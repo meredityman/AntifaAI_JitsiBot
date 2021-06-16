@@ -6,7 +6,7 @@ from ..utils.make_map import draw_map
 from ..utils.cuemanager import send_cue
 from .prompts import prompt_option
 
-OUTPUT_MAP_PATH  = "app/var/map_latest.jpg"
+OUTPUT_MAP_PATH  = "app/static/var/map_latest.jpg"
 
 QUESTION_PATH = "app/data/survey/survey.json"
 
@@ -108,6 +108,7 @@ class Survey(SingleGeneratorEngine):
         self.outro     = survey_def["outro"]
         self.questions = survey_def["questions"]
         self.metrics   = survey_def["metrics"]
+        self.prompt    = survey_def["prompt"]
         self.stations  = [ s for s in survey_def["stations"] if s["active"] ]
 
 
@@ -122,7 +123,8 @@ class Survey(SingleGeneratorEngine):
         for qIndex in range(len(self.questions)):
 
             text =  self.getQuestionText(qIndex)
-            self.sendMessageAll(text)
+            self.sendBroadcastMessage(text)
+            self.sendMessageAll(self.prompt)
             yield
 
             while True:

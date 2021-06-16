@@ -12,7 +12,7 @@
         {"id": "10",    "date": "21.06.2021", "time": "09:00", "uuid": "cb55691b3c8245989f9636ebdb222d65", "url":	"https://meet.cobratheatercobra.com/cb55691b3c8245989f9636ebdb222d65"},
         {"id": "11",    "date": "21.06.2021", "time": "10:15", "uuid": "f4e7678434d249e7b47ca6979934d283", "url":	"https://meet.cobratheatercobra.com/f4e7678434d249e7b47ca6979934d283"},
         {"id": "12",    "date": "21.06.2021", "time": "11:30", "uuid": "425183fc449b473b93d3e88fceebba57", "url":	"https://meet.cobratheatercobra.com/425183fc449b473b93d3e88fceebba57"},
-        {"id": "DEBUG", "date": "",           "time": ""     , "uuid": "6f6191891e6444e0a156bdca6617ccf0", "url":	"https://meet.cobratheatercobra.com/6f6191891e6444e0a156bdca6617ccf0"},
-        {"id": "SPON", "date": "",           "time": ""     , "uuid": "MemorableHeadquartersAttendBehind", "url":	"https://meet.cobratheatercobra.com/MemorableHeadquartersAttendBehind"}
+        {"id": "DEBUG", "date": "00.00.0000", "time": "00.00", "uuid": "6f6191891e6444e0a156bdca6617ccf0", "url":	"https://meet.cobratheatercobra.com/6f6191891e6444e0a156bdca6617ccf0"},
+        {"id": "SPON",  "date": "00.00.0000", "time": "00.00", "uuid": "MemorableHeadquartersAttendBehind", "url":	"https://meet.cobratheatercobra.com/MemorableHeadquartersAttendBehind"}
     ]
 }

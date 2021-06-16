@@ -7,25 +7,21 @@ def prompt_continue(message):
 # This function asks us to choose from a list of options
 def prompt_option(message, options, nota = False):
     selected = None
-
     if nota and "None of these!" not in options:
         options.append("None of these!")
 
     try:
-        print(len(options))
         selected = options[int(message)-1]
     except IndexError:
-        print(1)
         selected = None
     except ValueError:
-        print(0)
         if message in options:
             selected = message
 
-    if selected:
+    if selected is not None:
         response = f"You chose '{selected}'."
     else:
-        response = f"Selection not understood!" 
+        response = f"Selection he not understood!" 
 
     if nota and selected == "None of these!":
         selected = None
