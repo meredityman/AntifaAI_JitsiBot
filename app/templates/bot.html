@@ -61,7 +61,7 @@
         socketio.disconnect();
         engine_socketio.disconnect();
         connection.disconnect();
-        $("#main").html('<h1>Disconnected</h1>');
+        $("#main").html('<a id="reconnect-button" href="javascript:location.reload(true)">Reconnect</a>');
       }
 
       function startConference(){ 

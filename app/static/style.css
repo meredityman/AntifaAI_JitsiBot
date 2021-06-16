@@ -4,7 +4,13 @@ body {
     font-family: system-ui;
 }
 
+a {
+    color: purple;
+}
 
+#reconnect-button {
+    font-size: x-large;
+}
 button.selected {
     background-color: black;
 }
@@ -13,9 +19,6 @@ button.selected {
     background-color: black;
 }
 
-a {
-    color: purple;
-}
 
 div.messages {
     overflow-x: scroll;
