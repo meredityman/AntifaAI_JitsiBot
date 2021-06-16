@@ -5,9 +5,10 @@ ids = [ "0" ]
 
 config = {
     # 'type': 'incidents',
-    'type': 'telegram',
+    #'type': 'telegram',
     #'type': 'hatespeech',
     #'type': 'twitter',
+    'type': 'survey',
     'ids': ids,
 } 
 

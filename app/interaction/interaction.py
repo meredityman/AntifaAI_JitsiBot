@@ -113,6 +113,8 @@ class MultiGeneratorEngine(InteractionEngine):
             try:
                 self.id = id
                 next(self.generators[id])
+            except KeyError:
+                pass
             except StopIteration:
                 print(f"Generator {id} Complete")   
 

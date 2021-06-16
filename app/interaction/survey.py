@@ -36,7 +36,7 @@ class Survey(SingleGeneratorEngine):
 
 
         choices = self.questions[qIndex]["choices"]
-        selected, response = prompt_option(self.text, choices)
+        selected, response = prompt_option(self.text, list(range(len(choices))))
         
         if selected:
             if qIndex not in self.responses:
@@ -70,8 +70,8 @@ class Survey(SingleGeneratorEngine):
         for qIndex, response in self.responses.items():
             question = self.questions[qIndex]
             metric   = question['metric']
-
-            score = [question['choices']['score'] for r in response.values()]
+            print(response)
+            score = [question['choices'][r-1]['score'] for r in response.values()]
 
             score = sum(score) / len(score)
             scores[metric] += score
