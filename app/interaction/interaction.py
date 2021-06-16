@@ -137,10 +137,14 @@ class MultiGeneratorEngine(InteractionEngine):
         raise NotImplementedError()
 
     def _getResponse(self, id, text, isPublic):
-        if id in self.ids:
-            self.id   = id
-            self.text = text
-            self.iterateGenerator()
+        self.isPublic = isPublic
+        if isPublic:
+            print("Skipping Public message")
+        else:
+            if id in self.ids:
+                self.id   = id
+                self.text = text
+                self.iterateGenerator()
 
 
 

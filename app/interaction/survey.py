@@ -52,7 +52,9 @@ class Survey(SingleGeneratorEngine):
             return False
 
         yetToAnswer = set(self.ids) - set(self.responses[qIndex].keys())
-        print("Yet to answer", yetToAnswer)
+        if len(yetToAnswer) != 0:
+            self.sendBroadcastMessage( f"{len(yetToAnswer)} peorple are yet to answer")
+            print("Yet to answer", yetToAnswer)
         return len(yetToAnswer) == 0
 
     def finalizeAllQuestions(self):
@@ -64,7 +66,7 @@ class Survey(SingleGeneratorEngine):
         return message
 
 
-    def getRoute(self, number = 4):
+    def getRoute(self, number = 6):
 
         scores = { m["name"] : 0.0 for m in self.metrics }
         for qIndex, response in self.responses.items():
@@ -106,7 +108,7 @@ class Survey(SingleGeneratorEngine):
 
         self.intro     = survey_def["intro"]
         self.outro     = survey_def["outro"]
-        self.questions = survey_def["questions"]
+        self.questions = [q for q in survey_def["questions"] if q["active"]]
         self.metrics   = survey_def["metrics"]
         self.prompt    = survey_def["prompt"]
         self.stations  = [ s for s in survey_def["stations"] if s["active"] ]

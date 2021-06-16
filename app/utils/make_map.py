@@ -17,7 +17,10 @@ all_stations = {
     "Garage"        : ( 250, 175),
     "Memorial"      : (  85, 125),
     "Drum"          : ( 255, 105),
-    "Reading Room"  : ( 115,  85)
+    "Reading Room"  : ( 115,  85),
+    "Antifa Kitchen": ( 115,  85),
+    "Playstation"   : ( 115,  85),
+    "Fountain"      : ( 115,  85)
 }
 colors = [
     "#6c1985",
