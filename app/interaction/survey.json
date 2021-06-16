@@ -4,6 +4,7 @@
         {
             "prompt" : "Wie viel,laut der auf tatortrechts.de zusammengetragenen Taten rechter Gewalt, gab es seit 2000 in Deutschland?",
             "metric"    : "knowledge",
+            "active" : true,
             "choices"  : [
                 {
                     "option" : "ca. 200",
@@ -25,6 +26,7 @@
         },        {
             "prompt" : "Wo im Internet würde deine Suche nach Naziaktivitäten beginnen?",
             "metric"    : "technik",
+            "active"    : true,
             "choices"  : [
                 {
                     "option" : "auf Twitter",
@@ -46,6 +48,7 @@
         },        {
             "prompt" : "Wie viel rechte Gewalttaten aus den 90ern sind dir bekannt?",
             "metric"    : "history",
+            "active"    : true,
             "choices"  : [
                 {
                     "option" : "3",
@@ -68,6 +71,7 @@
         {
             "prompt" : "Was hast du bisher gegen rechte Gewalt unternommen?",
             "metric"    : "courage",
+            "active"    : true,
             "choices"  : [
                 {
                     "option" : "Ich informiere mich regelmäßig über aktuelle Vorfälle und Entwicklungen",
@@ -89,6 +93,7 @@
         },        {
             "prompt" : "Wenn du an 1990 denkst...",
             "metric"    : "empathy",
+            "active"    : true, 
             "choices"  : [
                 {
                     "option" : "werde ich wütend",
@@ -110,6 +115,7 @@
         },        {
             "prompt" : "Mit dem Ende des NSU-Prozesses...",
             "metric"    : "anger",
+            "active"    : false,
             "choices"  : [
                 {
                     "option" : "...müsste ich mich nochmal genauer mit beschäftigen.",
@@ -131,6 +137,7 @@
         },           {
             "prompt" : "Auf welche Demo würdest du gehen? ",
             "metric"    : "anger",
+            "active"    : true,
             "choices"  : [
                 {
                     "option" : "In Gedenken an die Opfer des NSU",
@@ -152,6 +159,7 @@
         },           {
             "prompt" : "Spiele, die politische Botschaften haben...  ",
             "metric"    : "technik",
+            "active"    : true,
             "choices"  : [
                 {
                     "option" : "...habe ich noch nie gespielt.",
@@ -173,6 +181,7 @@
         },           {
             "prompt" : "Nach Jahrelangen rechtsextremen Skandalen in der Bundeswehr fanden Ermittlungen bei dem KSK (Kommando - Spezialkräfte) der Bundeswehr statt. Was haben die Ermittlungen ergeben? ",
             "metric"    : "knowledge",
+            "active"    : true,
             "choices"  : [
                 {
                     "option" : "48.000 Schuss Munition fehlten.",
