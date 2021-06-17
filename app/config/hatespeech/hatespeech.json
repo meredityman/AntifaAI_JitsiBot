@@ -1,9 +1,9 @@
 {
     "introduction" : [
-        "Social media platforms, online publications and researchers have long been interested in automated methods for determining whether text is hateful or offensive. Modern advances in machine learning for natural language processing have led to increasingly impressive results. You will now have an opportunity to interact with such a cutting edge system yourself.",
+        
         "This model is one of the few open access hate speech detection models we could find. It is based on a neural network architecture called a transformer. This model was first trained on an extremely large corpus of text over many days to derive a general purpose language model. It was then ‘fine tuned’ on a smaller collection of data taken from the comment sections of online publications. The data was labelled as ‘offensive’ or ‘other’ by human moderators and is trained to make the same predictions on new data. This work was done by a Berlin-based start up as a prototype and is ‘definitely not production ready’.        ",
-        "You are now free to write messages to the bot. It will reply by telling you the probability it assigns to your message being offensive. Do not censor yourself! You are being invited to test the boundaries of this system, and will not be judged for what you write. Nothing you write will be recorded.",
-        "You can type ‘PROMPT’ to receive ideas for experiments and more information."     
+        "Du hast jetzt die Möglichkeit eine Nachricht an den Bot zu schreiben. Er wird dir antworten und versuchen dir eine Bewertung zurück zu geben (eine Wahrscheinlichkeit) wie sehr deine Nachricht aggressiv/hasserfüllt ist oder nicht. Nichts was du schreibst wird gespeichert oder veröffentlicht.",
+        "Du kannst “prompt” eingeben um die Vorschläge geben zu lassen und mehr Informationen zu erhalten."     
     ],
     "commands": {
         "prompt" : [ "prompt", "PROMPT"]
