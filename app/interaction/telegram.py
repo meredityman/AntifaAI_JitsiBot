@@ -3,7 +3,7 @@ from .interaction import SingleGeneratorEngine
 import numpy as np
 import random
 import json
-from .prompts import prompt_continue, prompt_rating
+from .prompts import prompt_rating
 from .regex_helper import  is_url
 from collections import defaultdict
 

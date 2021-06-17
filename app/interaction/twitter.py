@@ -2,14 +2,13 @@ import re
 from numpy.core.fromnumeric import mean
 from .interaction import SingleGeneratorEngine
 import json
-from .prompts import prompt_continue, prompt_rating, prompt_choice
 from .regex_helper import  is_url
 from collections import defaultdict
 
 import tweepy
 import json
 
-from .prompts import prompt_continue, prompt_option
+from .prompts import prompt_option
 
 ####input your credentials here
 consumer_key        = 'qjBKfredGfs5DeH69SDNLdEXN'

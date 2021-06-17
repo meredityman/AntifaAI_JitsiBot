@@ -1,14 +1,21 @@
+import json
+
+prompts = json.load(open("app/config/errors.json", "r"))
+NOTA   = prompts['none']
+CHOOSE = prompts['choose']
+ERROR  = prompts['error']
+
 # This function asks if we want to continue and prints a custom message
-def prompt_continue(message):
-    prompt = "j/n: "
-    print(f"{message}")
-    return  input(prompt).upper() in ["J", "Y", "JA", "YES"]
+# def prompt_continue(message):
+#     prompt = "j/n: "
+#     print(f"{message}")
+#     return  input(prompt).upper() in ["J", "Y", "JA", "YES"]
 
 # This function asks us to choose from a list of options
 def prompt_option(message, options, nota = False):
     selected = None
-    if nota and "None of these!" not in options:
-        options.append("None of these!")
+    if nota and NOTA not in options:
+        options.append(NOTA)
 
     try:
         selected = options[int(message)-1]
@@ -19,11 +26,11 @@ def prompt_option(message, options, nota = False):
             selected = message
 
     if selected is not None:
-        response = f"You chose '{selected}'."
+        response = CHOOSE.format(selected = selected)
     else:
-        response = f"Selection he not understood!" 
+        response = ERROR
 
-    if nota and selected == "None of these!":
+    if nota and selected == NOTA:
         selected = None
         
     return selected, response
@@ -41,9 +48,9 @@ def prompt_choice(message):
         selected = False
 
     if selected is not None:
-        response = f"You chose '{selected}'."
+        response = CHOOSE.format(selected = selected)
     else:
-        response = f"Selection not understood!" 
+        response = ERROR 
         
     return selected, response
 
@@ -56,7 +63,7 @@ def prompt_rating(message, min, max):
         if rating < min or rating > max:
             raise ValueError
     except ValueError:
-        response = "Rating not understood."
+        response = ERROR
         rating = None
 
 
