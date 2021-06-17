@@ -25,6 +25,7 @@ class Incidents(MultiGeneratorEngine):
         self.intro     = self.config["intro"]
         self.thankyou  = self.config["thankyou"]
         self.more      = self.config["more"]
+        self.isPublic  = None
         self.sendBroadcastMessage(self.intro)
         self.iterateAllGenerators()
 

@@ -4,6 +4,7 @@ class InteractionEngine:
         self.callback = callback
         self.broadcastCallback = broadcastCallback
         self.ids = ids
+        self.isPublic = None
         self.setup()
 
 
