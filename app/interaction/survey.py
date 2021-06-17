@@ -36,13 +36,18 @@ class Survey(SingleGeneratorEngine):
 
 
         choices = self.questions[qIndex]["choices"]
-        selected, response = prompt_option(self.text, list(range(len(choices))))
+        options = [ c['option'] for c in choices]
+        selected, response = prompt_option(self.text, options)
         
         if selected:
             if qIndex not in self.responses:
                 self.responses[qIndex] = {}
 
-            self.responses[qIndex][self.id] = selected
+            score = 0
+            for c in choices:
+                if c['option'] == selected:
+                    score = c['score']
+            self.responses[qIndex][self.id] = score
 
         return response
 
@@ -53,15 +58,22 @@ class Survey(SingleGeneratorEngine):
 
         yetToAnswer = set(self.ids) - set(self.responses[qIndex].keys())
         if len(yetToAnswer) != 0:
-            self.sendBroadcastMessage( f"{len(yetToAnswer)} people are yet to answer")
-            print("Yet to answer", yetToAnswer)
+            message = self.pyta.format(pyta=len(yetToAnswer))
+            self.sendBroadcastMessage( message )
         return len(yetToAnswer) == 0
 
     def finalizeAllQuestions(self):
         route = self.getRoute()
-        message = f"{' -> '.join(route)}"
+        message = "🗺️" * 8 + "\n"        
+        message += "{:_^12}".format("ROUTE") + "\n"
+        message += "🗺️" * 8 + "\n\n"
+
+        message += '\n ⬇️⬇️ \n'.join(route)
+
+        message += "\n\n" + ("🗺️" * 8) + "\n\n"
 
         route.insert(0, "Questionaire")
+        route.append("Inflatable")
         draw_map(route, OUTPUT_MAP_PATH)
         return message
 
@@ -72,7 +84,7 @@ class Survey(SingleGeneratorEngine):
         for qIndex, response in self.responses.items():
             question = self.questions[qIndex]
             metric   = question['metric']
-            score = [question['choices'][r-1]['score'] for r in response.values()]
+            score = list(response.values())
 
             score = sum(score) / len(score)
             scores[metric] += score
@@ -109,6 +121,7 @@ class Survey(SingleGeneratorEngine):
         self.metrics   = survey_def["metrics"]
         self.prompt    = survey_def["prompt"]
         self.stations  = [ s for s in survey_def["stations"] if s["active"] ]
+        self.pyta      = survey_def["pyta"]
 
 
     def _reset(self):
@@ -127,14 +140,20 @@ class Survey(SingleGeneratorEngine):
             yield
 
             while True:
-                if self.text:
+                if  self.isPublic:
+                    if( self.text == "ESCAPE"):
+                        break
+                    else:
+                        yield
+                else:
                     responce = self.parseResponse(qIndex)
                     if responce:
                         self.sendMessage(self.id, responce )
-                if self.questionAnswered(qIndex):
-                    break
-                else:
-                    yield
+
+                    if self.questionAnswered(qIndex):
+                        break
+                    else:
+                        yield
 
         message = self.finalizeAllQuestions()
         

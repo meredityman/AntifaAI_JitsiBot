@@ -20,7 +20,8 @@ all_stations = {
     "Reading Room"  : ( 115,  85),
     "Antifa Kitchen": ( 117,  87),
     "Playstation"   : ( 110,  80),
-    "Fountain"      : ( 111,  81)
+    "Fountain"      : ( 111,  81),
+    "Inflatable"    : ( 0,  0)
 }
 colors = [
     "#6c1985",
@@ -72,21 +73,22 @@ def draw_map(stations, file_path):
     smooth_paths = []
     for path in paths:
         np_path = np.asarray(path) / scale
- 
-        # #create spline function
-        f, u = interpolate.splprep([np_path[:,0], np_path[:,1]], s=2000)
-        # #create interpolated lists of points
-        xint, yint = interpolate.splev(np.linspace(0, 1, 60), f)
-        smooth_path = [ (x, y) for x, y in zip(xint.tolist(), yint.tolist()) ]
-        smooth_paths.append(smooth_path)
-
-
+        try:
+            # #create spline function
+            f, u = interpolate.splprep([np_path[:,0], np_path[:,1]], s=2000)
+            # #create interpolated lists of points
+            xint, yint = interpolate.splev(np.linspace(0, 1, 40), f)
+            smooth_path = [ (x, y) for x, y in zip(xint.tolist(), yint.tolist()) ]
+            smooth_paths.append(smooth_path)
+        except:
+            smooth_paths.append([])
 
 
     path_img = Image.new("RGB", img.size, (255, 255, 255))
     path_img_draw = ImageDraw.Draw(path_img)
     for i, path in enumerate(smooth_paths):
-        path_img_draw.line(path, fill=rgb_cols[i], width=10, joint='curve')
+        if path:
+            path_img_draw.line(path, fill=rgb_cols[i], width=10, joint='curve')
 
     for i, (name, coord) in enumerate(zip(stations.keys(), coords)):
         r = 15

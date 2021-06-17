@@ -2,6 +2,7 @@
     "intro": "Welcome to the survey!",
     "outro": "Thank you for participating in the survey.",
     "prompt": "Please select to option that best fits.",
+    "pyta"   : "{pyta} people are yet to answer",
     "questions": [
         {
             "prompt": "Wie viel,laut der auf tatortrechts.de zusammengetragenen Taten rechter Gewalt, gab es seit 2000 in Deutschland?",

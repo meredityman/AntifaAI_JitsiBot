@@ -23,9 +23,9 @@ class HateSpeech(MultiGeneratorEngine):
 
 
 
-        self.start = "self.data['start']"
-        self.prompts = self.data['prompts']
-        self.commands = self.data['commands']
+        self.start        = self.data['start-prompt']
+        self.prompts      = self.data['prompts']
+        self.commands     = self.data['commands']
         self.final_prompt = self.data['final-prompt']
 
         self.prompts_seen = defaultdict(list)
@@ -106,7 +106,10 @@ class HateSpeech(MultiGeneratorEngine):
             prediction = LABELS[np.argmax(probabilities)]
             certainty = np.max(probabilities)
 
-            response = f"Classified as: {prediction} ({certainty:.0%})"
+            response = self.result.format(
+                prediction = prediction,
+                certainty  = certainty
+            )
 
             if public:
                 self.sendBroadcastMessage(response)
