@@ -8,7 +8,7 @@ from .prompts import prompt_option
 
 OUTPUT_MAP_PATH  = "app/static/var/map_latest.jpg"
 
-QUESTION_PATH = "app/data/survey/survey.json"
+QUESTION_PATH = "app/config/survey/survey.json"
 
 
 class Survey(SingleGeneratorEngine):

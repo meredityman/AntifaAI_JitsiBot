@@ -1,0 +1,5 @@
+{
+    "intro" : "Welcome to telegram. We will all rate the message from...",
+    "thankyou":"Thank you for your responses.",
+    "srtend" : ["BEGIN", "END"]
+}

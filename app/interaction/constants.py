@@ -12,7 +12,7 @@ interactionTypes = {
     # 'echo'      : Echo,
     # 'gpt2'      : GPT2,
     'survey'    : Survey,
-    'incidents' : Incidents,
+    #'incidents' : Incidents,
     'hatespeech': HateSpeech,
     'telegram'  : Telegram,
     'twitter'   : Twitter

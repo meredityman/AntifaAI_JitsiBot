@@ -241,6 +241,7 @@ class UserList {
     button = button.wrap('<li class="list-group-item"></li>').parent();
     this.listEl.append(button);
   };
+  
 
   removeUser( user){
     console.log("Removing element " + user._id);

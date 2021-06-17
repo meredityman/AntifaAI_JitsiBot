@@ -1,0 +1,13 @@
+{
+    "hr" : {
+        "name"  : "Hatefulness",
+        "prompt": "On a scale of 0 to 10, how hateful is this message",
+        "hint" : "Enter a number between 0.0 and 10.0"
+    },
+    "gr" : {
+        "name"  : "Galvanisingness",
+        "prompt": "On a scale of 0 to 10, how galvanising is this message?",
+        "hint" : "Enter a number between 0.0 and 10.0"
+    }
+
+}
