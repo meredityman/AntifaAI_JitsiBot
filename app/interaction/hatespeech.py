@@ -19,7 +19,7 @@ class HateSpeech(MultiGeneratorEngine):
         self.model = BertForSequenceClassification.from_pretrained(MODEL)
 
     def _reset(self):
-        self.data = json.load(open("app/data/hatespeech/hatespeech.json", 'r'))
+        self.data = json.load(open("app/config/hatespeech/hatespeech.json", 'r'))
 
 
 
@@ -29,6 +29,8 @@ class HateSpeech(MultiGeneratorEngine):
         self.final_prompt = self.data['final-prompt']
 
         self.prompts_seen = defaultdict(list)
+
+        self.introSend = False
 
         self.sendBroadcastMessage(self.start)
         self.waitingForStart = True
@@ -82,8 +84,12 @@ class HateSpeech(MultiGeneratorEngine):
         while self.waitingForStart:
             yield
 
-        for line in self.data['introduction']:
-            self.sendMessageAll(line)
+
+        if not self.introSend:
+            for line in self.data['introduction']:
+                self.sendMessageAll(line)
+            self.introSend = True
+
         yield
          
         while True:

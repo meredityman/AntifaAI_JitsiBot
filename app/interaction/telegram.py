@@ -6,7 +6,7 @@ import json
 from .prompts import prompt_continue, prompt_rating
 from .regex_helper import  is_url
 from collections import defaultdict
-metrics = json.load(open("app/data/telegram/metrics.json"))
+metrics = json.load(open("app/config/telegram/metrics.json"))
 
 
 class Telegram(SingleGeneratorEngine):
@@ -16,10 +16,10 @@ class Telegram(SingleGeneratorEngine):
         pass
 
     def _reset(self):
-        self.messages = json.load(open("app/data/telegram/channel_telegram_messages.json", 'r'))
+        self.messages = json.load(open("app/config/telegram/channel_telegram_messages.json", 'r'))
         self.ratings  = json.load(open("app/data/telegram/telegram_rating_data.json", 'r'))
 
-        othertext  = json.load(open("app/data/telegram/text.json", 'r'))
+        othertext  = json.load(open("app/config/telegram/text.json", 'r'))
         self.intro   = othertext['intro']
         self.thankyou = othertext['thankyou']
         self.srtend = othertext['srtend']
@@ -66,7 +66,7 @@ class Telegram(SingleGeneratorEngine):
             scores = defaultdict(lambda: defaultdict(list))
             
             for name, metric in metrics.items():
-                self.sendMessageAll(metric['prompt'])
+                self.sendBroadcastMessage(metric['prompt'])
                 self.sendMessageAll(metric['hint'])
                 yield
                 
