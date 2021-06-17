@@ -1,5 +1,5 @@
 {
-    "choose" : "You chose '{selected}'.",
-    "error"  : "Selection not understood!",
-    "none"   : "None of these!"
+    "choose" : "Du hast '{selected}' gewählt.",
+    "error"  : "Eingabe nicht verstanden",
+    "none"   : "Keine von denen!"
 }
