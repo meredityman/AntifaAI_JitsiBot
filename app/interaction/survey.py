@@ -68,7 +68,7 @@ class Survey(SingleGeneratorEngine):
         message += "{:_^12}".format("ROUTE") + "\n"
         message += "🗺️" * 8 + "\n\n"
 
-        message += '\n ⬇️⬇️ \n'.join(route)
+        message += '\n ⬇️\n'.join(route)
 
         message += "\n\n" + ("🗺️" * 8) + "\n\n"
 
