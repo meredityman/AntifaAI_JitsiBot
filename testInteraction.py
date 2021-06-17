@@ -7,8 +7,8 @@ config = {
     # 'type': 'incidents',
     #'type': 'telegram',
     #'type': 'hatespeech',
-    #'type': 'twitter',
-    'type': 'survey',
+    'type': 'twitter',
+    #'type': 'survey',
     'ids': ids,
 } 
 
