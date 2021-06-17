@@ -8,7 +8,7 @@ from collections import defaultdict
 import tweepy
 import json
 
-from .prompts import prompt_option
+from .prompts import prompt_option, prompt_choice
 
 ####input your credentials here
 consumer_key        = 'qjBKfredGfs5DeH69SDNLdEXN'

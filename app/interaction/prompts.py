@@ -5,11 +5,11 @@ NOTA   = prompts['none']
 CHOOSE = prompts['choose']
 ERROR  = prompts['error']
 
-# This function asks if we want to continue and prints a custom message
-# def prompt_continue(message):
-#     prompt = "j/n: "
-#     print(f"{message}")
-#     return  input(prompt).upper() in ["J", "Y", "JA", "YES"]
+#This function asks if we want to continue and prints a custom message
+def prompt_continue(message):
+    prompt = "j/n: "
+    print(f"{message}")
+    return  input(prompt).upper() in ["J", "Y", "JA", "YES"]
 
 # This function asks us to choose from a list of options
 def prompt_option(message, options, nota = False):
