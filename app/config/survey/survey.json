@@ -1,8 +1,8 @@
 {
-    "intro"  : "Welcome to the survey!",
-    "outro"  : "Thank you for participating in the survey.",
-    "prompt" : "Please select to option that best fits.",
-    "pyta"   : "{pyta} people are yet to answer",
+    "intro"  : "Willkommen zum Fragebogen!",
+    "outro"  : "Danke für deine Teilnahme!",
+    "prompt" : "Wähle was am stärksten auf dich zutrifft!",
+    "pyta"   : "{pyta} Menschen müssen noch antworten.",
     "questions": [
         {
             "prompt": "Wie viel rechte Gewalttaten aus den 90ern sind dir bekannt?",

@@ -1,6 +1,6 @@
 {
-    "start-prompt" : "What does the shit say?",
-    "result" : "Classified as: {prediction} ({certainty:.0%})",
+    "start-prompt" : "Lasst uns den Scheiß analysieren!",
+    "result" : "Klassifiziert als: {prediction} ({certainty:.0%})",
     "introduction" : [
         "Du hast jetzt die Möglichkeit eine Nachricht an den Bot zu schreiben. Er wird dir antworten und versuchen dir eine Bewertung zurück zu geben (eine Wahrscheinlichkeit) wie sehr deine Nachricht aggressiv/hasserfüllt ist oder nicht. Nichts was du schreibst wird gespeichert oder veröffentlicht.",
         "Du kannst “prompt” eingeben um die Vorschläge geben zu lassen und mehr Informationen zu erhalten."     
@@ -8,7 +8,7 @@
     "commands": {
         "prompt" : [ "prompt", "PROMPT"]
     },
-    "final-prompt" : "No more prompts! Go play outside!",
+    "final-prompt" : "Ich bin am Ende. Du kannst jetzt wieder dem AVATAR_IN folgen!",
     "prompts" : [        
         "Eine der bemerkenswerten Fähigkeiten von Transformatormodellen ist ihre begrenzte Fähigkeit, Neologismen (neue Wörter) zu verarbeiten. Das ist interessant, weil Slang und verschlüsselte Sprache extrem effektiv sind, um naive Filtertechniken zu überwinden. Versuche, in einer Beleidigung echte Wörter durch erfundene zu ersetzen",
         "Ein Problem mit den Datensätzen, die zum Trainieren von Hatespeech-Modellen verwendet werden, ist, dass es schwierig ist, Wörter zu unterscheiden, die eine starke Assoziation mit negativer Sprache haben. Zum Beispiel führen Synonyme für Homosexualität oft dazu, dass der Text unabhängig vom Kontext als beleidigend eingestuft wird. Versuche, nette Dinge über homosexuelle Menschen zu sagen und schaue, wo das Modell Probleme hat.",
