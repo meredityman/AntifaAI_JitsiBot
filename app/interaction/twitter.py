@@ -161,6 +161,7 @@ class Twitter(SingleGeneratorEngine):
             yield
 
             while True:
+                print(self.isPublic)
                 if not self.isPublic:
                     # Private messages are ignored
                     yield
@@ -218,8 +219,10 @@ class Twitter(SingleGeneratorEngine):
                 yield
                 while True:
                     if  self.isPublic:
-                        # Public messages are ignored
-                        yield
+                        if( self.text == "ESCAPE"):
+                            break
+                        else:
+                            yield
                     else:
                         if self.text:
                             vote, response = prompt_choice(self.text)
@@ -231,10 +234,11 @@ class Twitter(SingleGeneratorEngine):
                             self.votes[suspicious_user][self.id] = vote
 
                             if set(self.ids) <= set(self.votes[suspicious_user].keys()):
+                                print(self.ids, self.votes[suspicious_user].keys() )
                                 break
                             else:
+                                print(self.ids, self.votes[suspicious_user].keys() )
                                 yield
-                            yield
                         else:
                             yield
 
