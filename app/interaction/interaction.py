@@ -125,6 +125,8 @@ class MultiGeneratorEngine(InteractionEngine):
             print("Generator Complete")   
         except NameError:
             print("No id set")  
+        except KeyError:
+            print("Waaah")
 
 
     def _onSetIds(self):

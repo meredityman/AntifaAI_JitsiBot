@@ -53,7 +53,7 @@ class Survey(SingleGeneratorEngine):
 
         yetToAnswer = set(self.ids) - set(self.responses[qIndex].keys())
         if len(yetToAnswer) != 0:
-            self.sendBroadcastMessage( f"{len(yetToAnswer)} peorple are yet to answer")
+            self.sendBroadcastMessage( f"{len(yetToAnswer)} people are yet to answer")
             print("Yet to answer", yetToAnswer)
         return len(yetToAnswer) == 0
 
@@ -72,7 +72,6 @@ class Survey(SingleGeneratorEngine):
         for qIndex, response in self.responses.items():
             question = self.questions[qIndex]
             metric   = question['metric']
-            print(response)
             score = [question['choices'][r-1]['score'] for r in response.values()]
 
             score = sum(score) / len(score)
@@ -89,8 +88,6 @@ class Survey(SingleGeneratorEngine):
                 point.append(0.0) 
         point = 0.5 * (np.asarray(point) + 0.5)         
         point = point/np.linalg.norm(point)
-
-        print(point)
 
         distances = {}
         for station in self.stations:

@@ -228,7 +228,7 @@ class UserList {
 
   }
 
-  addUser( user, selected = true){
+  addUser( user, selected = false){
     console.log("Adding element " + user._id);
     user['selected'] = selected;
     this.participants[user._id] = user;

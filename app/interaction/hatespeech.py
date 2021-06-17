@@ -23,7 +23,7 @@ class HateSpeech(MultiGeneratorEngine):
 
 
 
-        self.start = self.data['start']
+        self.start = "self.data['start']"
         self.prompts = self.data['prompts']
         self.commands = self.data['commands']
         self.final_prompt = self.data['final-prompt']
@@ -94,14 +94,18 @@ class HateSpeech(MultiGeneratorEngine):
             yield
 
     def getPrediction(self, public = False_):
-        loss, probabilities = self.forward(self.text)
+        try:
+            loss, probabilities = self.forward(self.text)
 
-        prediction = LABELS[np.argmax(probabilities)]
-        certainty = np.max(probabilities)
+            prediction = LABELS[np.argmax(probabilities)]
+            certainty = np.max(probabilities)
 
-        response = f"Classified as: {prediction} ({certainty:.0%})"
+            response = f"Classified as: {prediction} ({certainty:.0%})"
 
-        if public:
-            self.sendBroadcastMessage(response)
-        else:
-            self.sendMessage(self.id, response)
+            if public:
+                self.sendBroadcastMessage(response)
+            else:
+                self.sendMessage(self.id, response)
+        except:
+            print(f"Predictions failed {self.text}")
+            pass

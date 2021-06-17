@@ -4,4 +4,4 @@
 # export FLASK_ENV=development
 # flask run
 
-python3 app.py --name SPON
+python3 app.py
