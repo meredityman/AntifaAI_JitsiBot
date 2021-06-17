@@ -5,6 +5,29 @@
     "pyta"   : "{pyta} people are yet to answer",
     "questions": [
         {
+            "prompt": "Wie viel rechte Gewalttaten aus den 90ern sind dir bekannt?",
+            "metric": "history",
+            "active": true,
+            "choices": [
+                {
+                    "option": "3",
+                    "score": 0
+                },
+                {
+                    "option": "mehr als 10",
+                    "score": 1
+                },
+                {
+                    "option": "keins",
+                    "score": -1
+                },
+                {
+                    "option": "mehr als 5",
+                    "score": 0.5
+                }
+            ]
+        },
+        {
             "prompt": "Wie viel,laut der auf tatortrechts.de zusammengetragenen Taten rechter Gewalt, gab es seit 2000 in Deutschland?",
             "metric": "knowledge",
             "active": true,
@@ -51,29 +74,6 @@
             ]
         },
         {
-            "prompt": "Wie viel rechte Gewalttaten aus den 90ern sind dir bekannt?",
-            "metric": "history",
-            "active": true,
-            "choices": [
-                {
-                    "option": "3",
-                    "score": 0
-                },
-                {
-                    "option": "mehr als 10",
-                    "score": 1
-                },
-                {
-                    "option": "keins",
-                    "score": -1
-                },
-                {
-                    "option": "mehr als 5",
-                    "score": 0.5
-                }
-            ]
-        },
-        {
             "prompt": "Was hast du bisher gegen rechte Gewalt unternommen?",
             "metric": "courage",
             "active": true,
@@ -99,7 +99,7 @@
         {
             "prompt": "Wenn du an 1990 denkst...",
             "metric": "empathy",
-            "active": true,
+            "active": false,
             "choices": [
                 {
                     "option": "werde ich wütend",
@@ -144,7 +144,7 @@
         },
         {
             "prompt": "Auf welche Demo würdest du gehen? ",
-            "metric": "anger",
+            "metric": "empathy",
             "active": true,
             "choices": [
                 {
@@ -168,7 +168,7 @@
         {
             "prompt": "Spiele, die politische Botschaften haben...  ",
             "metric": "technik",
-            "active": true,
+            "active": false,
             "choices": [
                 {
                     "option": "...habe ich noch nie gespielt.",
