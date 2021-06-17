@@ -239,7 +239,6 @@ class Twitter(SingleGeneratorEngine):
                             else:
                                 print(self.ids, self.votes[suspicious_user].keys() )
                                 yield
-                            yield
                         else:
                             yield
 

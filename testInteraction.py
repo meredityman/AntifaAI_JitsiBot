@@ -1,13 +1,13 @@
 from app.interaction import engine
 
 
-ids = [ "0", "1" ]
+ids = [ "0" ]
 
 config = {
     # 'type': 'incidents',
-    #'type': 'telegram',
+    'type': 'telegram',
     #'type': 'hatespeech',
-    'type': 'twitter',
+    #'type': 'twitter',
     #'type': 'survey',
     'ids': ids,
 } 
