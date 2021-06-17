@@ -219,7 +219,6 @@ class Twitter(SingleGeneratorEngine):
                 yield
                 while True:
                     if  self.isPublic:
-                        print(self.text)
                         if( self.text == "ESCAPE"):
                             break
                         else:
@@ -235,8 +234,10 @@ class Twitter(SingleGeneratorEngine):
                             self.votes[suspicious_user][self.id] = vote
 
                             if set(self.ids) <= set(self.votes[suspicious_user].keys()):
+                                print(self.ids, self.votes[suspicious_user].keys() )
                                 break
                             else:
+                                print(self.ids, self.votes[suspicious_user].keys() )
                                 yield
                             yield
                         else:

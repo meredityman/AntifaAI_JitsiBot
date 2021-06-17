@@ -53,6 +53,7 @@ class Engine():
 
     def feedEnginePrivate(self, id, text):
         if self.interactionEngine is not None:
+            print(f"Feeding engine {id} <- {text}")
             self.interactionEngine.getResponsePrivate(id, text)
         else:
             print(f"No engine for private message from {id}")
