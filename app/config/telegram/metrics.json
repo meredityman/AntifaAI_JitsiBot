@@ -1,13 +1,13 @@
 {
     "hr" : {
-        "name"  : "Hatefulness",
-        "prompt": "On a scale of 0 to 10, how hateful is this message",
-        "hint" : "Enter a number between 0.0 and 10.0"
+        "name"  : "Hassladung",
+        "prompt": "Auf einer Skala von 0 bis 10, wie hassgeladen ist diese Nachricht",
+        "hint" : "Gib eine Zahl zwischen 0.0 und 10.0 ein"
     },
     "gr" : {
-        "name"  : "Galvanisingness",
-        "prompt": "On a scale of 0 to 10, how galvanising is this message?",
-        "hint" : "Enter a number between 0.0 and 10.0"
+        "name"  : "Anstiftend",
+        "prompt": "Auf einer Skala von 0 bis 10, wie sehr stiftet diese Nachricht zur Tat an?",
+        "hint" : "Gib eine Zahl zwischen 0.0 und 10.0 ein"
     }
 
 }
