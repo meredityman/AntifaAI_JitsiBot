@@ -45,6 +45,18 @@ def get_meetings():
 def get_route():
     return send_from_directory('static/var', 'map_latest.jpg')
 
+
+@main.route('/telegram.html')
+def get_telegram():
+    return send_from_directory('static/var', 'TelegramRatingScatter.html')
+
+
+@main.route('/twitter.html')
+def get_twitter():
+    return send_from_direct
+    
+    ory('static/var', '')
+
 @main.route('/map-data.json')
 def get_map_data():
     data = {}

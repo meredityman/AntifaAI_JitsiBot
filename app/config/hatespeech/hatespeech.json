@@ -1,4 +1,5 @@
 {
+    "start-prompt" : "",
     "introduction" : [
         
         "This model is one of the few open access hate speech detection models we could find. It is based on a neural network architecture called a transformer. This model was first trained on an extremely large corpus of text over many days to derive a general purpose language model. It was then ‘fine tuned’ on a smaller collection of data taken from the comment sections of online publications. The data was labelled as ‘offensive’ or ‘other’ by human moderators and is trained to make the same predictions on new data. This work was done by a Berlin-based start up as a prototype and is ‘definitely not production ready’.        ",
@@ -12,7 +13,7 @@
     "prompts" : [        
         "One of the remarkable abilities of transformer models is their limited ability to handle neologisms (new words). This is interesting because slang and coded language is extremely effective at defeating more naive filtering techniques. Try substituting made up words for real ones in an insult. ",
         "One problem with the datasets used to train hatespeech models is that they find it difficult to distinguish words that have a strong association with negative speech. For example, synonyms for homosexuality often cause text to be classified as offensive regardless of context. Try to say nice things about gay people and see where the model trips up.",
-        "Word substitution is a common way to test the behaviour of the model. Take an unambiguously hateful sentence, for example “[Something hateful]” and try replacing words one at a time. How much do you have to change the text before the model fails?",
+        "Word substitution is a common way to test the behaviour of the model. Take an unambiguously hateful sentence, for example “[Something hateful in German]” and try replacing words one at a time. How much do you have to change the text before the model fails?",
         "Language models can often be shown to have gender bias. Try changing the gender of the subject in a sentence. Do you get different behaviour?",
         "Sentiment and emotion detection are a related area of research that have also proved fruitful. In this model, we would expect  emotional signifiers to have a large effect on the result. What is the effect of expressing positive and negative emotions with respect to a target group?",
         "Unfortunately the symbols understood by this model only include regular characters and some punctuation. This is increasingly seen as an oversight, because emoji are a key part of online communication and methods are being developed to compensate for this. Even punctuation is important though. Try putting more exclamation marks into your writing. Does it make a difference?",

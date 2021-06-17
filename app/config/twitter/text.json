@@ -1,5 +1,16 @@
 {
-    "number-of-users" : 3
-
+    "intro" : "Wellcome to the Twitter bot!",
+    "outro" : "Thank you for the contribution. You took digital action. You have made AntifaAI smarter",
+    "number-of-users" : 3,
+    "question" : "Könnte der User ein Nazi sein ( 'j', 'n' )",
+    "hashtag-question" : "Pick a hashtag!",
+    "users-question" : "Between you, pick {num_users:d} users from the list:",
+    "is-nazi" : "👎\t'{user}' has been labled as a nazi by {votes_for} to {votes_against} votes.",
+    "is-not-nazi" : "👍\t'{user}' has not been labled as a nazi {votes_against} to {votes_for} votes.",
+    "summary" : {
+        "intro"       : "{suspicious_user} has {followers_count} followers.",
+        "description" : "Bio",
+        "tweets"      : "Recent Tweets"
+    }
 
 }

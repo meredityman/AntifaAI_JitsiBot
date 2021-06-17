@@ -1,3 +1,4 @@
+import re
 from numpy.core.fromnumeric import mean
 from .interaction import SingleGeneratorEngine
 import json
@@ -51,62 +52,6 @@ def get_users_for_trend(trend):
 
     return users
 
-def get_user_summmary(suspicious_user):
-    responce= ""
-
-    x = api.get_user(suspicious_user)
-
-    followers_count = x._json['followers_count']
-    self_description= x._json['description']
-    location        = x._json['location']   
-
-    responce += f"{suspicious_user} has {followers_count} followers."
-    responce += f"Their self description is:\n{self_description}"
-
-    ret = api.user_timeline(suspicious_user)
-    responce += f"Here are some of their recent tweets:\n"
-    #print(len(ret))
-    for r in ret:
-        responce += r.text + "\n"
-
-    return responce
-
-
-
-def get_results(votes):
-    message = ""
-    confirmed_users = []
-    for user, user_votes in votes.items():
-
-        votes_for = sum(user_votes.values())
-        votes_against = len(user_votes) - votes_for
-        is_nazi = votes_for > votes_against
-
-        if is_nazi:
-            message += f"👎\t'{user}' has been labled as a nazi by {votes_for} to {votes_against} votes.\n"
-            confirmed_users.append(user)
-        else:
-            message += f"👍\t'{user}' has not been labled as a nazi {votes_against} to {votes_for} votes.\n"
-
-    return  message, confirmed_users
-
-def save_data(users):
-    pass
-
-#     friends = api.friends(suspicous_user)
-#     connections = { f.screen_name : 1 for f in friends }
-
-    # if suspicous_user not in jsonData:
-    #     jsonData[suspicous_user] = {
-    #         "connections" : connections,
-    #         "followers"  : followers_count,
-    #         "location"   : location,
-    #         "description": self_description,
-    #     }
-
-
-    # json.dump(jsonData, open("data/twitter-data.json", "w"), indent=4, sort_keys=True)
-    # print('Thank you for the contribution. You took digital action. You have made AntifaAI smarter')
 
 class Twitter(SingleGeneratorEngine):
 
@@ -114,19 +59,102 @@ class Twitter(SingleGeneratorEngine):
         pass
 
     def _reset(self):
-        othertext  = json.load(open("app/data/twitter/text.json", 'r'))
+        self.jsonData  = json.load(open("app/data/twitter/twitter-data.json", 'r'))
+
+
+        othertext  = json.load(open("app/config/twitter/text.json", 'r'))
 
         self.num_users = othertext ['number-of-users']
-
+        self.intro = othertext ['intro']
+        self.outro = othertext ['outro']
+        self.question = othertext ['question']
+        self.hashtag_question = othertext ['hashtag-question']
+        self.users_question   = othertext ['users-question']
+        self.is_nazi     = othertext ['is-nazi']
+        self.is_not_nazi = othertext ['is-not-nazi']
+        self.summary     = othertext ['summary']
+        
         self.iterateGenerator()
 
+    def save_data(self, users):
+
+        for user in users:
+            friends = api.friends(user)
+            connections = { f.screen_name : 1 for f in friends }
+
+            x = api.get_user(user)
+
+            followers_count = x._json['followers_count']
+            self_description= x._json['description']
+            location        = x._json['location']   
+
+            if user not in self.jsonData:
+                self.jsonData[user] = {
+                    "connections" : connections,
+                    "followers"  : followers_count,
+                    "location"   : location,
+                    "description": self_description,
+                }
+
+
+        json.dump(jsonData, open("app/data/twitter/twitter-data.json", "w"), indent=4, sort_keys=True)
+ 
+    def get_user_summmary(self, suspicious_user):
+        response= ""
+
+        x = api.get_user(suspicious_user)
+
+        followers_count = x._json['followers_count']
+        self_description= x._json['description']
+        location        = x._json['location']   
+
+        user_title = "@" + suspicious_user.upper()
+        response += f"\n{user_title:_^20}\n\n"
+        response += self.summary['intro'].format(suspicious_user=suspicious_user, followers_count=followers_count) +"\n"
+
+        response += f"\n{self.summary['description']:_^20}\n\n"
+        response += f"{self_description}\n"
+
+        ret = api.user_timeline(suspicious_user)
+
+        response += f"\n{self.summary['tweets']:_^20}\n\n"
+        for i, r in enumerate(ret):
+            if i > 4:
+                break
+
+            response += r.text + "\n\n"
+            response += ("-" * 20) + "\n"
+
+        return response
+
+
+    def get_results(self, votes):
+        message = ""
+        confirmed_users = []
+        for user, user_votes in votes.items():
+
+            votes_for = sum(user_votes.values())
+            votes_against = len(user_votes) - votes_for
+            is_nazi = votes_for > votes_against
+
+            if is_nazi:
+                message += self.is_nazi.format(user=user, votes_for=votes_for, votes_against=votes_against) + "\n"
+                confirmed_users.append(user)
+            else:
+                message += self.is_not_nazi.format(user=user, votes_for=votes_for, votes_against=votes_against) + "\n"
+
+        return  message, confirmed_users
+
     def _generator(self):
+
+        self.sendBroadcastMessage(self.intro)
+
         running = True
         while running:
         
             # Get a hashtag
             hashtags = get_trending_hashtags()
-            message = "Pick a hashtag!\n"
+            message = self.hashtag_question + "\n"
             message += '\n'.join([f"{i+1}). {hashtag}" for i, hashtag in enumerate(hashtags)])
             message += f"\n1-{len(hashtags)}: "
             self.sendBroadcastMessage(message)
@@ -153,9 +181,10 @@ class Twitter(SingleGeneratorEngine):
             # Get a users
             suspicious_users = set([])
             users = get_users_for_trend(hashtag)
-            message = f"Pick {self.num_users} users.\n"
+            message  = self.users_question.format(num_users = self.num_users)
+            message += "\n"
             message += "\n".join([ f"{i+1}). {user}" for i, user in enumerate(users)])
-            message += f"\n1-{len(users)}: "
+            message += f"\n\n1-{len(users)}: "
             self.sendBroadcastMessage(message)
             yield
 
@@ -183,9 +212,9 @@ class Twitter(SingleGeneratorEngine):
             self.votes = defaultdict(dict)
 
             for suspicious_user in suspicious_users:
-                message = get_user_summmary(suspicious_user)
+                message = self.get_user_summmary(suspicious_user)
                 self.sendBroadcastMessage(message)    
-                self.sendMessageAll("Könnte der User ein Nazi sein ( 'j', 'n' )")      
+                self.sendMessageAll(self.question )     
                 yield
                 while True:
                     if  self.isPublic:
@@ -194,10 +223,12 @@ class Twitter(SingleGeneratorEngine):
                     else:
                         if self.text:
                             vote, response = prompt_choice(self.text)
+
+                        if response:
+                            self.sendMessage(self.id, response)
+
                         if vote is not None:
                             self.votes[suspicious_user][self.id] = vote
-                            if response:
-                                self.sendMessage(self.id, response)
 
                             if set(self.ids) <= set(self.votes[suspicious_user].keys()):
                                 break
@@ -207,14 +238,13 @@ class Twitter(SingleGeneratorEngine):
                         else:
                             yield
 
-
-
-            message, confirmed_users = get_results(self.votes)
-            save_data(confirmed_users)
+            message, confirmed_users = self.get_results(self.votes)
             self.sendBroadcastMessage(message)  
-            self.sendBroadcastMessage("Thank you for helping ...")  
+            self.sendBroadcastMessage(self.outro)  
 
             running = False
+
+            self.save_data(confirmed_users)
 
 # def main_loop():
 
