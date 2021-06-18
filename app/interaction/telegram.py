@@ -6,8 +6,42 @@ import json
 from .prompts import prompt_rating
 from .regex_helper import  is_url
 from collections import defaultdict
+import holoviews as hv
+from holoviews import dim, opts
+import json
 
 
+def plot_telegram():
+
+
+    print("Plotting...")
+
+    hv.extension('bokeh')
+
+    raw_data = json.load(open("app/data/telegram/telegram_rating_data.json", "r"))
+
+
+    channels = []
+
+    data_groups = {}
+    for message in raw_data.values():
+
+        channel = message["channel"].split("/")[-1]
+
+        if channel in data_groups:
+            data_groups[channel].append(message["hr-mean"])
+            data_groups[channel].append(message["gr-mean"])
+        else:
+            data_groups[channel] = [message["hr-mean"], message["gr-mean"]]
+
+
+    overlay = hv.NdOverlay({channel: hv.Scatter(np.clip(np.asarray(data).reshape([-1,2]), 0.0, 1.0), 'Hatefullness' , 'Galvanizing')
+                            for channel, data in data_groups.items()})
+
+    overlay.opts( opts.NdOverlay(legend_position='right', width=1000, height=700), opts.Scatter(color = hv.Cycle('RdGy'), alpha=0.8,  marker='s', size=6))
+
+    print("Saving...")
+    hv.save(overlay, 'app/static/var/TelegramRatingScatter.html')
 
 
 class Telegram(SingleGeneratorEngine):
@@ -118,8 +152,15 @@ class Telegram(SingleGeneratorEngine):
                             print(scores)
                             yield
 
+
             response = self.saveScores(scores, message_id, channel)
             self.sendBroadcastMessage(response)
+
+            try:
+                plot_telegram()
+            except:
+                raise
+
 
         self.sendBroadcastMessage(self.outro)
 

@@ -8,20 +8,41 @@ a {
     color: purple;
 }
 
+.list-group-item {
+    background-color: black;
+}
+
+/* Structure */
+
+div.column {
+    width: 50%;
+    float:left;
+}
+
+/* #col-1 {
+
+}
+
+#col-1 {
+
+} */
+
+/* Buttons */
 #reconnect-button {
     font-size: x-large;
 }
 button.selected {
     background-color: red;
 }
-
-.list-group-item {
-    background-color: black;
-}
-
-
+ /* Messages */ 
 div.messages {
     overflow-x: scroll;
+}
+
+div.message-list {
+    float: left;
+    margin-left: 4pt;
+    margin-right: 4pt;
 }
 
 p.message {
@@ -30,8 +51,3 @@ p.message {
     word-wrap: break-word;
 }
 
-div.message-list {
-    float: left;
-    margin-left: 4pt;
-    margin-right: 4pt;
-}
