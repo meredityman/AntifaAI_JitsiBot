@@ -140,6 +140,10 @@ class Survey(SingleGeneratorEngine):
             yield
 
             while True:
+                if not self.text:
+                    yield
+                    continue
+
                 if  self.isPublic:
                     if( self.text == "ESCAPE"):
                         break
