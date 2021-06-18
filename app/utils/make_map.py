@@ -1,4 +1,4 @@
-from PIL import Image, ImageFilter, ImageDraw, ImageChops, ImageColor, ImageFont
+from PIL import Image, ImageFilter, ImageDraw, ImageOps, ImageColor, ImageFont
 from pathfinding.core.diagonal_movement import DiagonalMovement
 from pathfinding.core.grid import Grid
 from pathfinding.finder.a_star import AStarFinder
@@ -8,60 +8,66 @@ from numpy import random
 
 
 
-BASE_MAP_PATH    = "resources/horror.png"
+BASE_MAP_PATH    = "resources/horror-base.png"
+MASK_MAP_PATH    = "resources/horror-mask.png"
 
 all_stations = {
-    "Questionaire"  : (  35,  40),
-    "Map"           : ( 100,  70),
-    "Embodiment"    : ( 245,  35),
-    "Garage"        : ( 250, 175),
-    "Memorial"      : (  85, 125),
-    "Drum"          : ( 255, 105),
-    "Reading Room"  : ( 115,  85),
-    "Antifa Kitchen": ( 117,  87),
-    "Playstation"   : ( 110,  80),
-    "Fountain"      : ( 111,  81),
-    "Inflatable"    : ( 0,  0)
+    "Questionaire"  : (1038,  630),
+    "Embodiment"    : ( 794,  633),
+    "Garage"        : ( 776,  325),
+    "Memorial"      : ( 890,  180),
+    "Playstation"   : ( 600,  500),
+    "Fountain"      : ( 484,  364),  
+    "Map"           : ( 285,  456),
+    "Drum"          : ( 480,  182),
+    "Inflatable"    : ( 407,   63)
 }
+
+
+
 colors = [
-    "#6c1985",
-    "#a84085",
-    "#d0728e",
-    "#eba7a7",
-    "#ffddd2",
-    "#ffdab2",
-    "#ffdf89",
-    "#ffeb59",
-    "#fffc17"
+    "#6c1985cc",
+    "#a84085cc",
+    "#d0728ecc",
+    "#eba7a7cc",
+    "#ffddd2cc",
+    "#ffdab2cc",
+    "#ffdf89cc",
+    "#ffeb59cc",
+    "#fffc17cc"
 ]
 rgb_cols = [ ImageColor.getrgb(c) for c in colors]
-fnt = ImageFont.truetype("resources/OpenSans-SemiBold.ttf", 24)
+fnt = ImageFont.truetype("resources/OpenSans-SemiBold.ttf", 16)
 
 def draw_map(stations, file_path):
 
     stations = { s: all_stations[s] for s in stations }
 
-    img = Image.open(BASE_MAP_PATH).convert("RGB")
+    base = Image.open(BASE_MAP_PATH).convert("RGB")
+    mask = Image.open(MASK_MAP_PATH).convert("L")
+
+    scale = 200 / mask.width 
+
+    mask = mask.resize((int(mask.width * scale), int(mask.height * scale)))
 
 
-    scale = 200 / img.width 
-
-    background = img.resize((int(img.width * scale), int(img.height * scale)))
-    mask = background.copy()
-
-    c = background.info['dpi'][0] / 25.4
-    coords = [ (int(x * c  * scale), int(y * c  * scale)) for x, y in stations.values()]
+    coords = [ (int(x   * scale), int(y   * scale)) for x, y in stations.values()]
     
     mask = mask.convert('L').filter(ImageFilter.GaussianBlur(3.5))
-    mask = mask.point(lambda x: 0 if x< 250 else 255, '1')
+    mask = ImageOps.invert(mask)
+
+
 
     matrix = np.asarray(mask)
-
+    print(matrix)
     grid = Grid(matrix=matrix)
     finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
 
+    print(grid)
+
     paths = []
     for pntA, pntB in zip(coords[0:-1], coords[1:] ):
+        print(pntA, pntB)
         start = grid.node(pntA[0], pntA[1])
         end   = grid.node(pntB[0], pntB[1])
         
@@ -75,7 +81,7 @@ def draw_map(stations, file_path):
         np_path = np.asarray(path) / scale
         try:
             # #create spline function
-            f, u = interpolate.splprep([np_path[:,0], np_path[:,1]], s=2000)
+            f, u = interpolate.splprep([np_path[:,0], np_path[:,1]], s=1000)
             # #create interpolated lists of points
             xint, yint = interpolate.splev(np.linspace(0, 1, 40), f)
             smooth_path = [ (x, y) for x, y in zip(xint.tolist(), yint.tolist()) ]
@@ -84,34 +90,36 @@ def draw_map(stations, file_path):
             smooth_paths.append([])
 
 
-    path_img = Image.new("RGB", img.size, (255, 255, 255))
+    path_img = base.copy()
     path_img_draw = ImageDraw.Draw(path_img)
     for i, path in enumerate(smooth_paths):
         if path:
-            path_img_draw.line(path, fill=rgb_cols[i], width=10, joint='curve')
+            path_img_draw.line(path, fill=rgb_cols[i], width=6, joint='curve')
 
     for i, (name, coord) in enumerate(zip(stations.keys(), coords)):
-        r = 15
+        r = 10
         box = (
             (coord[0] / scale ) - r,
             (coord[1] / scale ) - r,
             (coord[0] / scale ) + r,
             (coord[1] / scale ) + r
         )
-        path_img_draw.ellipse(box, fill = rgb_cols[i], outline=(255,255,255), width=6)
-        
-        path_img_draw.text( (box[0] + 35, box[1] - 15), name, fill=(0,0,0), stroke_fill = (255, 255, 255), stroke_width = 2, font=fnt)
+        path_img_draw.ellipse(box, fill = rgb_cols[i], outline=(255,255,255), width=2)
         
 
+        text = f"{i:02d} | {name}"
+        path_img_draw.text( (box[0] + 35, box[1] - 15), text, fill=(0,0,0), stroke_fill = (255, 255, 255), stroke_width = 2, font=fnt)
+        
 
-    path_img = path_img.filter(ImageFilter.GaussianBlur(0.5))
 
-    img = ImageChops.darker(img, path_img)
-    # mask = mask.resize((img.width, img.height)).convert("RGB").filter(ImageFilter.GaussianBlur(15))
-    # img = Image.blend(mask, img, 0.5)
-    #img.show()
+    # path_img = path_img.filter(ImageFilter.GaussianBlur(0.5))
 
-    img.save(file_path)
+    # img = ImageChops.darker(img, path_img)
+    # # mask = mask.resize((img.width, img.height)).convert("RGB").filter(ImageFilter.GaussianBlur(15))
+    # # img = Image.blend(mask, img, 0.5)
+    # #img.show()
+
+    path_img.save(file_path, quality=95)
 
 
 def get_tests(stations):

@@ -1,17 +1,17 @@
 {
-    "intro" : "Wellcome to the Twitter bot!",
-    "outro" : "Thank you for the contribution. You took digital action. You have made AntifaAI smarter",
+    "intro" : "🤖🤖🤖 Willkommen zum TwitterBot! 🤖🤖🤖 Mal sehen ob wir zusammen ein Paar Nazis auf Twitter finden...",
+    "outro" : "Danke für die Teilnahme. Du hast digital etwas unternommen. You have made AntifaAI smarter :)",
     "number-of-users" : 3,
     "question" : "Könnte der User ein Nazi sein ( 'j', 'n' )",
-    "hashtag-question" : "Pick a hashtag!",
-    "users-question" : "Between you, pick {num_users:d} users from the list:",
-    "is-nazi" : "👎\t'{user}' has been labled as a nazi by {votes_for} to {votes_against} votes.",
-    "is-not-nazi" : "👍\t'{user}' has not been labled as a nazi {votes_against} to {votes_for} votes.",
+    "hashtag-question" : "Wähle einen hashtag!",
+    "users-question" : "Wählt {num_users:d} User*innen aus der folgenden Liste:",
+    "is-nazi" : "🖕🖕🖕\t'{user}' wurde als Nazi markiert. Stimmen dafür:  {votes_for} Stimmen dagegen: {votes_against} .",
+    "is-not-nazi" : "👌👌👌\t'{user}' wurde nicht als Nazi markiert. Stimmen dafür: {votes_against} Stimmen dagegen: {votes_for} .",
     "summary" : {
-        "intro"       : "{suspicious_user} has {followers_count} followers.",
-        "description" : "Bio",
-        "tweets"      : "Recent Tweets"
+        "intro"       : "{suspicious_user} hat {followers_count} followers.",
+        "description" : "Selbstbeschreibung: ",
+        "tweets"      : "Aktuellste Tweets: "
     },
-    "picked" : "'{user}' has been picked already",
-    "calculating" : "Generating graphic..."
+    "picked" : "'{user}' wurde bereits ausgewählt",
+    "calculating" : "Grafik wird erstellt..."
 }

@@ -98,7 +98,7 @@ class MessageList {
   };
 
   addPublicMessage(uid, displayName, message){
-
+    message = message.replace(/\n/g, "<br />");
     this.publicMessages.push({
       'uid'  : uid,
       'text' : message
@@ -108,6 +108,8 @@ class MessageList {
   };
 
   addPrivateMessage(uid, displayName, message){
+    message = message.replace(/\n/g, "<br />");
+    
     if(!(uid in this.privateMessages)){
       this.privateMessages[uid] = [];
     }

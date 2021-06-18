@@ -1,5 +1,5 @@
 {
-    "start-prompt" : "Lasst uns den Scheiß analysieren!",
+    "start-prompt" : "Lasst uns den Scheiß analysieren!💩",
     "result" : "Klassifiziert als: {prediction} ({certainty:.0%})",
     "introduction" : [
         "Du hast jetzt die Möglichkeit eine Nachricht an den Bot zu schreiben. Er wird dir antworten und versuchen dir eine Bewertung zurück zu geben (eine Wahrscheinlichkeit) wie sehr deine Nachricht aggressiv/hasserfüllt ist oder nicht. Nichts was du schreibst wird gespeichert oder veröffentlicht.",
