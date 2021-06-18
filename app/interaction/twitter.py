@@ -97,10 +97,6 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth,wait_on_rate_limit=True)
 
-jsonData = json.load(open("app/data/twitter/twitter-data.json", "r"))
-
-
-
 
 ## Constants
 woeids = {
@@ -170,6 +166,7 @@ class Twitter(SingleGeneratorEngine):
             location        = x._json['location']   
 
             if user not in self.jsonData:
+                print(f"Saving {user}")
                 self.jsonData[user] = {
                     "connections" : connections,
                     "followers"  : followers_count,
@@ -178,7 +175,7 @@ class Twitter(SingleGeneratorEngine):
                 }
 
 
-        json.dump(jsonData, open("app/data/twitter/twitter-data.json", "w"), indent=4, sort_keys=True)
+        json.dump(self.jsonData, open("app/data/twitter/twitter-data.json", "w"), indent=4, sort_keys=True)
  
     def get_user_summmary(self, suspicious_user):
         response= ""
