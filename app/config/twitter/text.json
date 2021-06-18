@@ -11,6 +11,7 @@
         "intro"       : "{suspicious_user} has {followers_count} followers.",
         "description" : "Bio",
         "tweets"      : "Recent Tweets"
-    }
-
+    },
+    "picked" : "'{user}' has been picked already",
+    "calculating" : "Generating graphic..."
 }

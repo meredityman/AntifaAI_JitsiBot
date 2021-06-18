@@ -10,6 +10,83 @@ import json
 
 from .prompts import prompt_option, prompt_choice
 
+
+import pandas as pd
+import holoviews as hv
+from holoviews import opts, dim
+from bokeh.sampledata.les_mis import data
+
+import json
+
+
+def plot_twitter():
+    def cn(n):
+        #return n.replace("@", "")
+        return n
+
+    raw_data = json.load(open("app/data/twitter/twitter-data.json", "r"))
+
+    nodes_data = [ { 'name' : cn(n), 'group' : 0 } for n in raw_data.keys() ]
+
+    index_lookup = { d['name'] : i for i, d in enumerate(nodes_data) }
+
+    links_data = []
+    for user, d in raw_data.items():
+
+        user_index = index_lookup[cn(user)]
+
+        links_data.append(
+            {
+                'source' : user_index,
+                'target' : user_index,
+                'value'  : 1
+            }
+        )
+
+
+        for con, w in d["connections"].items():
+            c_user = cn(con)
+
+            if c_user in index_lookup:
+                links_data.append(
+                    {
+                        'source' : user_index,
+                        'target' : index_lookup[c_user],
+                        'value'  : w
+                    }
+                )
+
+
+    hv.extension('bokeh')
+    hv.output(size=254)
+
+    links = pd.DataFrame(links_data)
+ 
+    nodes = hv.Dataset(pd.DataFrame(nodes_data), 'index')
+    chord = hv.Chord((links, nodes))
+    chord.opts(
+        opts.Chord(
+            cmap='RdGy', 
+            edge_cmap='RdGy', 
+            edge_color=dim('source').str(), 
+            labels='name', 
+            node_color=dim('index').str()
+            ))
+
+    hv.save(chord, 'app/static/var/NaziTwitterBubble.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
 ####input your credentials here
 consumer_key        = 'qjBKfredGfs5DeH69SDNLdEXN'
 consumer_secret     = 'YoXs5jEOC4EkLKl7MvkNNkpp55L70vqKvmfWofHPVijutnAa5f'
@@ -21,6 +98,9 @@ auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth,wait_on_rate_limit=True)
 
 jsonData = json.load(open("app/data/twitter/twitter-data.json", "r"))
+
+
+
 
 ## Constants
 woeids = {
@@ -72,6 +152,8 @@ class Twitter(SingleGeneratorEngine):
         self.is_nazi     = othertext ['is-nazi']
         self.is_not_nazi = othertext ['is-not-nazi']
         self.summary     = othertext ['summary']
+        self.picked      = othertext['picked']
+        self.calculating = othertext['calculating']
         
         self.iterateGenerator()
 
@@ -178,7 +260,7 @@ class Twitter(SingleGeneratorEngine):
                         yield
 
 
-            # Get a users
+            # Get users
             suspicious_users = set([])
             users = get_users_for_trend(hashtag)
             message  = self.users_question.format(num_users = self.num_users)
@@ -189,10 +271,7 @@ class Twitter(SingleGeneratorEngine):
             yield
 
             while True:
-                if not self.isPublic:
-                    # Private messages are ignored
-                    yield
-                else:
+                if self.isPublic:
                     if self.text:
                         user, response = prompt_option(self.text, users)
 
@@ -200,13 +279,14 @@ class Twitter(SingleGeneratorEngine):
                         self.sendBroadcastMessage(response)
 
                     if user:
-                        suspicious_users.add(user)
-                        if(len(suspicious_users) >= self.num_users):
-                            break
+                        if user in suspicious_users:
+                            message = self.picked.format(user = user)
+                            self.sendBroadcastMessage(message)
                         else:
-                            yield
-                    else:
-                        yield
+                            suspicious_users.add(user)
+                            if(len(suspicious_users) >= self.num_users):
+                                break
+                yield
 
             # Vote on users
             self.votes = defaultdict(dict)
@@ -232,22 +312,24 @@ class Twitter(SingleGeneratorEngine):
                         if vote is not None:
                             self.votes[suspicious_user][self.id] = vote
 
-                            if set(self.ids) <= set(self.votes[suspicious_user].keys()):
-                                print(self.ids, self.votes[suspicious_user].keys() )
-                                break
-                            else:
-                                print(self.ids, self.votes[suspicious_user].keys() )
-                                yield
-                        else:
-                            yield
+                        if set(self.ids) <= set(self.votes[suspicious_user].keys()):
+                            print(self.ids, self.votes[suspicious_user].keys() )
+                            break
+     
+                        print(self.ids, self.votes[suspicious_user].keys() )
+                        yield
 
             message, confirmed_users = self.get_results(self.votes)
-            self.sendBroadcastMessage(message)  
-            self.sendBroadcastMessage(self.outro)  
-
+            self.sendBroadcastMessage(message)    
+            self.sendBroadcastMessage(self.calculating)  
             running = False
 
             self.save_data(confirmed_users)
+            try:
+                plot_twitter()
+            except:
+                pass
+            self.sendBroadcastMessage(self.outro)
 
 # def main_loop():
 
