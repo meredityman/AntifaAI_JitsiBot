@@ -27,6 +27,7 @@ class HateSpeech(MultiGeneratorEngine):
         self.prompts      = self.data['prompts']
         self.commands     = self.data['commands']
         self.final_prompt = self.data['final-prompt']
+        self.result       = self.data['result']
 
         self.prompts_seen = defaultdict(list)
 
@@ -117,4 +118,4 @@ class HateSpeech(MultiGeneratorEngine):
                 self.sendMessage(self.id, response)
         except:
             print(f"Predictions failed {self.text}")
-            pass
+            raise
