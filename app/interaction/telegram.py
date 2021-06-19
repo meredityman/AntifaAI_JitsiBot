@@ -81,10 +81,10 @@ class Telegram(SingleGeneratorEngine):
             else:
                 self.ratings[key][name] = newRatings
 
-            mean = np.mean(np.asarray(self.ratings[key]["hr"]))
-            std  = np.std(np.asarray(self.ratings[key]["hr"]))
+            mean = np.mean(np.asarray(self.ratings[key][name]))
+            std  = np.std(np.asarray(self.ratings[key][name]))
             self.ratings[key][ name + "-mean"] = mean
-            self.ratings[key]["hr-std"] = std 
+            self.ratings[key][ name + "-std"] = std 
 
             response += "\n" + self.line.format(
                 displayName = self.metrics[name]['name'],
