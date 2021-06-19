@@ -221,7 +221,7 @@ class UserList {
   addButton(element, selected){
     let uid = element._id
     let text = element._displayName + " (" + uid + ")";
-    let id = 'element-btn-' + uid;
+    let htmlid = 'element-btn-' + uid;
 
     let userList = this;
 
@@ -239,6 +239,7 @@ class UserList {
     }
 
     let button = $('<button/>', {
+        id   : htmlid,
         text: text, 
         name: uid,
         class : 'user-btn',
@@ -262,13 +263,11 @@ class UserList {
       if( $(button).attr("name") in uids){
         $(button).addClass('selected');
       } else {
-        console.warn("Here");
         $(button).removeClass('selected');
       }
 
     });
-    
-
+  
   }
 
   addUser( user, selected = false){
@@ -283,6 +282,19 @@ class UserList {
     let button = this.addButton(user, selected);
     button = button.wrap('<li class="list-group-item"></li>').parent();
     this.listEl.append(button);
+  };
+
+  updateUserName(uid, name){
+    if(uid in this.participants){
+      console.log("Updating user " + uid);
+      this.participants[uid]._displayName = name;
+
+      let text = name + " (" + uid + ")";
+      this.listEl.find('#element-btn-' + uid).html(text)
+    } else {
+      console.warn(uid + " not in list.")
+    }
+   
   };
   
 

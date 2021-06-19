@@ -128,6 +128,11 @@
             console.info('participants left', id, user);
             userList.removeUser(user);
           });
+
+          room.on( JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, function(id, name){
+            console.info('Display name changed', id, name);
+            userList.updateUserName(id, name);
+          });
         }
 
         room.on( JitsiMeetJS.events.conference.CONFERENCE_JOINED,
