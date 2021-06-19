@@ -11,6 +11,34 @@ String.prototype.hashCode = function() {
   return hash;
 }
 
+function showTime(){
+  var date = new Date();
+  var h = date.getHours(); // 0 - 23
+  var m = date.getMinutes(); // 0 - 59
+  var s = date.getSeconds(); // 0 - 59
+  var session = "AM";
+
+  if(h == 0){
+      h = 12;
+  }
+
+  if(h > 12){
+      h = h - 12;
+      session = "PM";
+  }
+
+  h = (h < 10) ? "0" + h : h;
+  m = (m < 10) ? "0" + m : m;
+  s = (s < 10) ? "0" + s : s;
+
+  var time = h + ":" + m + ":" + s + " " + session;
+  document.getElementById("MyClockDisplay").innerText = time;
+  document.getElementById("MyClockDisplay").textContent = time;
+
+  setTimeout(showTime, 1000);
+
+}
+
 class MeetingDetails{
   constructor(element, meetingUrl){
     this.element      = element;
@@ -18,6 +46,17 @@ class MeetingDetails{
 
     this.element.find("#meeting-link").attr("href", meetingUrl)
 
+  }
+
+}
+
+class AvatarDetails{
+  constructor(element){
+    this.element      = element;
+    this.uptime = null;
+
+    let clock = $('<div id="MyClockDisplay" class="clock"></div>').appendTo(this.element);
+    showTime();
   }
 }
 
@@ -85,16 +124,17 @@ class InteractionSelector{
 };
 
 class MessageList {
-  constructor(element, ownUid, displayName){
-    this.element      = element;
+  constructor(element_public, element_private, ownUid, displayName){
+    this.element_public      = element_public;
+    this.element_private     = element_private;
     this.ownUid = ownUid;
     this.displayName = displayName;
     this.publicMessages = [];
     this.privateMessages = {};
 
 
-    this.publicMessageElement  = $(`<div id="public-messages", class="message-list"</div>`).appendTo(element);
-    this.privateMessageElement = $(`<div id="private-messages", class="message-list"></div>`).appendTo(element);
+    this.publicMessageElement  = $(`<div id="public-messages", class="message-list"</div>`).appendTo(element_public);
+    this.privateMessageElement = $(`<div id="private-messages", class="message-list"></div>`).appendTo(element_private);
   };
 
   addPublicMessage(uid, displayName, message){
@@ -104,7 +144,8 @@ class MessageList {
       'text' : message
     });
 
-    this.publicMessageElement.append(`<p class="message">${displayName} - ${message}</p>`);
+    this.publicMessageElement.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
+    this.publicMessageElement.scrollTop = this.publicMessageElement.scrollHeight;
   };
 
   addPrivateMessage(uid, displayName, message){
@@ -123,8 +164,8 @@ class MessageList {
     if(!messageEl.length){
       messageEl = $(`<div id="${'#private-messages-' + uid}", class="message-list"></div>`).appendTo(this.privateMessageElement);
     }
-    messageEl.append(`<p class="message">${displayName} - ${message}</p>`);
-
+    messageEl.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
+    messageEl.scrollTop = messageEl.scrollHeight;
   }
 
   addPrivateReply(uid, message){
@@ -140,9 +181,10 @@ class MessageList {
     let messageEl = $('#private-messages-' + uid);
     if(!messageEl.length){
       messageEl = $(`<div id="${'#private-messages-' + uid}"></div>`).appendTo(this.privateMessageElement);
-    }
-    messageEl.append(`<p class="message">${this.displayName} - ${message}</p>`);
 
+    }
+    messageEl.append(`<p class="message"><span class="user-name">${this.displayName}</span> - ${message}</p>`);
+    messageEl.scrollTop = messageEl.scrollHeight;
   }
 
 };
@@ -156,7 +198,7 @@ class UserList {
 
       // this.participants = Object.assign({}, ...participants.map((x) => ({[x._id]: x})));
       this.participants = {};
-      this.listEl = $('<ul id="element-list-ul"></ul>');
+      this.listEl = $('<ul id="user-list-ul"></ul>');
       this.element.append(this.listEl);
       Object.values(participants).forEach(user => {
         this.addUser(user, false);
@@ -199,8 +241,7 @@ class UserList {
     let button = $('<button/>', {
         text: text, 
         name: uid,
-        id: id,
-        class : 'element-btn',
+        class : 'user-btn',
     });
 
     if( selected){

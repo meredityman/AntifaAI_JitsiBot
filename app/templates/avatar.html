@@ -88,15 +88,13 @@
 
 
           // Jitsi callbacks
-
-
           console.info('Console Joined!')
 
           let userList       = new UserList($('#user-list'), room.getParticipants(), null, selectable=false );
 
-          let meetingDetails = new MeetingDetails( $("#meeting-details"), meetingUrl);
+          let meetingDetails = new AvatarDetails( $("#meeting-details"));
 
-          let messageList    = new MessageList($('#messages'), room.myUserId(), ownDisplayName);
+          let messageList    = new MessageList($('#messages-public'), $('#messages-private'), room.myUserId(), ownDisplayName);
 
           socketio.on('disconnect_now', function(data) {
               console.info('disconnect signal received');
@@ -177,17 +175,14 @@
   <div id="main" class="avatar">
 
     <div id="col-1", class="column">
-      <div id="messages"></div>
+      <div id="messages-public"  class="messages"></div>
     </div>
     <!-- Col2 -->
     <div id="col-2", class="column">
-      <div id="meeting-details">
-        <a id="meeting-link" href="" target="_blank">Meeting Link</a>
-      </div>
+      <div id="meeting-details" class="messages"></div>
 
       <div id="user-list"></div>
-
-      <div id="event-list"></div>
+      <div id="messages-private" class="messages" style="height: 700px;"></div>
     </div>
   </div>
 

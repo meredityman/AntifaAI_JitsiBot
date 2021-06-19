@@ -1,3 +1,8 @@
+div.main {
+    width: 100%;
+    overflow: hidden;
+}
+
 body {
     background-color: black;
     color: greenyellow;
@@ -8,9 +13,19 @@ a {
     color: purple;
 }
 
-.list-group-item {
+li.list-group-item {
     background-color: black;
+    padding-top: 0;
+    padding-bottom: 0;
+    
 }
+
+button.user-button {
+    padding: 0; 
+    background: black;
+    outline: 0;
+}
+
 
 /* Structure */
 
@@ -19,13 +34,16 @@ div.column {
     float:left;
 }
 
-/* #col-1 {
 
+
+
+/* Structure */
+div.user-list {
+    height:  30vh;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
-
-#col-1 {
-
-} */
 
 /* Buttons */
 #reconnect-button {
@@ -35,19 +53,51 @@ button.selected {
     background-color: red;
 }
  /* Messages */ 
+
+span.user-name {
+    font-style:italic;
+    font-weight: bold;
+}
+
 div.messages {
-    overflow-x: scroll;
+    overflow:hidden;
+    width: 100%;
+
 }
 
 div.message-list {
     float: left;
-    margin-left: 4pt;
-    margin-right: 4pt;
+    padding:4px;
+    height:  100vh;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    text-align:left;
+    border-style: dotted;
 }
 
 p.message {
-    width: 200pt;
+    width: 100%;
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
 
+ /* Hide scrollbar for Chrome, Safari and Opera */
+ .example::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .example {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  } 
+
+.clock {
+    float: right;
+    margin-bottom: 2rem;
+    padding-right: 30px;
+    clear: both;
+    font-size: larger;    
+
+}
