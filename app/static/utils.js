@@ -134,7 +134,7 @@ class MessageList {
 
 
     this.publicMessageElement  = $(`<div id="public-messages", class="message-list"</div>`).appendTo(element_public);
-    this.privateMessageElement = $(`<div id="private-messages", class="message-list"></div>`).appendTo(element_private);
+    this.privateMessageElement = $(`<div id="private-messages"></div>`).appendTo(element_private);
   };
 
   addPublicMessage(uid, displayName, message){
@@ -145,7 +145,9 @@ class MessageList {
     });
 
     this.publicMessageElement.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
-    this.publicMessageElement.scrollTop = this.publicMessageElement.scrollHeight;
+    
+    this.publicMessageElement.scrollTop(this.publicMessageElement[0].scrollHeight);
+  
   };
 
   addPrivateMessage(uid, displayName, message){
@@ -161,30 +163,17 @@ class MessageList {
     });
 
     let messageEl = $('#private-messages-' + uid);
+    console.warn(messageEl);
     if(!messageEl.length){
-      messageEl = $(`<div id="${'#private-messages-' + uid}", class="message-list"></div>`).appendTo(this.privateMessageElement);
+      messageEl = $(`<div id="${'private-messages-' + uid}", class="message-list"></div>`).appendTo(this.privateMessageElement);
     }
     messageEl.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
     messageEl.scrollTop = messageEl.scrollHeight;
+    messageEl.scrollTop(messageEl[0].scrollHeight);
   }
 
   addPrivateReply(uid, message){
-    if(!(uid in this.privateMessages)){
-      this.privateMessages[uid] = [];
-    }
-
-    this.privateMessages[uid].push( {
-      'uid'  : this.ownUid,
-      'text' : message
-    });
-
-    let messageEl = $('#private-messages-' + uid);
-    if(!messageEl.length){
-      messageEl = $(`<div id="${'#private-messages-' + uid}"></div>`).appendTo(this.privateMessageElement);
-
-    }
-    messageEl.append(`<p class="message"><span class="user-name">${this.displayName}</span> - ${message}</p>`);
-    messageEl.scrollTop = messageEl.scrollHeight;
+    this.addPrivateMessage(uid, "Me", message)
   }
 
 };
