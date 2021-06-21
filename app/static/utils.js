@@ -168,7 +168,6 @@ class MessageList {
       messageEl = $(`<div id="${'private-messages-' + uid}", class="message-list"></div>`).appendTo(this.privateMessageElement);
     }
     messageEl.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
-    messageEl.scrollTop = messageEl.scrollHeight;
     messageEl.scrollTop(messageEl[0].scrollHeight);
   }
 

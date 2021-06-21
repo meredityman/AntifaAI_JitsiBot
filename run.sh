@@ -4,4 +4,4 @@
 # export FLASK_ENV=development
 # flask run
 
-python3 app.py
+python3 app.py --name "10"
