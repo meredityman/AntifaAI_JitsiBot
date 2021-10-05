@@ -105,8 +105,8 @@ class Incidents(MultiGeneratorEngine):
 
 
             # transformer = Transformer.from_crs('epsg:3857', 'esri:31491') 
-            # entry['coordinates'] = transform.itransform([(coords['lng'], coords['lat'])])[0]
-
+       
+       
 
         filename = f"{id}-{time.strftime('%Y%m%d-%H%M%S')}.json"
         path = PurePath(OUTPUT_PATH, filename )
