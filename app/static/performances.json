@@ -13,7 +13,13 @@
         {"id": "11",    "date": "21.06.2021", "time": "09:15", "uuid": "f4e7678434d249e7b47ca6979934d283", "url":	"https://meet.cobratheatercobra.com/f4e7678434d249e7b47ca6979934d283"},
         {"id": "12",    "date": "21.06.2021", "time": "10:30", "uuid": "425183fc449b473b93d3e88fceebba57", "url":	"https://meet.cobratheatercobra.com/425183fc449b473b93d3e88fceebba57"},
         {"id": "13",    "date": "21.06.2021", "time": "11:45", "uuid": "38ebce02d25511ebabf9f8b46a75d52d", "url":	"https://meet.cobratheatercobra.com/38ebce02d25511ebabf9f8b46a75d52d"},
-        {"id": "DEBUG", "date": "00.00.0000", "time": "00.00", "uuid": "bd64426ed1af11ebbece907841cadd93", "url":	"https://meet.cobratheatercobra.com/bd64426ed1af11ebbece907841cadd93"},
-        {"id": "SPON",  "date": "00.00.0000", "time": "00.00", "uuid": "MemorableHeadquartersAttendBehind", "url":	"https://meet.cobratheatercobra.com/MemorableHeadquartersAttendBehind"}
+
+        {"id": "14"   , "date": "08.09.2021", "time": "10.00", "uuid": "c392683dbfd14e1b9f30a987d26c2a15", "url": "https://meet.cobratheatercobra.com/c392683dbfd14e1b9f30a987d26c2a15"},
+        {"id": "15"   , "date": "08.09.2021", "time": "11.30", "uuid": "3e631486e9d74f769d3fa7f3f85eca3a", "url": "https://meet.cobratheatercobra.com/3e631486e9d74f769d3fa7f3f85eca3a"},
+        {"id": "16"   , "date": "08.09.2021", "time": "18.00", "uuid": "0a160a5ad4884e22b4f1350b4c1eb42d", "url": "https://meet.cobratheatercobra.com/0a160a5ad4884e22b4f1350b4c1eb42d"},
+        {"id": "17"   , "date": "08.09.2021", "time": "20.00", "uuid": "3ff2ec6aa73d4f85bc4d53973df0a1f5", "url": "https://meet.cobratheatercobra.com/3ff2ec6aa73d4f85bc4d53973df0a1f5"},
+
+        {"id": "DEBUG"   , "date": "00.00.0000", "time": "00.00", "uuid": "bd64426ed1af11ebbece907841cadd93", "url": "https://meet.cobratheatercobra.com/bd64426ed1af11ebbece907841cadd93"},
+        {"id": "REHERSAL", "date": "00.00.0000", "time": "00.00", "uuid": "rehersal"                        , "url": "https://meet.cobratheatercobra.com/rehersal"}
     ]
 }
