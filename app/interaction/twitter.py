@@ -110,7 +110,7 @@ def get_trending_hashtags():
     trends = []
     woeid = woeids['hamburg']
 
-    ret = api.trends_place(id = woeid)
+    ret = api.get_place_trends(id = woeid)
 
     for value in ret:
         for trend in value['trends']:
@@ -121,7 +121,7 @@ def get_trending_hashtags():
 def get_users_for_trend(trend):
     users = []
 
-    search = api.search(q=trend, lang='de')
+    search = api.search_tweets(q=trend, lang='de')
     for tweet in search: 
         users.append(tweet.user.screen_name)
 
@@ -180,7 +180,7 @@ class Twitter(SingleGeneratorEngine):
     def get_user_summmary(self, suspicious_user):
         response= ""
 
-        x = api.get_user(suspicious_user)
+        x = api.get_user(screen_name=suspicious_user)
 
         followers_count = x._json['followers_count']
         self_description= x._json['description']
@@ -193,7 +193,7 @@ class Twitter(SingleGeneratorEngine):
         response += f"\n{self.summary['description']:_^20}\n\n"
         response += f"{self_description}\n"
 
-        ret = api.user_timeline(suspicious_user)
+        ret = api.user_timeline(screen_name=suspicious_user)
 
         response += f"\n{self.summary['tweets']:_^20}\n\n"
         for i, r in enumerate(ret):
