@@ -37,8 +37,15 @@ div.column {
     float:left;
 }
 
+div.avatar {
+    cursor: none !important;
+    overflow:hidden;
+}
 
-
+.column-block {
+    overflow:hidden;
+    width: 100%;
+}
 
 /* Structure */
 div.user-list {
@@ -65,8 +72,14 @@ span.user-name {
 div.messages {
     overflow:hidden;
     width: 100%;
-
 }
+
+ /* Hide scrollbar for Chrome, Safari and Opera */
+ div.message-list::-webkit-scrollbar {
+    display: none;
+  }
+  
+/* Hide scrollbar for IE, Edge and Firefox */
 
 div.message-list {
     float: left;
@@ -77,6 +90,8 @@ div.message-list {
     overflow-y: scroll;
     text-align:left;
     border-style: dotted;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 
 p.message {
@@ -86,21 +101,25 @@ p.message {
 }
 
  /* Hide scrollbar for Chrome, Safari and Opera */
- .example::-webkit-scrollbar {
+.example::-webkit-scrollbar {
     display: none;
-  }
+}
   
   /* Hide scrollbar for IE, Edge and Firefox */
-  .example {
+ .example {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
-  } 
+} 
 
 .clock {
     float: right;
+    margin-right: 2rem;
     margin-bottom: 2rem;
-    padding-right: 30px;
     clear: both;
     font-size: larger;    
+}
 
+video#operator-video {
+    height: 100%; 
+    width: 100%;
 }

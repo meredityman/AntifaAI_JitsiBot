@@ -138,38 +138,41 @@ class MessageList {
   };
 
   addPublicMessage(uid, displayName, message){
-    message = message.replace(/\n/g, "<br />");
-    this.publicMessages.push({
-      'uid'  : uid,
-      'text' : message
-    });
-
-    this.publicMessageElement.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
-    
-    this.publicMessageElement.scrollTop(this.publicMessageElement[0].scrollHeight);
+    if (message) {
+      message = message.replace(/\n/g, "<br />");
+      this.publicMessages.push({
+        'uid'  : uid,
+        'text' : message
+      });
   
+      this.publicMessageElement.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
+      
+      this.publicMessageElement.scrollTop(this.publicMessageElement[0].scrollHeight);
+    }
   };
 
   addPrivateMessage(uid, displayName, message){
-    message = message.replace(/\n/g, "<br />");
-    
-    if(!(uid in this.privateMessages)){
-      this.privateMessages[uid] = [];
-    }
+    if (message) {
+      message = message.replace(/\n/g, "<br />");
+      
+      if(!(uid in this.privateMessages)){
+        this.privateMessages[uid] = [];
+      }
 
-    this.privateMessages[uid].push( {
-      'uid'  : uid,
-      'text' : message
-    });
+      this.privateMessages[uid].push( {
+        'uid'  : uid,
+        'text' : message
+      });
 
-    let messageEl = $('#private-messages-' + uid);
-    console.warn(messageEl);
-    if(!messageEl.length){
-      messageEl = $(`<div id="${'private-messages-' + uid}", class="message-list"></div>`).appendTo(this.privateMessageElement);
+      let messageEl = $('#private-messages-' + uid);
+      console.warn(messageEl);
+      if(!messageEl.length){
+        messageEl = $(`<div id="${'private-messages-' + uid}", class="message-list"></div>`).appendTo(this.privateMessageElement);
+      }
+      messageEl.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
+      messageEl.scrollTop(messageEl[0].scrollHeight);
     }
-    messageEl.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
-    messageEl.scrollTop(messageEl[0].scrollHeight);
-  }
+  };
 
   addPrivateReply(uid, message){
     this.addPrivateMessage(uid, "Me", message)

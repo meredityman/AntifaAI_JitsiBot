@@ -69,6 +69,8 @@
         room.setDisplayName(ownDisplayName)
         room.join();
 
+        
+
         function onConferenceJoined() {
 
 
@@ -133,14 +135,38 @@
             console.info('Display name changed', id, name);
             userList.updateUserName(id, name);
           });
+
+          room.on(JitsiMeetJS.events.conference.TRACK_ADDED, function(track){
+            console.info('Track Added', track);
+            if (track.isLocal()) {
+              return;
+            }
+
+            if (userList.getDisplayName(track.getParticipantId()) != callConfig['operatorName'] ){
+              return;
+            }
+
+            if (track.getType() != 'video') {
+              return;
+            }
+
+            track.attach($('#operator-video')[0]);
+
+          });
+
+          room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, function(track){
+              console.log(`track removed!!!${track}`);
+          });
+
         }
+
 
         room.on( JitsiMeetJS.events.conference.CONFERENCE_JOINED,
           onConferenceJoined,
         );
 
       }
-    
+
       socketio.on('disconnect', function() {
         console.info('socket disconnected');
         disconnect();
@@ -178,17 +204,18 @@
   </script>
   
   <div id="main" class="avatar">
-
-    <div id="col-1", class="column">
-      <div id="messages-public"  class="messages"></div>
-    </div>
-    <!-- Col2 -->
-    <div id="col-2", class="column">
-      <div id="meeting-details" class="messages"></div>
-
-      <div id="user-list"></div>
-      <div id="messages-private"></div>
-    </div>
+      <div id="col-1", class="column">
+        <div id="messages-public"  class="column-block messages"></div>
+      </div>
+      <!-- Col2 -->
+      <div id="col-2", class="column">
+        <div id="meeting-details"   class="column-block"></div>
+        <div id="operator-video-div"class="column-block">
+          <video autoplay='1' id='operator-video'></video>
+        </div>
+        <div id="user-list"         class="column-block"></div>
+        <div id="messages-private"  class="column-block messages"></div>
+      </div>
   </div>
 
 </body>

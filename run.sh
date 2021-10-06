@@ -4,4 +4,4 @@
 # export FLASK_ENV=development
 # flask run
 
-python3 app.py --name "DEBUG"
+python3 app.py --name "REHERSAL"

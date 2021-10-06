@@ -97,7 +97,8 @@ class HateSpeech(MultiGeneratorEngine):
             if self.parsePrompt():
                 self.sendMessage(self.id, self.getPrompt())
             else:
-                self.getPrediction()
+                if self.text:
+                    self.getPrediction()
             yield
 
     def getPrediction(self, public = False_):

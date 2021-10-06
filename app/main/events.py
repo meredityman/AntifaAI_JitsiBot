@@ -7,7 +7,7 @@ from .. import socketio, conferenceName, botName, avatarName
 
 from ..interaction import engine
 from ..interaction.constants import *
-from app import interaction
+from app import interaction, operatorName
 
 
 avatar_client = None
@@ -102,6 +102,7 @@ def handle_avatar_connect():
     message = {
         'displayName'        : avatarName,
         'conference'         : conferenceName,
+        'operatorName'       : operatorName,
         'default-engine-config': DEFAULT_ENGINE_CONFIG,
         'types'  :  INTERACTION_TYPES
     }
