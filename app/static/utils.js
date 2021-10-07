@@ -150,7 +150,7 @@ class MessageList {
 
 
     this.publicMessageElement  = $(`<div id="public-messages", class="message-list"</div>`).appendTo(element_public);
-    this.privateMessageElement = $(`<div id="private-messages"></div>`).appendTo(element_private);
+    this.privateMessageElement = $(`<div id="private-messages", class="messages"></div>`).appendTo(element_private);
   };
 
   addPublicMessage(uid, displayName, message){

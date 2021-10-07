@@ -42,16 +42,24 @@ div.avatar {
     overflow:hidden;
 }
 
-.column-block {
+div.column-block {
     overflow:hidden;
     width: 100%;
 }
 
 /* Structure */
-div.user-list {
-    height:  30vh;
-    width: 100%;
-    overflow-x: hidden;
+#user-list {
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+#user-list::-webkit-scrollbar {
+    display: none;
+}
+
+/* Structure */
+.avatar#messages-private {
     overflow-y: scroll;
 }
 
@@ -89,7 +97,6 @@ div.message-list {
     overflow-x: auto;
     overflow-y: scroll;
     text-align:left;
-    border-style: dotted;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
@@ -98,6 +105,7 @@ p.message {
     width: 100%;
     overflow-wrap: break-word;
     word-wrap: break-word;
+    border-bottom: 1px dotted;
 }
 
  /* Hide scrollbar for Chrome, Safari and Opera */
@@ -122,4 +130,6 @@ p.message {
 video#operator-video {
     height: 100%; 
     width: 100%;
+    padding: 2px;
+    border: 1px dotted;
 }
