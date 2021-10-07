@@ -48,7 +48,11 @@ class Telegram(SingleGeneratorEngine):
 
 
     def _setup(self):
-        pass
+        self.commands = {
+            "ESCAPE",
+            "START",
+            "END"
+        }
 
     def _reset(self):
         self.messages = json.load(open("app/config/telegram/channel_telegram_messages.json", 'r'))
@@ -104,7 +108,7 @@ class Telegram(SingleGeneratorEngine):
 
             while True:
                 if  self.isPublic:
-                    if( self.text == "CONTINUE" or self.text == "START"):
+                    if( self.text == "START"):
                         break
                     elif( self.text == "END"): 
                         running = False

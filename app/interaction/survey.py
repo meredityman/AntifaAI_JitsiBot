@@ -14,6 +14,9 @@ QUESTION_PATH = "app/config/survey/survey.json"
 class Survey(SingleGeneratorEngine):
 
     def _setup(self):
+        self.commands = {
+            "ESCAPE"
+        }
         pass
 
     def getQuestionText(self, qIndex):

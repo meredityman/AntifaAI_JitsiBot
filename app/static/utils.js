@@ -84,8 +84,9 @@ class EventSelector{
 };
 
 class InteractionSelector{
-  constructor(element, interactionList, setInteractionEngine, defaultEngine){
+  constructor(element, interactionList, sendEngineCommand, setInteractionEngine, engineConfig){
     this.element      = element;
+    this.element.empty();
     this.setInteractionEngine = setInteractionEngine;
 
     let buttons = [];
@@ -109,15 +110,30 @@ class InteractionSelector{
         }
       });
 
-      if (interactionName == defaultEngine){
+      if (interactionName == engineConfig["type"]){
         button.addClass('selected');  
       }
 
-
       buttons.push(button);
       this.element.append(button);
-    });  
+    });
 
+    this.element.append($('<br/>'));
+
+    let commands = engineConfig["commands"];
+
+    if (commands) {
+      commands.forEach( (command) => {
+
+        var cbutton = $('<button/>', {
+          text: command, 
+          id: 'btn-' + engineConfig['type'] + '-' + command,
+          click: function () { 
+            sendEngineCommand(command);        }
+        });
+        this.element.append(cbutton);
+      });  
+    }
   }
 
   
