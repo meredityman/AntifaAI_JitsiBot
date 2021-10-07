@@ -5,6 +5,7 @@ class InteractionEngine:
         self.broadcastCallback = broadcastCallback
         self.ids = ids
         self.isPublic = None
+        self.commands = {}
         self.setup()
 
 
@@ -90,7 +91,7 @@ class SingleGeneratorEngine(InteractionEngine):
 
     def _getResponse(self, id, text, isPublic):
         self.isPublic = isPublic
-        if id in self.ids:
+        if id in self.ids or text in self.commands:
             self.id   = id
             self.text = text
             self.iterateGenerator()
@@ -142,10 +143,15 @@ class MultiGeneratorEngine(InteractionEngine):
 
     def _getResponse(self, id, text, isPublic):
         self.isPublic = isPublic
-        if isPublic:
-            print("Skipping Public message")
-        else:
-            if id in self.ids:
+
+        if text in self.commands:
+                self.id   = id
+                self.text = text
+                self.iterateGenerator()
+        elif id in self.ids:
+            if isPublic:
+                print("Skipping Public message")
+            else:
                 self.id   = id
                 self.text = text
                 self.iterateGenerator()

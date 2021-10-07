@@ -62,6 +62,16 @@ def handle_disconnect():
     if client == bot_client:
         bot_client = None
 
+
+@socketio.on('received_command', namespace='/bot')
+def received_command(command):
+    global bot_client
+    client = request.sid
+    if client == bot_client:
+        print('received_command', client, command)
+        engine.feedEnginePublic(None, command)
+
+
 @socketio.on('received_message', namespace='/bot')
 def received_message(message):
     global bot_client
