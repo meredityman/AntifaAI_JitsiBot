@@ -45,7 +45,7 @@
       const ownDisplayName            = callConfig['displayName'];
       const meetingName               = callConfig['conference'].toLowerCase();
 
-      let selectedId = callConfig['default-engine-config']['ids']
+      let engineConfig = callConfig['default-engine-config']
 
       let meetingUrl = 'https://' + config['hosts']['domain'] + '/' + meetingName;
       let connection = null;
@@ -74,18 +74,18 @@
 
           // event callbacks
           function setInteractionEngineIds(uids){
-            engine_socketio.emit('set_interaction_engine_ids',  {
-              'ids': uids,
-            }); 
+            engineConfig['ids'] = uids
+            engine_socketio.emit('set_interaction_engine_ids', engineConfig); 
           }
 
           function setInteractionEngine(type){
-            engine_socketio.emit('set_interaction_engine',  {
-              'type': type,
-              'ids': userList.getSelectedIds(),
-            }); 
+            engineConfig['type'] = type
+            engine_socketio.emit('set_interaction_engine', engineConfig); 
           }
 
+          function sendEngineCommand(command){
+            engine_socketio.emit('received_command', command); 
+          }
 
           // Jitsi callbacks
           function sendPublicMessage(message){
@@ -101,17 +101,21 @@
           console.info('Console Joined!')
 
           let userList       = new UserList($('#user-list'), room.getParticipants(), setInteractionEngineIds );
-          userList.setSelectedIds(selectedId);
+          userList.setSelectedIds(engineConfig['ids']);
 
           let meetingDetails = new MeetingDetails( $("#meeting-details"), meetingUrl);
 
           let messageList    = new MessageList($('#messages-public'), $('#messages-private'), room.myUserId(), ownDisplayName);
   
+          
+
+
           let interactionSelector = new InteractionSelector(
             $("#interaction-selector"), 
             callConfig['types'],
+            sendEngineCommand,
             setInteractionEngine,
-            callConfig['default-engine-config'].type
+            engineConfig
             );
 
           let eventSelector    = new EventSelector($('#event-list'), sendPublicMessage);
@@ -123,14 +127,27 @@
 
           socketio.on('send_private_message', function(data) {
               console.info('send_private_message', data['id'], data['message']);
-              sendPrivateMessage(data['id'], data['message'])
+              sendPrivateMessage(data['id'], data['message']);
               messageList.addPrivateReply(data['id'], data['message']);
           });
 
           socketio.on('disconnect_now', function(data) {
               console.info('disconnect signal received');
-              disconnect()
+              disconnect();
           });
+
+          socketio.on('interaction_engine_changed', function(data) {
+            console.error(data);
+            engineConfig = data
+            interactionSelector = new InteractionSelector(
+              $("#interaction-selector"), 
+              callConfig['types'],
+              sendEngineCommand,
+              setInteractionEngine,
+              engineConfig
+            );
+          });
+
 
           // Socket io callbacks
           room.on( JitsiMeetJS.events.conference.MESSAGE_RECEIVED, (uid, text, ts) => {

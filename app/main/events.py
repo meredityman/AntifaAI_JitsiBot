@@ -62,16 +62,6 @@ def handle_disconnect():
     if client == bot_client:
         bot_client = None
 
-
-@socketio.on('received_command', namespace='/bot')
-def received_command(command):
-    global bot_client
-    client = request.sid
-    if client == bot_client:
-        print('received_command', client, command)
-        engine.feedEnginePublic(None, command)
-
-
 @socketio.on('received_message', namespace='/bot')
 def received_message(message):
     global bot_client
@@ -139,14 +129,22 @@ def handle_engine_connect():
 def handle_engine_disconnect():
     pass
 
+
+@socketio.on('received_command', namespace='/engine')
+def received_command(command):
+    engine.feedEnginePublic(None, command)
+
 @socketio.on('set_interaction_engine', namespace='/engine')
 def set_interaction_engine(config):
     print('set_interaction_engine', config)
     engine.setup(config, send_message, send_private_message)
-    socketio.emit('interaction_engine_changed', config)
+
+    config["commands"] = list(engine.get_commands())
+    print("Here!")
+    socketio.emit('interaction_engine_changed', config, namespace="/bot")
 
 @socketio.on('set_interaction_engine_ids', namespace='/engine')
 def set_interaction_engine_ids(config):
     print('set_interaction_engins_ids', config)
     engine.set_ids(config)
-    socketio.emit('interaction_engine_changed', config)
+    socketio.emit('interaction_engine_changed', config, namespace="/bot")

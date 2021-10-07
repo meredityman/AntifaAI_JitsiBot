@@ -9,6 +9,12 @@ class Engine():
         self.interactionType   = None
         self.setup(DEFAULT_ENGINE_CONFIG)
     
+    def get_commands(self):
+        if(self.interactionEngine):
+            return self.interactionEngine.commands
+        else:
+            return []
+
     def set_ids(self, args):
         self.ids = args['ids']   
 
