@@ -110,8 +110,11 @@ def draw_map(stations, file_path):
         text = f"{i:02d} | {name}"
         path_img_draw.text( (box[0] + 35, box[1] - 15), text, fill=(0,0,0), stroke_fill = (255, 255, 255), stroke_width = 2, font=fnt)
         
-
-
+    background = Image.new('RGBA', (1440, 900), (255, 255, 255, 255))
+    bg_w, bg_h = background.size
+    img_w, img_h = background.size
+    offset = ((bg_w - img_w) // 2, (bg_h - img_h) // 2)
+    background.paste(path_img, offset)
     # path_img = path_img.filter(ImageFilter.GaussianBlur(0.5))
 
     # img = ImageChops.darker(img, path_img)
@@ -119,7 +122,7 @@ def draw_map(stations, file_path):
     # # img = Image.blend(mask, img, 0.5)
     # #img.show()
 
-    path_img.save(file_path, quality=95)
+    background.save(file_path, quality=95)
 
 
 def get_tests(stations):
