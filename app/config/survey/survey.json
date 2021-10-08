@@ -1,7 +1,7 @@
 {
     "intro"  : "Willkommen zum Fragebogen!",
     "outro"  : "Danke für deine Teilnahme!",
-    "prompt" : "Wähle was am stärksten auf dich zutrifft!",
+    "prompt" : "Wähle was am stärksten auf dich zutrifft! [e.g. 2]",
     "pyta"   : "{pyta} Menschen müssen noch antworten.",
     "questions": [
         {

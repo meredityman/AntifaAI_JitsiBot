@@ -21,7 +21,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
   
  
-  <link rel="stylesheet" href="static/style.css"></link> 
+  <link rel="stylesheet" href="static/style-bot.css"></link> 
 
   <script type="text/javascript" charset="utf-8">
 
@@ -220,7 +220,7 @@
 
   </script>
   
-  <div id="main">
+  <div id="main" class="bot">
     <div id="row1" class="row">
       <div class="col-md-4">
         <div id="meeting-details">
@@ -239,8 +239,11 @@
     <div id="row1" class="row">
       <div class="col-md-12">
         <h2>Chat</h2>
-        <div id="messages-public"></div>
-        <div id="messages-private"></div>
+        <div id="messages-scroll">
+          <div id="messages-public"></div>
+          <div id="messages-private"></div>
+        </div>
+
       </div>
     </div>
   </div>

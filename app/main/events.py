@@ -145,6 +145,6 @@ def set_interaction_engine(config):
 
 @socketio.on('set_interaction_engine_ids', namespace='/engine')
 def set_interaction_engine_ids(config):
-    print('set_interaction_engins_ids', config)
+    print('set_interaction_engines_ids', config)
     engine.set_ids(config)
     socketio.emit('interaction_engine_changed', config, namespace="/bot")

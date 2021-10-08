@@ -131,7 +131,7 @@ def get_users_for_trend(trend):
 class Twitter(SingleGeneratorEngine):
 
     def _setup(self):
-        self.commands = {"END"}
+        self.commands = {"END", "ESCAPE"}
 
     def _reset(self):
         self.jsonData  = json.load(open("app/data/twitter/twitter-data.json", 'r'))
