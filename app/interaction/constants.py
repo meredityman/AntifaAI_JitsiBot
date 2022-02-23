@@ -1,4 +1,4 @@
-from app.interaction.hatespeech import HateSpeech
+from sites.interaction.hatespeech import HateSpeech
 from .gpt2 import GPT2
 from .survey import Survey
 from .incidents import Incidents

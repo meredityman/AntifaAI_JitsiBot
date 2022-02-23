@@ -1,0 +1,13 @@
+{
+    "hr" : {
+        "name"  : "Hassladung",
+        "prompt": "Auf einer Skala von 0 bis 10, wie hassgeladen ist diese Nachricht",
+        "hint" : "Gib eine Zahl zwischen 0.0 und 10.0 ein"
+    },
+    "gr" : {
+        "name"  : "Anstiftend",
+        "prompt": "Auf einer Skala von 0 bis 10, wie sehr stiftet diese Nachricht zur Tat an?",
+        "hint" : "Gib eine Zahl zwischen 0.0 und 10.0 ein"
+    }
+
+}

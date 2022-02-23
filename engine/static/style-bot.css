@@ -1,0 +1,148 @@
+div.main {
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    background-color: black;
+    color: greenyellow;
+    font-family: system-ui;
+}
+
+a {
+    color: purple;
+}
+
+li.list-group-item {
+    background-color: black;
+    padding: 0;
+    width : 100%
+    
+}
+
+button.user-btn {
+    padding: 0; 
+    color: greenyellow;
+    background: black;
+    outline: 0;
+    margin : 0;
+    width : 100%
+}
+
+
+/* Structure */
+
+div.column {
+    width: 50%;
+    float:left;
+}
+
+div.avatar {
+    cursor: none !important;
+    overflow:hidden;
+}
+
+div.column-block {
+    overflow:hidden;
+    width: 100%;
+}
+
+/* Structure */
+#user-list {
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+#user-list::-webkit-scrollbar {
+    display: none;
+}
+
+/* Structure */
+.avatar#messages-private {
+    overflow-y: scroll;
+}
+
+/* Buttons */
+#reconnect-button {
+    font-size: x-large;
+}
+button.selected {
+    background-color: red;
+}
+ /* Messages */ 
+
+span.user-name {
+    font-style:italic;
+    font-weight: bold;
+}
+
+div.messages {
+    overflow:hidden;
+    width: 100%;
+}
+
+ /* Hide scrollbar for Chrome, Safari and Opera */
+
+
+#messages-public {
+    float: left;
+}
+#messages-private {
+    float: left;
+}
+
+div.message-list {
+    float: left;
+    padding:4px;
+    height:  100vh;
+    width: 20vw;
+    overflow-x: auto;
+    overflow-y: scroll;
+    text-align:left;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+div.message-list::-webkit-scrollbar {
+    display: none;
+  }
+
+
+p.message {
+    width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    border-bottom: 1px dotted;
+}
+
+ /* Hide scrollbar for Chrome, Safari and Opera */
+.example::-webkit-scrollbar {
+    display: none;
+}
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+ .example {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+} 
+
+.clock {
+    float: right;
+    margin-right: 2rem;
+    margin-bottom: 2rem;
+    clear: both;
+    font-size: larger;    
+}
+
+#messages-scroll{   
+    overflow-x: scroll;
+    overflow-y: auto ;
+}
+
+video#operator-video {
+    height: 100%; 
+    width: 100%;
+    margin: 4px;
+    padding: -2px;
+    border: 1px dotted;
+}

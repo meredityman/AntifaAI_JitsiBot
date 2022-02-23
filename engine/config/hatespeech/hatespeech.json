@@ -1,0 +1,24 @@
+{
+    "start-prompt" : "Lasst uns den Scheiß analysieren!💩",
+    "result" : "Klassifiziert als: {prediction} ({certainty:.0%})",
+    "introduction" : [
+        "Du hast jetzt die Möglichkeit eine Nachricht an den Bot zu schreiben. Er wird dir antworten und versuchen dir eine Bewertung zurück zu geben (eine Wahrscheinlichkeit) wie sehr deine Nachricht aggressiv/hasserfüllt ist oder nicht. Nichts was du schreibst wird gespeichert oder veröffentlicht."
+    ],
+    "commands": {
+        "prompt" : [ "prompt", "PROMPT"]
+    },
+    "final-prompt" : "Ich bin am Ende. Du kannst jetzt wieder dem AVATAR_IN folgen!",
+    "prompts" : [        
+        "Eine der bemerkenswerten Fähigkeiten von Transformatormodellen ist ihre begrenzte Fähigkeit, Neologismen (neue Wörter) zu verarbeiten. Das ist interessant, weil Slang und verschlüsselte Sprache extrem effektiv sind, um naive Filtertechniken zu überwinden. Versuche, in einer Beleidigung echte Wörter durch erfundene zu ersetzen",
+        "Ein Problem mit den Datensätzen, die zum Trainieren von Hatespeech-Modellen verwendet werden, ist, dass es schwierig ist, Wörter zu unterscheiden, die eine starke Assoziation mit negativer Sprache haben. Zum Beispiel führen Synonyme für Homosexualität oft dazu, dass der Text unabhängig vom Kontext als beleidigend eingestuft wird. Versuche, nette Dinge über homosexuelle Menschen zu sagen und schaue, wo das Modell Probleme hat.",
+        "Das Ersetzen von Wörtern ist eine gängige Methode, um das Verhalten des Modells zu testen. Nehme einen eindeutig liebevollen Satz, z. B. 'Ich liebe dich', und versuche, ein Wort nach dem anderen zu ersetzen. Was passiert wenn du den Satz immer um etwas negatives erweiterst? Bspw.: 'Ich liebe dich nicht'",
+        "Sprachmodelle weisen oft geschlechtsspezifische Vorurteile auf. Versuche, das Geschlecht des Subjekts in einem Satz zu ändern. Erhältst du ein anderes Verhalten?",
+        "Sentiment- und Emotionserkennung sind verwandte Forschungsgebiete, die sich ebenfalls als fruchtbar erwiesen haben. In diesem Modell erwarten wir, dass emotionale Signifikanten einen großen Einfluss auf das Ergebnis haben. Wie wirkt sich der Ausdruck von positiven und negativen Emotionen in Bezug auf eine Zielgruppe aus?",
+        "Leider versteht dieses Modell nur reguläre Zeichen und einige Satzzeichen. Dies wird zunehmend als Versäumnis angesehen, da Emojis ein wichtiger Bestandteil der Online-Kommunikation sind. Es werden Methoden entwickelt, um dies auszugleichen. Aber auch die Zeichensetzung ist wichtig. Versuche, mehr Ausrufezeichen in deinen Text einzubauen. Macht das einen Unterschied?",
+        "Beeinflusst eine “schlechte” Rechtschreibung das Ergebnis? Könnte das der Fall sein?",
+        "Schreibe den schlechtesten Witz, den du kennst. Mach schon, es schaut ja keiner zu!",
+        "Viele Forscher:innen in diesem Bereich unterscheiden zwischen direkter und indirekter Beleidigung. Unserer Erfahrung nach ist direkter Antisemitismus online eher selten zu beobachten, aber indirekter Antisemitismus ist weit verbreitet, durch Tropen und Verschwörungstmythen über das internationale Bankwesen, Kabalen der Eliten und 'Hot-takes' zum Israel-Palästina-Konflikt. Wie reagiert das Modell auf indirekte rassistische Argumente?",
+        "Dieses Modell hat kein Verständnis für den Kontext jenseits des Textes, mit dem es gefüttert wird. Versuchen Sie, eine Aussage mit und ohne einige zusätzliche Informationen zu schreiben. Was wird benötigt, um ein Ergebnis zu ändern?",
+        "Denke an etwas, das du gesagt hast oder zu dir gesagt wurde, dass du jetzt als hasserfüllt betrachtest. Das können Ausdrücke sein, die du heute bereust gesagt zu haben. Stimmt das Modell mit dem alten Du oder dem neuen Du überein?"
+    ]
+}
