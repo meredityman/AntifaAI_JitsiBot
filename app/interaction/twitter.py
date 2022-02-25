@@ -97,10 +97,6 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth,wait_on_rate_limit=True)
 
-jsonData = json.load(open("app/data/twitter/twitter-data.json", "r"))
-
-
-
 
 ## Constants
 woeids = {
@@ -114,7 +110,7 @@ def get_trending_hashtags():
     trends = []
     woeid = woeids['hamburg']
 
-    ret = api.trends_place(id = woeid)
+    ret = api.get_place_trends(id = woeid)
 
     for value in ret:
         for trend in value['trends']:
@@ -125,7 +121,7 @@ def get_trending_hashtags():
 def get_users_for_trend(trend):
     users = []
 
-    search = api.search(q=trend, lang='de')
+    search = api.search_tweets(q=trend, lang='de')
     for tweet in search: 
         users.append(tweet.user.screen_name)
 
@@ -135,7 +131,7 @@ def get_users_for_trend(trend):
 class Twitter(SingleGeneratorEngine):
 
     def _setup(self):
-        pass
+        self.commands = {"END", "ESCAPE"}
 
     def _reset(self):
         self.jsonData  = json.load(open("app/data/twitter/twitter-data.json", 'r'))
@@ -170,6 +166,7 @@ class Twitter(SingleGeneratorEngine):
             location        = x._json['location']   
 
             if user not in self.jsonData:
+                print(f"Saving {user}")
                 self.jsonData[user] = {
                     "connections" : connections,
                     "followers"  : followers_count,
@@ -178,12 +175,12 @@ class Twitter(SingleGeneratorEngine):
                 }
 
 
-        json.dump(jsonData, open("app/data/twitter/twitter-data.json", "w"), indent=4, sort_keys=True)
+        json.dump(self.jsonData, open("app/data/twitter/twitter-data.json", "w"), indent=4, sort_keys=True)
  
     def get_user_summmary(self, suspicious_user):
         response= ""
 
-        x = api.get_user(suspicious_user)
+        x = api.get_user(screen_name=suspicious_user)
 
         followers_count = x._json['followers_count']
         self_description= x._json['description']
@@ -196,7 +193,7 @@ class Twitter(SingleGeneratorEngine):
         response += f"\n{self.summary['description']:_^20}\n\n"
         response += f"{self_description}\n"
 
-        ret = api.user_timeline(suspicious_user)
+        ret = api.user_timeline(screen_name=suspicious_user)
 
         response += f"\n{self.summary['tweets']:_^20}\n\n"
         for i, r in enumerate(ret):

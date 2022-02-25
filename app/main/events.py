@@ -7,7 +7,7 @@ from .. import socketio, conferenceName, botName, avatarName
 
 from ..interaction import engine
 from ..interaction.constants import *
-from app import interaction
+from app import interaction, operatorName
 
 
 avatar_client = None
@@ -102,6 +102,7 @@ def handle_avatar_connect():
     message = {
         'displayName'        : avatarName,
         'conference'         : conferenceName,
+        'operatorName'       : operatorName,
         'default-engine-config': DEFAULT_ENGINE_CONFIG,
         'types'  :  INTERACTION_TYPES
     }
@@ -128,14 +129,22 @@ def handle_engine_connect():
 def handle_engine_disconnect():
     pass
 
+
+@socketio.on('received_command', namespace='/engine')
+def received_command(command):
+    engine.feedEnginePublic(None, command)
+
 @socketio.on('set_interaction_engine', namespace='/engine')
 def set_interaction_engine(config):
     print('set_interaction_engine', config)
     engine.setup(config, send_message, send_private_message)
-    socketio.emit('interaction_engine_changed', config)
+
+    config["commands"] = list(engine.get_commands())
+    print("Here!")
+    socketio.emit('interaction_engine_changed', config, namespace="/bot")
 
 @socketio.on('set_interaction_engine_ids', namespace='/engine')
 def set_interaction_engine_ids(config):
-    print('set_interaction_engins_ids', config)
+    print('set_interaction_engines_ids', config)
     engine.set_ids(config)
-    socketio.emit('interaction_engine_changed', config)
+    socketio.emit('interaction_engine_changed', config, namespace="/bot")

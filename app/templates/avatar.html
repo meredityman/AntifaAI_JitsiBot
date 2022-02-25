@@ -69,6 +69,8 @@
         room.setDisplayName(ownDisplayName)
         room.join();
 
+        
+
         function onConferenceJoined() {
 
 
@@ -88,15 +90,13 @@
 
 
           // Jitsi callbacks
-
-
           console.info('Console Joined!')
 
           let userList       = new UserList($('#user-list'), room.getParticipants(), null, selectable=false );
 
-          let meetingDetails = new MeetingDetails( $("#meeting-details"), meetingUrl);
+          let meetingDetails = new AvatarDetails( $("#meeting-details"));
 
-          let messageList    = new MessageList($('#messages'), room.myUserId(), ownDisplayName);
+          let messageList    = new MessageList($('#messages-public'), $('#messages-private'), room.myUserId(), ownDisplayName);
 
           socketio.on('disconnect_now', function(data) {
               console.info('disconnect signal received');
@@ -130,14 +130,43 @@
             console.info('participants left', id, user);
             userList.removeUser(user);
           });
+
+          room.on( JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, function(id, name){
+            console.info('Display name changed', id, name);
+            userList.updateUserName(id, name);
+          });
+
+          room.on(JitsiMeetJS.events.conference.TRACK_ADDED, function(track){
+            console.info('Track Added', track);
+            if (track.isLocal()) {
+              return;
+            }
+
+            if (userList.getDisplayName(track.getParticipantId()) != callConfig['operatorName'] ){
+              return;
+            }
+
+            if (track.getType() != 'video') {
+              return;
+            }
+
+            track.attach($('#operator-video')[0]);
+
+          });
+
+          room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, function(track){
+              console.log(`track removed!!!${track}`);
+          });
+
         }
+
 
         room.on( JitsiMeetJS.events.conference.CONFERENCE_JOINED,
           onConferenceJoined,
         );
 
       }
-    
+
       socketio.on('disconnect', function() {
         console.info('socket disconnected');
         disconnect();
@@ -175,20 +204,18 @@
   </script>
   
   <div id="main" class="avatar">
-
-    <div id="col-1", class="column">
-      <div id="messages"></div>
-    </div>
-    <!-- Col2 -->
-    <div id="col-2", class="column">
-      <div id="meeting-details">
-        <a id="meeting-link" href="" target="_blank">Meeting Link</a>
+      <div id="col-1", class="column">
+        <div id="messages-public"  class="column-block messages"></div>
       </div>
-
-      <div id="user-list"></div>
-
-      <div id="event-list"></div>
-    </div>
+      <!-- Col2 -->
+      <div id="col-2", class="column">
+        <div id="meeting-details"   class="column-block" style="height: 5vh"></div>
+        <div id="operator-video-div"class="column-block" style="height: 15vh">
+          <video autoplay='1' id='operator-video'></video>
+        </div>
+        <div id="user-list"         class="column-block" style="height: 40vh"></div>
+        <div id="messages-private"  class="column-block" style="height: 40vh"></div>
+      </div>
   </div>
 
 </body>

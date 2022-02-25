@@ -3,6 +3,9 @@ from flask import render_template, send_from_directory
 from . import main
 from pathlib import Path
 import json
+import requests
+
+from app import conferenceName, operatorName
 
 MAP_DATA_PATH  = "app/data/incidents"
 
@@ -12,16 +15,36 @@ def getLink(link):
 
 @main.route('/')
 def index():
+
+    params={
+        "userInfo.displayName" : operatorName,
+        "config.startWithAudioMuted" : "true",
+        "config.disableAP" : "false",
+        "config.disableAEC": "false",
+        "config.disableNS" : "true",
+        "config.disableAGC": "true",
+        "config.disableHPF": "true",
+        "config.stereo"    : "true",
+        "resolution"       : "1280"
+    }
+    params = [ f'{k}="{v}"' for k, v in params.items()]
+    params = "&".join(params)
+
+
+    operator_link = f"https://meet.cobratheatercobra.com/{conferenceName}#{params}"
+    link = f"https://meet.cobratheatercobra.com/{conferenceName}"
+
     links = [
-        {'href' : "bot"     , 'text' : 'Bot'   },
-        {'href' : "avatar"  , 'text' : 'Avatar'},
-        {'href' : "meetings", 'text' : 'MeetingLinks'}
+        {'href' : link         , 'text' : '🎪 Participant' },
+        {'href' : "bot"        , 'text' : '🤖 Bot'         },
+        {'href' : "avatar"     , 'text' : '📹 Avatar'      },
+        {'href' : operator_link, 'text' : '🎬 Operator'    },
     ]
     return render_template('index.html', links = links)
 
 @main.route('/cue', methods=['POST'])
 def cue():
-    if request.method == 'POST':
+    if requests.method == 'POST':
         return send_cue('name', data)
 
 

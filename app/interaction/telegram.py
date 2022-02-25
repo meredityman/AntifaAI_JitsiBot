@@ -48,7 +48,11 @@ class Telegram(SingleGeneratorEngine):
 
 
     def _setup(self):
-        pass
+        self.commands = {
+            "ESCAPE",
+            "START",
+            "END"
+        }
 
     def _reset(self):
         self.messages = json.load(open("app/config/telegram/channel_telegram_messages.json", 'r'))
@@ -81,10 +85,10 @@ class Telegram(SingleGeneratorEngine):
             else:
                 self.ratings[key][name] = newRatings
 
-            mean = np.mean(np.asarray(self.ratings[key]["hr"]))
-            std  = np.std(np.asarray(self.ratings[key]["hr"]))
+            mean = np.mean(np.asarray(self.ratings[key][name]))
+            std  = np.std(np.asarray(self.ratings[key][name]))
             self.ratings[key][ name + "-mean"] = mean
-            self.ratings[key]["hr-std"] = std 
+            self.ratings[key][ name + "-std"] = std 
 
             response += "\n" + self.line.format(
                 displayName = self.metrics[name]['name'],
@@ -104,7 +108,7 @@ class Telegram(SingleGeneratorEngine):
 
             while True:
                 if  self.isPublic:
-                    if( self.text == "CONTINUE" or self.text == "START"):
+                    if( self.text == "START"):
                         break
                     elif( self.text == "END"): 
                         running = False

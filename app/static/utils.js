@@ -11,6 +11,34 @@ String.prototype.hashCode = function() {
   return hash;
 }
 
+function showTime(){
+  var date = new Date();
+  var h = date.getHours(); // 0 - 23
+  var m = date.getMinutes(); // 0 - 59
+  var s = date.getSeconds(); // 0 - 59
+  var session = "AM";
+
+  if(h == 0){
+      h = 12;
+  }
+
+  if(h > 12){
+      h = h - 12;
+      session = "PM";
+  }
+
+  h = (h < 10) ? "0" + h : h;
+  m = (m < 10) ? "0" + m : m;
+  s = (s < 10) ? "0" + s : s;
+
+  var time = h + ":" + m + ":" + s + " " + session;
+  document.getElementById("MyClockDisplay").innerText = time;
+  document.getElementById("MyClockDisplay").textContent = time;
+
+  setTimeout(showTime, 1000);
+
+}
+
 class MeetingDetails{
   constructor(element, meetingUrl){
     this.element      = element;
@@ -18,6 +46,17 @@ class MeetingDetails{
 
     this.element.find("#meeting-link").attr("href", meetingUrl)
 
+  }
+
+}
+
+class AvatarDetails{
+  constructor(element){
+    this.element      = element;
+    this.uptime = null;
+
+    let clock = $('<div id="MyClockDisplay" class="clock"></div>').appendTo(this.element);
+    showTime();
   }
 }
 
@@ -45,8 +84,9 @@ class EventSelector{
 };
 
 class InteractionSelector{
-  constructor(element, interactionList, setInteractionEngine, defaultEngine){
+  constructor(element, interactionList, sendEngineCommand, setInteractionEngine, engineConfig){
     this.element      = element;
+    this.element.empty();
     this.setInteractionEngine = setInteractionEngine;
 
     let buttons = [];
@@ -70,77 +110,88 @@ class InteractionSelector{
         }
       });
 
-      if (interactionName == defaultEngine){
+      if (interactionName == engineConfig["type"]){
         button.addClass('selected');  
       }
 
-
       buttons.push(button);
       this.element.append(button);
-    });  
+    });
 
+    this.element.append($('<br/>'));
+
+    let commands = engineConfig["commands"];
+
+    if (commands) {
+      commands.forEach( (command) => {
+
+        var cbutton = $('<button/>', {
+          text: command, 
+          id: 'btn-' + engineConfig['type'] + '-' + command,
+          click: function () { 
+            sendEngineCommand(command);        }
+        });
+        this.element.append(cbutton);
+      });  
+    }
   }
 
   
 };
 
 class MessageList {
-  constructor(element, ownUid, displayName){
-    this.element      = element;
+  constructor(element_public, element_private, ownUid, displayName){
+    this.element_public      = element_public;
+    this.element_private     = element_private;
     this.ownUid = ownUid;
     this.displayName = displayName;
     this.publicMessages = [];
     this.privateMessages = {};
 
 
-    this.publicMessageElement  = $(`<div id="public-messages", class="message-list"</div>`).appendTo(element);
-    this.privateMessageElement = $(`<div id="private-messages", class="message-list"></div>`).appendTo(element);
+    this.publicMessageElement  = $(`<div id="public-messages", class="message-list"</div>`).appendTo(element_public);
+    this.privateMessageElement = $(`<div id="private-messages", class="messages"></div>`).appendTo(element_private);
   };
 
   addPublicMessage(uid, displayName, message){
-
-    this.publicMessages.push({
-      'uid'  : uid,
-      'text' : message
-    });
-
-    this.publicMessageElement.append(`<p class="message">${displayName} - ${message}</p>`);
+    if (message) {
+      message = message.replace(/\n/g, "<br />");
+      this.publicMessages.push({
+        'uid'  : uid,
+        'text' : message
+      });
+  
+      this.publicMessageElement.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
+      
+      this.publicMessageElement.scrollTop(this.publicMessageElement[0].scrollHeight);
+    }
   };
 
   addPrivateMessage(uid, displayName, message){
-    if(!(uid in this.privateMessages)){
-      this.privateMessages[uid] = [];
+    if (message) {
+      message = message.replace(/\n/g, "<br />");
+      
+      if(!(uid in this.privateMessages)){
+        this.privateMessages[uid] = [];
+      }
+
+      this.privateMessages[uid].push( {
+        'uid'  : uid,
+        'text' : message
+      });
+
+      let messageEl = $('#private-messages-' + uid);
+      console.warn(messageEl);
+      if(!messageEl.length){
+        messageEl = $(`<div id="${'private-messages-' + uid}", class="message-list"></div>`).appendTo(this.privateMessageElement);
+      }
+      messageEl.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
+      messageEl.scrollTop(messageEl[0].scrollHeight);
     }
-
-    this.privateMessages[uid].push( {
-      'uid'  : uid,
-      'text' : message
-    });
-
-    let messageEl = $('#private-messages-' + uid);
-    if(!messageEl.length){
-      messageEl = $(`<div id="${'#private-messages-' + uid}", class="message-list"></div>`).appendTo(this.privateMessageElement);
-    }
-    messageEl.append(`<p class="message">${displayName} - ${message}</p>`);
-
-  }
+  };
 
   addPrivateReply(uid, message){
-    if(!(uid in this.privateMessages)){
-      this.privateMessages[uid] = [];
-    }
-
-    this.privateMessages[uid].push( {
-      'uid'  : this.ownUid,
-      'text' : message
-    });
-
-    let messageEl = $('#private-messages-' + uid);
-    if(!messageEl.length){
-      messageEl = $(`<div id="${'#private-messages-' + uid}"></div>`).appendTo(this.privateMessageElement);
-    }
-    messageEl.append(`<p class="message">${this.displayName} - ${message}</p>`);
-
+    this.addPrivateMessage(uid, "Me", message)
   }
 
 };
@@ -154,7 +205,7 @@ class UserList {
 
       // this.participants = Object.assign({}, ...participants.map((x) => ({[x._id]: x})));
       this.participants = {};
-      this.listEl = $('<ul id="element-list-ul"></ul>');
+      this.listEl = $('<ul id="user-list-ul"></ul>');
       this.element.append(this.listEl);
       Object.values(participants).forEach(user => {
         this.addUser(user, false);
@@ -177,7 +228,7 @@ class UserList {
   addButton(element, selected){
     let uid = element._id
     let text = element._displayName + " (" + uid + ")";
-    let id = 'element-btn-' + uid;
+    let htmlid = 'element-btn-' + uid;
 
     let userList = this;
 
@@ -195,10 +246,10 @@ class UserList {
     }
 
     let button = $('<button/>', {
+        id   : htmlid,
         text: text, 
         name: uid,
-        id: id,
-        class : 'element-btn',
+        class : 'user-btn',
     });
 
     if( selected){
@@ -219,13 +270,11 @@ class UserList {
       if( $(button).attr("name") in uids){
         $(button).addClass('selected');
       } else {
-        console.warn("Here");
         $(button).removeClass('selected');
       }
 
     });
-    
-
+  
   }
 
   addUser( user, selected = false){
@@ -240,6 +289,19 @@ class UserList {
     let button = this.addButton(user, selected);
     button = button.wrap('<li class="list-group-item"></li>').parent();
     this.listEl.append(button);
+  };
+
+  updateUserName(uid, name){
+    if(uid in this.participants){
+      console.log("Updating user " + uid);
+      this.participants[uid]._displayName = name;
+
+      let text = name + " (" + uid + ")";
+      this.listEl.find('#element-btn-' + uid).html(text)
+    } else {
+      console.warn(uid + " not in list.")
+    }
+   
   };
   
 
