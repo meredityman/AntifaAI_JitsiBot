@@ -1,8 +1,8 @@
-import time
-import json
+
 import argparse
+from distutils.log import debug
 import json
-from engine import socketio, create_app
+from engine import create_app
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -16,4 +16,4 @@ if __name__ == "__main__":
 
     app = create_app(args)
 
-    socketio.run(app, host='0.0.0.0')
+    app.run( host='0.0.0.0', debug=True, use_debugger=False, use_reloader=False)

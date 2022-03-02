@@ -20,7 +20,7 @@ def index():
 @main.route('/engine-start/<interface_type>', methods=['POST'])
 def engine_start(interface_type):
     if request.method == 'POST':
-        ret = engine.start(interface_type, request.json)
+        ret = engine.start(interface_type, **request.json)
         return ret, 200
     else:
         return { 'success' : False, 'error' : "Not a POST request!"}, 404
@@ -36,7 +36,7 @@ def engine_message(interface_id):
 @main.route('/engine-stop/<interface_id>', methods=['POST'])
 def engine_stop(interface_id):
     if request.method == 'POST':
-        ret = engine.stop(interface_id, request.json)
+        ret = engine.stop(interface_id)
         return ret, 200
     else:
         return { 'success' : False, 'error' : "Not a POST request!"}, 404

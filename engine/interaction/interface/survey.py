@@ -1,23 +1,71 @@
 import json
 import numpy as np
 from numpy.lib.function_base import select
-from .interaction import SingleGeneratorEngine
-from ..utils.make_map import draw_map
-from ..utils.cuemanager import send_cue
-from .prompts import prompt_option
+from .utils.make_map import draw_map
+from .utils.cuemanager import send_cue
+from .utils.prompts import prompt_option
+
+from .interface import MultiUserGenerator
+
 
 OUTPUT_MAP_PATH  = "app/static/var/map_latest.jpg"
 
 QUESTION_PATH = "app/config/survey/survey.json"
 
 
-class Survey(SingleGeneratorEngine):
+class Survey(MultiUserGenerator):
 
-    def _setup(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.commands = {
             "ESCAPE"
         }
-        pass
+
+    def start(self) -> list:
+        self.loadQuestions()
+        self.responses = {}
+        self.replies   = [ {"message" : self.intro, "user" : None, "channel" : "public" } ]
+        return super().start()
+
+
+    def generatorFunc(self):
+        for qIndex in range(len(self.questions)):
+
+            qtext =  self.getQuestionText(qIndex)
+            self.replies  += [ {"message" : qtext, "user" : self.last_user, "channel" : "public" } ]
+            self.replies  += [ {"message" : self.prompt, "user" : user, "channel" : "private" } for user in self.users]
+            yield
+
+
+            while True:
+                if self.last_data == None:
+                    yield
+                    continue
+                
+                user_message = self.last_data["message"]
+                isPublic = self.last_data["channel"] == "public"
+
+                if  isPublic:
+                    if( user_message == "ESCAPE"):
+                        break
+                    else:
+                        yield
+                else:
+                    responce = self.parseResponse(qIndex, user_message)
+                    if responce:
+                        self.replies  += [ {"message" : responce, "user" : self.last_user, "channel" : "private" } ]
+                    if self.questionAnswered(qIndex):
+                        break
+                    else:
+                        yield
+
+        message = self.finalizeAllQuestions()
+        
+        send_cue("map-decision", message)
+
+        self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
+        self.replies  += [ {"message" : self.outro, "user" : user, "channel" : "private" } for user in self.users]
+
 
     def getQuestionText(self, qIndex):
         question = self.questions[qIndex]
@@ -33,14 +81,11 @@ class Survey(SingleGeneratorEngine):
         return text
 
 
-    def parseResponse(self, qIndex):
-        if self.id not in self.ids:
-            response = None
-
+    def parseResponse(self, qIndex, user_message):
 
         choices = self.questions[qIndex]["choices"]
         options = [ c['option'] for c in choices]
-        selected, response = prompt_option(self.text, options)
+        selected, response = prompt_option(user_message, options)
         
         if selected:
             if qIndex not in self.responses:
@@ -50,7 +95,7 @@ class Survey(SingleGeneratorEngine):
             for c in choices:
                 if c['option'] == selected:
                     score = c['score']
-            self.responses[qIndex][self.id] = score
+            self.responses[qIndex][self.last_user] = score
 
         return response
 
@@ -59,10 +104,11 @@ class Survey(SingleGeneratorEngine):
         if qIndex not in self.responses:
             return False
 
-        yetToAnswer = set(self.ids) - set(self.responses[qIndex].keys())
+        yetToAnswer = set(self.users) - set(self.responses[qIndex].keys())
         if len(yetToAnswer) != 0:
             message = self.pyta.format(pyta=len(yetToAnswer))
-            self.sendBroadcastMessage( message )
+
+            self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
         return len(yetToAnswer) == 0
 
     def finalizeAllQuestions(self):
@@ -126,47 +172,6 @@ class Survey(SingleGeneratorEngine):
         self.stations  = [ s for s in survey_def["stations"] if s["active"] ]
         self.pyta      = survey_def["pyta"]
 
-
-    def _reset(self):
-        self.loadQuestions()
-        self.responses = {}
-        self.iterateGenerator()
-
-    def _generator(self):
-        self.sendBroadcastMessage(self.intro)
-
-        for qIndex in range(len(self.questions)):
-
-            text =  self.getQuestionText(qIndex)
-            self.sendBroadcastMessage(text)
-            self.sendMessageAll(self.prompt)
-            yield
-
-            while True:
-                if not self.text:
-                    yield
-                    continue
-
-                if  self.isPublic:
-                    if( self.text == "ESCAPE"):
-                        break
-                    else:
-                        yield
-                else:
-                    responce = self.parseResponse(qIndex)
-                    if responce:
-                        self.sendMessage(self.id, responce )
-
-                    if self.questionAnswered(qIndex):
-                        break
-                    else:
-                        yield
-
-        message = self.finalizeAllQuestions()
-        
-        send_cue("map-decision", message)
-        self.sendBroadcastMessage(message)
-        self.sendBroadcastMessage(self.outro)
 
 
 # def runSurvey(survey_def):

@@ -1,5 +1,7 @@
-from .echo import Echo
+from .interface import Echo
+from .survey import Survey
 
 INTERFACES = {
-    "Echo" : Echo
+    "Echo" : Echo,
+    "Survey" : Survey
 }

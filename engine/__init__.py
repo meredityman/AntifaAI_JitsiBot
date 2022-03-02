@@ -1,4 +1,1 @@
-from .app import *
-from .interaction import engine
-
-engine = engine.Engine()
+from .app import create_app, engine

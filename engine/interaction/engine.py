@@ -1,6 +1,6 @@
 # from .interaction import *
 # from .constants import *
-from ast import In
+# from ast import In
 import uuid
 
 
@@ -17,10 +17,11 @@ class Engine():
     def get_interfaces(self) -> list:
         return [{ 'interface_id' : n, 'type' : str(type(i)) } for n, i in  self.interfaces.items()]
 
-    def start(self, interface_type, data):
+    def start(self, interface_type, **kwargs):
         if interface_type in INTERFACES:
             new_id = str(uuid.uuid1())
-            self.interfaces[new_id] = INTERFACES[interface_type](data)
+            print("engine.start", kwargs)
+            self.interfaces[new_id] = INTERFACES[interface_type](**kwargs)
 
             msgs = self.interfaces[new_id].start()
 
@@ -29,8 +30,8 @@ class Engine():
             return { 'success' : False, 'error'  : f"'{interface_type}' not available!" }
 
 
-    def stop(self, interface_id, data):
-        print(self.interfaces)
+    def stop(self, interface_id):
+        print("Heet")
         if interface_id not in self.interfaces:
            return { 'success' : False, 'error'  : f"Interface does not exist '{interface_id}'" }
 
