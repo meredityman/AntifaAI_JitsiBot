@@ -55,7 +55,7 @@ if __name__ == '__main__':
     print("Engine types:\n\t{0}\n".format("\n\t".join(engine.get_types())))
 
 
-    if args.id == "":
+    if args.id is None:
         print(f"Starting session: {args.interface_type}")
         ret = StartInterface(args.interface_type, users=args.users)
         printMessages(ret)

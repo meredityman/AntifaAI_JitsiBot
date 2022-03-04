@@ -6,8 +6,6 @@ class Interface:
         if "users" in kwargs:
             for user in kwargs["users"]:
                 self.users.add(user)
-        else:
-            raise
                 
 
     def message(self, user : str, data : dict) -> list:

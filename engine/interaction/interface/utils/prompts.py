@@ -1,6 +1,6 @@
 import json
 
-prompts = json.load(open("app/config/errors.json", "r"))
+prompts = json.load(open("engine/config/errors.json", "r"))
 NOTA   = prompts['none']
 CHOOSE = prompts['choose']
 ERROR  = prompts['error']

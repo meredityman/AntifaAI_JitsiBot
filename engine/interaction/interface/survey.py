@@ -8,9 +8,9 @@ from .utils.prompts import prompt_option
 from .interface import MultiUserGenerator
 
 
-OUTPUT_MAP_PATH  = "app/static/var/map_latest.jpg"
+OUTPUT_MAP_PATH  = "engine/static/var/map_latest.jpg"
 
-QUESTION_PATH = "app/config/survey/survey.json"
+QUESTION_PATH = "engine/config/survey/survey.json"
 
 
 class Survey(MultiUserGenerator):

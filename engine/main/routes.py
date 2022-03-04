@@ -1,5 +1,6 @@
 from code import interact
 import os
+import re
 from flask import render_template, jsonify, request, send_from_directory
 from . import main
 from .. import engine
@@ -20,10 +21,18 @@ def index():
 @main.route('/engine-start/<interface_type>', methods=['POST'])
 def engine_start(interface_type):
     if request.method == 'POST':
-        ret = engine.start(interface_type, **request.json)
+        print(request.data)
+        data = request.json
+        if data:
+            ret = engine.start(interface_type, **data)
+        else:
+            print("No data with request!")
+            ret = engine.start(interface_type)
         return ret, 200
+        
     else:
         return { 'success' : False, 'error' : "Not a POST request!"}, 404
+
 
 @main.route('/engine-message/<interface_id>', methods=['POST'])
 def engine_message(interface_id):

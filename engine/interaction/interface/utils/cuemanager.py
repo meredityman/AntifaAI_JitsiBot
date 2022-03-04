@@ -5,7 +5,7 @@ import uuid
 import json
 import os
 
-cue_sheet  = json.load(open("app/static/cues.json", "r"))
+cue_sheet  = json.load(open("engine/static/cues.json", "r"))
 
 CUES = [ cue for target in cue_sheet['targets'].values() for cue in target['cues'] ]
 
