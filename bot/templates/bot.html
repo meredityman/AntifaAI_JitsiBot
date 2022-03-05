@@ -34,6 +34,23 @@
     }); 
   }
 
+  function clostInteractionEngine(interaction_id){
+    //engineConfig['type'] = type
+    $.ajax({
+      type: "POST",
+      url : "http://192.168.21.188:5001/engine-stop/" + interaction_id ,
+      data : {},    
+      success : (data, status) => {
+        console.info("Try stop: ", interaction_id,  data);
+      },
+      error : (err) => {
+        console.log("Error: " + err); //just use the err here
+      },
+      dataType : "json",
+      contentType :  "application/json; charset=utf-8",
+    });
+  }
+
 
 
   function setInteractionEngine(type, setData, users){
@@ -99,6 +116,7 @@
     let messageList     = null;
     let interactionSelector = null;
     let eventSelector       = null;
+
     let interface_types     = getInterfaceTypes();
 
 
@@ -108,27 +126,6 @@
         interface_types = data['interface-types'];
       }); 
     }
-
-
-    // async function getInterfaceTypes(){
-    //   const interface_types = fetch("http://192.168.21.188:5001/interface-types", {
-    //     method: 'GET',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     }
-    //   })
-    //   .then((response) => {
-    //       return response.json();
-    //   }).then(data => {
-    //     return data['interface-types']
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error:', error);
-    //   });
-    //   return interface_types;
-    // }
-
-    // let interface_types = await getInterfaceTypes();
 
     function sendPublicMessage(message){
         console.info("Send public message: ", message);
@@ -156,6 +153,10 @@
     }
 
     function disconnect(){
+      if(interactionSelector){
+        interactionSelector.close();
+      }
+
       if (socketio) {
         socketio.disconnect();
       }
@@ -184,6 +185,7 @@
         $("#interaction-selector"), 
         interface_types,
         setInteractionEngine,
+        clostInteractionEngine,
         postReplies,
         () => {return userList.getSelectedIds() }
       );

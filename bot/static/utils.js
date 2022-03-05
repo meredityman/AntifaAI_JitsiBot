@@ -82,13 +82,14 @@ class EventSelector{
 };
 
 class InteractionSelector{
-  constructor(element, interface_types, setInteractionEngine, postReplies, getUsers){
+  constructor(element, interface_types, setInteractionEngine, closeInteractionEngine, postReplies, getUsers){
     this.element      = element;
     this.element.empty();
 
-    this.setInteractionEngine = setInteractionEngine;
-    this.postReplies = postReplies;
-    this.getUsers    = getUsers
+    this.setInteractionEngine   = setInteractionEngine;
+    this.postReplies            = postReplies;
+    this.getUsers               = getUsers;
+    this.closeInteractionEngine = closeInteractionEngine;
 
     this.interaction_id = null;
 
@@ -99,6 +100,9 @@ class InteractionSelector{
         text: interactionName, 
         id: 'btn-' + interactionName,
         click: function () { 
+
+          selector.close()
+
           setInteractionEngine(
             interactionName, 
             (data) => {
@@ -149,6 +153,11 @@ class InteractionSelector{
     // }
   }
 
+  close(){
+    if( this.interaction_id){
+      this.closeInteractionEngine(this.interaction_id);
+    }
+  }
   
 };
 

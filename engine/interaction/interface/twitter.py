@@ -1,15 +1,14 @@
 import re
 from numpy.core.fromnumeric import mean
-from .interaction import SingleGeneratorEngine
 import json
-from .regex_helper import  is_url
+from .utils.regex_helper import  is_url
 from collections import defaultdict
 
 import tweepy
 import json
 
-from .prompts import prompt_option, prompt_choice
-
+from .utils.prompts import prompt_option, prompt_choice
+from .interface import MultiUserGenerator
 
 import pandas as pd
 import holoviews as hv
@@ -24,7 +23,7 @@ def plot_twitter():
         #return n.replace("@", "")
         return n
 
-    raw_data = json.load(open("app/data/twitter/twitter-data.json", "r"))
+    raw_data = json.load(open("engine/data/twitter/twitter-data.json", "r"))
 
     nodes_data = [ { 'name' : cn(n), 'group' : 0 } for n in raw_data.keys() ]
 
@@ -73,15 +72,7 @@ def plot_twitter():
             node_color=dim('index').str()
             ))
 
-    hv.save(chord, 'app/static/var/NaziTwitterBubble.html')
-
-
-
-
-
-
-
-
+    hv.save(chord, 'engine/static/var/NaziTwitterBubble.html')
 
 
 
@@ -127,17 +118,17 @@ def get_users_for_trend(trend):
 
     return users
 
+class Twitter(MultiUserGenerator):
 
-class Twitter(SingleGeneratorEngine):
-
-    def _setup(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.commands = {"END", "ESCAPE"}
 
-    def _reset(self):
-        self.jsonData  = json.load(open("app/data/twitter/twitter-data.json", 'r'))
+    def start(self) -> list:
+        self.jsonData  = json.load(open("engine/data/twitter/twitter-data.json", 'r'))
 
 
-        othertext  = json.load(open("app/config/twitter/text.json", 'r'))
+        othertext  = json.load(open("engine/config/twitter/text.json", 'r'))
 
         self.num_users = othertext ['number-of-users']
         self.intro = othertext ['intro']
@@ -151,7 +142,119 @@ class Twitter(SingleGeneratorEngine):
         self.picked      = othertext['picked']
         self.calculating = othertext['calculating']
         
-        self.iterateGenerator()
+        return super().start()
+
+
+    def generatorFunc(self):
+
+        self.replies  += [ {"message" : self.intro, "user" : self.last_user, "channel" : "public" } ]
+
+        running = True
+        while running:
+        
+            # Get a hashtag
+            hashtags = get_trending_hashtags()
+            message = self.hashtag_question + "\n"
+            message += '\n'.join([f"{i+1}). {hashtag}" for i, hashtag in enumerate(hashtags)])
+            message += f"\n1-{len(hashtags)}: "
+            self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
+            yield
+
+            while True:
+                isPublic = self.last_data["channel"] == "public"
+                user_message = self.last_data["message"]
+                if not isPublic:
+                    # Private messages are ignored
+                    yield
+                else:
+                    if user_message:
+                        hashtag, response = prompt_option(user_message, hashtags)
+                    
+                    if response:#
+                        self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
+                        
+                    if hashtag:
+                        break
+                    else:
+                        self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
+                        yield
+
+
+            # Get users
+            suspicious_users = set([])
+            users = get_users_for_trend(hashtag)
+            message  = self.users_question.format(num_users = self.num_users)
+            message += "\n"
+            message += "\n".join([ f"{i+1}). {user}" for i, user in enumerate(users)])
+            message += f"\n\n1-{len(users)}: "
+            self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
+            yield
+
+            while True:
+                isPublic = self.last_data["channel"] == "public"
+                user_message = self.last_data["message"]
+                if isPublic:
+                    if user_message:
+                        user, response = prompt_option(user_message, users)
+
+                    if response:#
+                        self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
+
+                    if user:
+                        if user in suspicious_users:
+                            message = self.picked.format(user = user)
+                            self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
+                        else:
+                            suspicious_users.add(user)
+                            if(len(suspicious_users) >= self.num_users):
+                                break
+                yield
+
+            # Vote on users
+            self.votes = defaultdict(dict)
+
+            for suspicious_user in suspicious_users:
+                message = self.get_user_summmary(suspicious_user)
+                self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
+                self.replies  += [ {"message" : self.question, "user" : user, "channel" : "private" } for user in self.users]  
+                yield
+                while True:
+                    isPublic = self.last_data["channel"] == "public"
+                    user_message = self.last_data["message"]
+                    if  isPublic:
+                        if( user_message == "ESCAPE"):
+                            break
+                        else:
+                            yield
+                    else:
+                        if user_message:
+                            vote, response = prompt_choice(user_message)
+
+                        if response:
+                            self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "private" } ]
+
+                        if vote is not None:
+                            self.votes[suspicious_user][self.last_user] = vote
+
+                        if set(self.users) <= set(self.votes[suspicious_user].keys()):
+                            print(self.users, self.votes[suspicious_user].keys() )
+                            break
+     
+                        print(self.users, self.votes[suspicious_user].keys() )
+                        yield
+
+            message, confirmed_users = self.get_results(self.votes)
+            self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]   
+            self.replies  += [ {"message" : self.calculating, "user" : self.last_user, "channel" : "public" } ]   
+            running = False
+
+            self.save_data(confirmed_users)
+            try:
+                plot_twitter()
+            except:
+                pass
+            self.replies  += [ {"message" : self.outro, "user" : self.last_user, "channel" : "public" } ]
+
 
     def save_data(self, users):
 
@@ -175,7 +278,7 @@ class Twitter(SingleGeneratorEngine):
                 }
 
 
-        json.dump(self.jsonData, open("app/data/twitter/twitter-data.json", "w"), indent=4, sort_keys=True)
+        json.dump(self.jsonData, open("engine/data/twitter/twitter-data.json", "w"), indent=4, sort_keys=True)
  
     def get_user_summmary(self, suspicious_user):
         response= ""
@@ -223,110 +326,6 @@ class Twitter(SingleGeneratorEngine):
 
         return  message, confirmed_users
 
-    def _generator(self):
-
-        self.sendBroadcastMessage(self.intro)
-
-        running = True
-        while running:
-        
-            # Get a hashtag
-            hashtags = get_trending_hashtags()
-            message = self.hashtag_question + "\n"
-            message += '\n'.join([f"{i+1}). {hashtag}" for i, hashtag in enumerate(hashtags)])
-            message += f"\n1-{len(hashtags)}: "
-            self.sendBroadcastMessage(message)
-            yield
-
-            while True:
-                print(self.isPublic)
-                if not self.isPublic:
-                    # Private messages are ignored
-                    yield
-                else:
-                    if self.text:
-                        hashtag, response = prompt_option(self.text, hashtags)
-                    
-                    if response:#
-                        self.sendBroadcastMessage(response)
-                        
-                    if hashtag:
-                        break
-                    else:
-                        self.sendBroadcastMessage(response)
-                        yield
-
-
-            # Get users
-            suspicious_users = set([])
-            users = get_users_for_trend(hashtag)
-            message  = self.users_question.format(num_users = self.num_users)
-            message += "\n"
-            message += "\n".join([ f"{i+1}). {user}" for i, user in enumerate(users)])
-            message += f"\n\n1-{len(users)}: "
-            self.sendBroadcastMessage(message)
-            yield
-
-            while True:
-                if self.isPublic:
-                    if self.text:
-                        user, response = prompt_option(self.text, users)
-
-                    if response:#
-                        self.sendBroadcastMessage(response)
-
-                    if user:
-                        if user in suspicious_users:
-                            message = self.picked.format(user = user)
-                            self.sendBroadcastMessage(message)
-                        else:
-                            suspicious_users.add(user)
-                            if(len(suspicious_users) >= self.num_users):
-                                break
-                yield
-
-            # Vote on users
-            self.votes = defaultdict(dict)
-
-            for suspicious_user in suspicious_users:
-                message = self.get_user_summmary(suspicious_user)
-                self.sendBroadcastMessage(message)    
-                self.sendMessageAll(self.question )     
-                yield
-                while True:
-                    if  self.isPublic:
-                        if( self.text == "ESCAPE"):
-                            break
-                        else:
-                            yield
-                    else:
-                        if self.text:
-                            vote, response = prompt_choice(self.text)
-
-                        if response:
-                            self.sendMessage(self.id, response)
-
-                        if vote is not None:
-                            self.votes[suspicious_user][self.id] = vote
-
-                        if set(self.ids) <= set(self.votes[suspicious_user].keys()):
-                            print(self.ids, self.votes[suspicious_user].keys() )
-                            break
-     
-                        print(self.ids, self.votes[suspicious_user].keys() )
-                        yield
-
-            message, confirmed_users = self.get_results(self.votes)
-            self.sendBroadcastMessage(message)    
-            self.sendBroadcastMessage(self.calculating)  
-            running = False
-
-            self.save_data(confirmed_users)
-            try:
-                plot_twitter()
-            except:
-                pass
-            self.sendBroadcastMessage(self.outro)
 
 # def main_loop():
 

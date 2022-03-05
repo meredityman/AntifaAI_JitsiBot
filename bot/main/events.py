@@ -3,7 +3,7 @@ import time
 import json
 from flask import request
 
-from .. import socketio, conferenceName, botName, avatarName
+from .. import socketio, conferenceName, botName, avatarName, operatorName
 
 avatar_client = None
 bot_client    = None
@@ -98,8 +98,6 @@ def handle_avatar_connect():
         'displayName'        : avatarName,
         'conference'         : conferenceName,
         'operatorName'       : operatorName,
-        'default-engine-config': DEFAULT_ENGINE_CONFIG,
-        'types'  :  INTERACTION_TYPES
     }
 
     print('Starting Conference "{}"'.format(message))
