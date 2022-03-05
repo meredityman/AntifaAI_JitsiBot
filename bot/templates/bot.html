@@ -38,10 +38,11 @@
 
   function setInteractionEngine(type, setData, users){
     //engineConfig['type'] = type
+    let data = JSON.stringify({ "users": users})
     $.ajax({
       type: "POST",
       url : "http://192.168.21.188:5001/engine-start/" + type ,
-      data : JSON.stringify({ test: "test"}),    
+      data : data,    
       success : (data, status) => {
         console.info("Try start: ", type, data);
         setData(data);
@@ -184,7 +185,7 @@
         interface_types,
         setInteractionEngine,
         postReplies,
-        userList.getSelectedIds
+        () => {return userList.getSelectedIds() }
       );
       eventSelector    = new EventSelector($('#event-list'), sendPublicMessage);
 

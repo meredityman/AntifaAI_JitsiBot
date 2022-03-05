@@ -1,7 +1,12 @@
-from .interface import Echo
+from .echo import Echo
 from .survey import Survey
+from .hatespeech import Hatespeech
+from .telegram import Telegram
+
 
 INTERFACES = {
     "Echo" : Echo,
-    "Survey" : Survey
+    "Survey" : Survey,
+    "Hatespeech" : Hatespeech,
+    "Telegram" : Telegram
 }

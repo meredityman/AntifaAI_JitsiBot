@@ -1,26 +1,22 @@
 from numpy.core.fromnumeric import mean
-from .interaction import SingleGeneratorEngine
 import numpy as np
 import random
 import json
-from .prompts import prompt_rating
-from .regex_helper import  is_url
+from .utils.prompts import prompt_rating
+from .utils.regex_helper import  is_url
 from collections import defaultdict
 import holoviews as hv
 from holoviews import dim, opts
 import json
 
+from .interface import MultiUserGenerator
+
 
 def plot_telegram():
-
-
     print("Plotting...")
 
     hv.extension('bokeh')
-
-    raw_data = json.load(open("app/data/telegram/telegram_rating_data.json", "r"))
-
-
+    raw_data = json.load(open("engine/data/telegram/telegram_rating_data.json", "r"))
     channels = []
 
     data_groups = {}
@@ -41,30 +37,113 @@ def plot_telegram():
     overlay.opts( opts.NdOverlay(legend_position='right', width=1000, height=700), opts.Scatter(color = hv.Cycle('RdGy'), alpha=0.8,  marker='s', size=6))
 
     print("Saving...")
-    hv.save(overlay, 'app/static/var/TelegramRatingScatter.html')
+    hv.save(overlay, 'engine/static/var/TelegramRatingScatter.html')
 
 
-class Telegram(SingleGeneratorEngine):
+class Telegram(MultiUserGenerator):
 
-
-    def _setup(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.commands = {
             "ESCAPE",
             "START",
             "END"
         }
 
-    def _reset(self):
-        self.messages = json.load(open("app/config/telegram/channel_telegram_messages.json", 'r'))
-        self.ratings  = json.load(open("app/data/telegram/telegram_rating_data.json", 'r'))
-        self.metrics  = json.load(open("app/config/telegram/metrics.json"))
+    def start(self) -> list:
+        self.messages = json.load(open("engine/config/telegram/channel_telegram_messages.json", 'r'))
+        self.ratings  = json.load(open("engine/data/telegram/telegram_rating_data.json", 'r'))
+        self.metrics  = json.load(open("engine/config/telegram/metrics.json"))
 
-        othertext  = json.load(open("app/config/telegram/text.json", 'r'))
+        othertext  = json.load(open("engine/config/telegram/text.json", 'r'))
         self.intro    = othertext['intro']
         self.thankyou = othertext['thankyou']
         self.outro    = othertext['outro']
         self.line     = othertext['line']
-        self.iterateGenerator()
+
+
+        self.replies   = [ {"message" : self.intro, "user" : None, "channel" : "public" } ]
+
+        return super().start()
+
+
+    def generatorFunc(self):
+
+
+
+        running = True
+        while running:
+            if self.last_data == None:
+                yield
+                continue   
+
+            isPublic = self.last_data["channel"] == "public"
+            user_message = self.last_data["message"]
+
+            while True: 
+                if  isPublic:
+                    if( user_message == "START"):
+                        break
+                    elif( user_message == "END"): 
+                        running = False
+                        break
+                    else:
+                        yield
+                else:
+                    yield
+
+            message, message_id, channel = self.getRandomMessage()
+
+
+            message = ("-" * 20) + "\n" + message + "\n" + ("-" * 20)
+
+            self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
+
+            scores = defaultdict(lambda: defaultdict(list))
+            
+            for name, metric in self.metrics.items():
+                self.replies  += [ {"message" : metric['prompt'], "user" : self.last_user, "channel" : "public" } ]
+
+                self.replies  += [ {"message" : metric['hint'], "user" : user, "channel" : "private" } for user in self.users]
+                yield
+                
+                while True:
+                    if  isPublic:
+                        if( self.text == "ESCAPE"):
+                            break
+                        else:
+                            yield
+                    else:
+                        if self.text is not None:
+                            rating, response = prompt_rating(self.text, 0.0, 10.0)
+
+                        if response is not None:
+                            self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "private" } ]
+
+
+                        if rating is not None:
+                            scores[name][self.id].append(rating)
+                        else:
+                            self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "private" } ]
+                            self.replies  += [ {"message" : metric['hint'], "user" : self.last_user, "channel" : "private" } ]
+
+                        if set(self.ids) <= scores[name].keys():
+                            break
+                        else:
+                            print(scores)
+                            yield
+
+
+            response = self.saveScores(scores, message_id, channel)
+            self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
+            
+            try:
+                plot_telegram()
+            except:
+                raise
+
+
+        self.replies  += [ {"message" : self.outro, "user" : user, "channel" : "private" } for user in self.users]
 
     def saveScores(self, scores, message_id, channel):
         response = f"{self.thankyou}"
@@ -95,78 +174,11 @@ class Telegram(SingleGeneratorEngine):
                 mean = mean
                 )
 
-            json.dump(self.ratings, open("app/data/telegram/telegram_rating_data.json", 'w'))
+            json.dump(self.ratings, open("engine/data/telegram/telegram_rating_data.json", 'w'))
 
         return response
 
 
-    def _generator(self):
-        self.sendBroadcastMessage(self.intro)
-        yield
-        running = True
-        while running:
-
-            while True:
-                if  self.isPublic:
-                    if( self.text == "START"):
-                        break
-                    elif( self.text == "END"): 
-                        running = False
-                        break
-                    else:
-                        yield
-                else:
-                    yield
-
-            message, message_id, channel = self.getRandomMessage()
-
-
-            message = ("-" * 20) + "\n" + message + "\n" + ("-" * 20)
-            self.sendBroadcastMessage(message)
-
-            scores = defaultdict(lambda: defaultdict(list))
-            
-            for name, metric in self.metrics.items():
-                self.sendBroadcastMessage(metric['prompt'])
-                self.sendMessageAll(metric['hint'])
-                yield
-                
-                while True:
-                    if  self.isPublic:
-                        if( self.text == "ESCAPE"):
-                            break
-                        else:
-                            yield
-                    else:
-                        if self.text is not None:
-                            rating, response = prompt_rating(self.text, 0.0, 10.0)
-
-                        if response is not None:
-                            self.sendMessage(self.id, response)
-
-                        if rating is not None:
-                            scores[name][self.id].append(rating)
-                        else:
-                            self.sendMessage(self.id, response)
-                            self.sendMessage(self.id, metric['hint'])
-
-                        if set(self.ids) <= scores[name].keys():
-                            break
-                        else:
-                            print(scores)
-                            yield
-
-
-            response = self.saveScores(scores, message_id, channel)
-            self.sendBroadcastMessage(response)
-
-            try:
-                plot_telegram()
-            except:
-                raise
-
-
-        self.sendBroadcastMessage(self.outro)
 
     def getRandomMessage(self):
         message = None

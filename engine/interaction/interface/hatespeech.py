@@ -1,7 +1,8 @@
+from glob import glob
+from lib2to3.pgen2.tokenize import tokenize
 from typing import Text
 
 from numpy.core.numeric import False_
-from .interaction import SingleGeneratorEngine
 import torch
 import numpy as np
 from transformers import BertTokenizer, BertForSequenceClassification
@@ -9,34 +10,91 @@ import json
 import random
 from collections import defaultdict
 
+from .interface import MultiUserGenerator
+
 MODEL = "deepset/bert-base-german-cased-hatespeech-GermEval18Coarse"
 LABELS = ['Other', 'Offense']
 
-class HateSpeech(SingleGeneratorEngine):
+tokenizer = None
+model     = None
 
-    def _setup(self):
-        self.tokenizer = BertTokenizer.from_pretrained(MODEL)
-        self.model = BertForSequenceClassification.from_pretrained(MODEL)
+class Hatespeech(MultiUserGenerator):
 
-    def _reset(self):
-        self.data = json.load(open("app/config/hatespeech/hatespeech.json", 'r'))
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-        self.start        = self.data['start-prompt']
+        global tokenizer, model
+
+        if tokenizer is None:
+            tokenizer = BertTokenizer.from_pretrained(MODEL)
+
+        if model is None:
+            model = BertForSequenceClassification.from_pretrained(MODEL)
+
+
+    def start(self) -> list:
+        self.loadData()
+        self.prompts_seen = {}
+        self.replies  = [ {"message" : s, "user" : None, "channel" : "public" }  for s in self.intro]
+        self.replies +=  [ {"message" : self.get_prompt_for_user(user), "user" : user, "channel" : "private" } for user in self.users]
+        return super().start()
+
+
+    def loadData(self):
+        self.data = json.load(open("engine/config/hatespeech/hatespeech.json", 'r'))
+        self.intro        = self.data['introduction']
         self.prompts      = self.data['prompts']
         self.commands     = self.data['commands']
         self.final_prompt = self.data['final-prompt']
         self.result       = self.data['result']
-        self.introSent    = False
 
-        self.prompts_seen = set()
+    def _getResponse(self, id, text, isPublic):
+        self.isPublic = isPublic
+        self.id   = id
+        self.text = text
+
 
         self.iterateGenerator()
 
+    def generatorFunc(self):
+        while True:
+            if self.last_data == None:
+                yield
+                continue
+
+            user_message = self.last_data["message"]
+            response = self.getPrediction(user_message)
+
+            isPrivate = self.last_data["channel"] == "private"
+            if response:
+                self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : self.last_data["channel"] } ]
+                if(isPrivate):
+                    self.replies  += [ {"message" : self.get_prompt_for_user(self.last_user), "user" : self.last_user, "channel" : "private" } ]
+            yield
+
+    def getPrediction(self, text):
+        try:
+            loss, probabilities = self.forward(text)
+
+            prediction = LABELS[np.argmax(probabilities)]
+            certainty = np.max(probabilities)
+
+            response = self.result.format(
+                prediction = prediction,
+                certainty  = certainty
+            )
+
+            return response
+        except Exception as e:
+            print(f"Predictions failed {text}")
+            return str(e)
 
     def forward(self, message):
-        inputs  = self.tokenizer(message, return_tensors="pt")
+        global tokenizer, model
+
+        inputs  = tokenizer(message, return_tensors="pt")
         labels  = torch.tensor([1]).unsqueeze(0)  # Batch size 1
-        outputs = self.model(**inputs, labels=labels)
+        outputs = model(**inputs, labels=labels)
         loss    = outputs.loss
         logits  = outputs.logits
         probabilities = torch.nn.functional.softmax(logits, dim=1).cpu().detach().numpy()
@@ -51,66 +109,23 @@ class HateSpeech(SingleGeneratorEngine):
         else: 
             return False
 
-    def getPrompt(self):
-        prompts_available = set(range(len(self.prompts))).difference( self.prompts_seen)
+    def get_prompt_for_user(self, user):
+        if(user in self.prompts_seen):
+            user_prompts_seen = self.prompts_seen[user]
 
-        if( len(prompts_available) ==  0):
-            return self.final_prompt
+            prompts_available = set(range(len(self.prompts))).difference( user_prompts_seen)
+
+            if( len(prompts_available) ==  0):
+                return self.final_prompt
+            else:
+                prompt_i = random.choice(list(prompts_available))
+                prompt = self.prompts[prompt_i]
+                self.prompts_seen[user].add(prompt_i)
+                return prompt
+
         else:
-            prompt_i = random.choice(list(prompts_available))
-            prompt = self.prompts[prompt_i]
-            self.prompts_seen.add(prompt_i)
+            prompt = random.choice(list(self.prompts))
+            self.prompts_seen[user] = set([prompt])
             return prompt
 
-    def _getResponse(self, id, text, isPublic):
-        self.isPublic = isPublic
-        self.id   = id
-        self.text = text
 
-
-        self.iterateGenerator()
-
-    def _generator(self):
-        
-
-        self.sendBroadcastMessage(self.start)
-        yield
-         
-        self.introSent = False
-        while True:
-            if self.text:
-                self.getPrediction(self.isPublic)
-
-                if self.isPublic:
-                    self.sendBroadcastMessage(self.getPrompt())
-                    self.sendBroadcastMessage(self.start)
-                else:
-                    self.sendMessage(self.id, self.start)
-
-                if not self.introSent:
-                    for line in self.data['introduction']:
-                        self.sendMessageAll(line)
-                    self.sendMessageAll(self.start)
-                    self.introSent = True
-
-            yield
-
-    def getPrediction(self, public = False_):
-        try:
-            loss, probabilities = self.forward(self.text)
-
-            prediction = LABELS[np.argmax(probabilities)]
-            certainty = np.max(probabilities)
-
-            response = self.result.format(
-                prediction = prediction,
-                certainty  = certainty
-            )
-
-            if public:
-                self.sendBroadcastMessage(response)
-            else:
-                self.sendMessage(self.id, response)
-        except:
-            print(f"Predictions failed {self.text}")
-            raise

@@ -109,7 +109,7 @@ class InteractionSelector{
                 console.warn(data);
               }
             },
-            selector.getUsers
+            selector.getUsers()
           );
           
           buttons.forEach( item => {
