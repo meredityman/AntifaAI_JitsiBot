@@ -40,8 +40,6 @@ def handle_bot_connect():
     message = {
         'displayName'        : botName,
         'conference'         : conferenceName,
-        # 'default-engine-config': DEFAULT_ENGINE_CONFIG,
-        # 'types'  :  INTERACTION_TYPES
     }
 
     print('Starting Conference "{}"'.format(message))
@@ -56,28 +54,6 @@ def handle_disconnect():
     client = request.sid
     if client == bot_client:
         bot_client = None
-
-# @socketio.on('received_message', namespace='/bot')
-# def received_message(message):
-#     global bot_client
-#     id = message['uid']
-#     text = message['text']
-#     client = request.sid
-#     if client == bot_client:
-#         print('received_message', client, id, text)
-#         engine.feedEnginePublic(id, text)
-
-# @socketio.on('received_private_message', namespace='/bot')
-# def received_private_message(message):
-#     global bot_client
-#     id   = message['uid']
-#     text = message['text']
-#     client = request.sid
-#     if client == bot_client:
-#         print('received_private_message', client, id, text)
-#         engine.feedEnginePrivate(id, text)
-
-
 
 # Avatar
 @socketio.on('connect', namespace='/avatar')
@@ -112,32 +88,3 @@ def handle_disconnect():
     client = request.sid
     if client == avatar_client:
         avatar_client = None
-
-# #Engine
-# @socketio.on('connect', namespace='/engine')
-# def handle_engine_connect():
-#     pass
-
-# @socketio.on('disconnect', namespace='/engine')
-# def handle_engine_disconnect():
-#     pass
-
-
-# @socketio.on('received_command', namespace='/engine')
-# def received_command(command):
-#     engine.feedEnginePublic(None, command)
-
-# @socketio.on('set_interaction_engine', namespace='/engine')
-# def set_interaction_engine(config):
-#     print('set_interaction_engine', config)
-#     engine.setup(config, send_message, send_private_message)
-
-#     config["commands"] = list(engine.get_commands())
-#     print("Here!")
-#     socketio.emit('interaction_engine_changed', config, namespace="/bot")
-
-# @socketio.on('set_interaction_engine_ids', namespace='/engine')
-# def set_interaction_engine_ids(config):
-#     print('set_interaction_engines_ids', config)
-#     engine.set_ids(config)
-#     socketio.emit('interaction_engine_changed', config, namespace="/bot")

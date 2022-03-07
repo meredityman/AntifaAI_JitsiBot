@@ -27,18 +27,11 @@
 
 
 
-  function getInterfaceTypes(){
-    return $.get("http://192.168.21.188:5001/interface-types",(data, status) => {
-      console.info("interfaces available", data);
-      return data;
-    }); 
-  }
-
-  function clostInteractionEngine(interaction_id){
+  function closeInteractionEngine(interaction_id){
     //engineConfig['type'] = type
     $.ajax({
       type: "POST",
-      url : "http://192.168.21.188:5001/engine-stop/" + interaction_id ,
+      url : "http://0.0.0.0:5001/engine-stop/" + interaction_id ,
       data : {},    
       success : (data, status) => {
         console.info("Try stop: ", interaction_id,  data);
@@ -51,14 +44,12 @@
     });
   }
 
-
-
   function setInteractionEngine(type, setData, users){
     //engineConfig['type'] = type
     let data = JSON.stringify({ "users": users})
     $.ajax({
       type: "POST",
-      url : "http://192.168.21.188:5001/engine-start/" + type ,
+      url : "http://0.0.0.0:5001/engine-start/" + type ,
       data : data,    
       success : (data, status) => {
         console.info("Try start: ", type, data);
@@ -72,19 +63,31 @@
     });
   }
 
-  function setInteractionEngineIds(uids){
-    // engineConfig['ids'] = uids
-    //engine_socketio.emit('set_interaction_engine_ids', engineConfig); 
+  function setInteractionEngineIds(users){
+    return {}
   }
 
-  function sendEngineCommand(command){
-    //engine_socketio.emit('received_command', command); 
+  function getInterfaceTypes(callback){
+    return $.ajax({
+      type: "GET",
+      url : "http://0.0.0.0:5001/interface-types",
+      data : {},    
+      success : (data, status) => {
+        console.info("Get Interface Types", data);
+        callback(data);
+      },
+      error : (err) => {
+        console.log("Error: " + err); //just use the err here
+      },
+      dataType : "json",
+      contentType :  "application/json; charset=utf-8",
+    }); 
   }
 
   function relayMessage(interaction_id, message, postReplies){
     return $.ajax({
       type: "POST",
-      url : "http://192.168.21.188:5001/engine-message/" + interaction_id ,
+      url : "http://0.0.0.0:5001/engine-message/" + interaction_id ,
       data : JSON.stringify(message),    
       success : (data, status) => {
         console.info("relay_message", data);
@@ -117,17 +120,12 @@
     let interactionSelector = null;
     let eventSelector       = null;
 
-    let interface_types     = getInterfaceTypes();
+    let interface_types     = [];
+    getInterfaceTypes( (data) => (interface_types = data['interface-types']));
 
+    addSocketCallbacks();
 
-    function getInterfaceTypes(){
-        $.get("http://192.168.21.188:5001/interface-types",(data, status) => {
-        console.info("interface", data);
-        interface_types = data['interface-types'];
-      }); 
-    }
-
-    function sendPublicMessage(message){
+   function sendPublicMessage(message){
         console.info("Send public message: ", message);
         room.sendTextMessage(message);
     }
@@ -177,6 +175,7 @@
     function onConferenceJoined() {
       console.info('Console Joined!');
       addRoomCallbacks();
+      
 
       messageList    = new MessageList($('#messages-public'), $('#messages-private'), room.myUserId(), ownDisplayName);
       userList       = new UserList($('#user-list'), room.getParticipants(), setInteractionEngineIds );
@@ -185,7 +184,7 @@
         $("#interaction-selector"), 
         interface_types,
         setInteractionEngine,
-        clostInteractionEngine,
+        closeInteractionEngine,
         postReplies,
         () => {return userList.getSelectedIds() }
       );
@@ -248,41 +247,42 @@
       });
     }
 
-    socketio.on('connect', function() {
-      console.info('socket connected');
-    });
+    function addSocketCallbacks(){
+      socketio.on('connect', function() {
+        console.info('socket connected');
+      });
 
-    socketio.on('start_conference', function(data) {
-      console.info("data", data);
+      socketio.on('start_conference', function(data) {
+        console.info("data", data);
 
-      callConfig = JSON.parse(data);
-      ownDisplayName            = callConfig['displayName'];
-      meetingName               = callConfig['conference'].toLowerCase();
+        callConfig = JSON.parse(data);
+        ownDisplayName            = callConfig['displayName'];
+        meetingName               = callConfig['conference'].toLowerCase();
 
-      meetingUrl = 'https://' + config['hosts']['domain'] + '/' + meetingName;
+        meetingUrl = 'https://' + config['hosts']['domain'] + '/' + meetingName;
 
-      JitsiMeetJS.init();
-      console.info("connecting...", config)
+        JitsiMeetJS.init();
+        console.info("connecting...", config)
 
-      connection = new JitsiMeetJS.JitsiConnection(null, null, config);
-      addConnectionCallbacks();
-      connection.connect();
-    });
-  
-    socketio.on('disconnect', function() {
-      console.info('socket disconnected');
-      disconnect();
-    });
+        connection = new JitsiMeetJS.JitsiConnection(null, null, config);
+        addConnectionCallbacks();
+        connection.connect();
+      });
+    
+      socketio.on('disconnect', function() {
+        console.info('socket disconnected');
+        disconnect();
+      });
 
-    socketio.on('connect_error', function(err) {
-      disconnect();
-    });
+      socketio.on('connect_error', function(err) {
+        disconnect();
+      });
 
-    socketio.on('disconnect_now', function(data) {
-      console.info('disconnect signal received');
-      disconnect();
-    });
-
+      socketio.on('disconnect_now', function(data) {
+        console.info('disconnect signal received');
+        disconnect();
+      });
+    }
   });
 
   </script>

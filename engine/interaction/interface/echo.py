@@ -15,3 +15,4 @@ class Echo(Interface) :
                 "message" : message,
                 "user"    : user
         }]
+
