@@ -25,7 +25,12 @@ class Engine():
 
             msgs = self.interfaces[new_id].start()
 
-            return { 'success' : True, 'interface_id'  : new_id,  'messages' : msgs }
+            return { 
+                'success' : True, 
+                'interface_id'  : new_id,  
+                'messages' : msgs,
+                'commands' : list(self.interfaces[new_id].commands)
+            }
         else:
             return { 'success' : False, 'error'  : f"'{interface_type}' not available!" }
 

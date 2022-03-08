@@ -1,7 +1,8 @@
 
 class Interface:
     def __init__(self, **kwargs):
-        self.users = set([])
+        self.users    = set([])
+        self.commands = set([])
         print(kwargs)
         if "users" in kwargs:
             for user in kwargs["users"]:

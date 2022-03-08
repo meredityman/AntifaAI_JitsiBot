@@ -1,4 +1,3 @@
-from engine import engine
 import requests
 import argparse
 
@@ -8,41 +7,47 @@ USE_API = True
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--user', type=str, required = True)
 parser.add_argument('--users', type=str, nargs='+')
-parser.add_argument('--interface_type', type=str, default="Survey")
 parser.add_argument('--id', type=str)
 
 
 args = parser.parse_args()
 
+INTERFACE_IP = "GoodOmen.local"
+INTERFACE_PORT = 5001
 
+TYPES = [
+    "Hatespeech",
+    "Telegram",
+    "Twitter"
+]
 
 def StartInterface(interaction_type, users):
     if USE_API:
         r = requests.post(
-            f'http://192.168.21.188:5000/engine-start/{interaction_type}', 
+            f'http://{INTERFACE_IP}:{INTERFACE_PORT}/engine-start/{interaction_type}', 
             json = {"users" : users}
         )
         print(r.status_code)
         return r.json()
     else:
-        return engine.start(type, users=users)
+        raise
 
 def MessageInterface(interface_id, data):
     if USE_API:
         r = requests.post(
-            f'http://192.168.21.188:5000/engine-message/{interface_id}',
+            f'http://{INTERFACE_IP}:{INTERFACE_PORT}/engine-message/{interface_id}',
             json = data
         )
         return r.json()
     else:
-        return engine.message(interface_id, data)
+        raise
 
 def StopInterface(interface_id):
     if USE_API:
-        r = requests.post(f'http://192.168.21.188:5000/engine-stop/{interface_id}')
+        r = requests.post(f'http://{INTERFACE_IP}:{INTERFACE_PORT}/engine-stop/{interface_id}')
         return r.json()
     else:
-        return engine.stop(interface_id)
+        raise
 
 def printMessages(ret):
     print("___________")
@@ -52,7 +57,7 @@ def printMessages(ret):
 if __name__ == '__main__':
 
     
-    print("Engine types:\n\t{0}\n".format("\n\t".join(engine.get_types())))
+    print("Engine types:\n\t{0}\n".format("\n\t".join(TYPES)))
 
 
     if args.id is None:
