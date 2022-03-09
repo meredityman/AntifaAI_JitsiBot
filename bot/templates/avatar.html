@@ -1,255 +1,263 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="google" content="notranslate">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Antifa Jitsi Avatar</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 
 <body>
   <!-- Content -->
   <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
   <script src="https://meet.cobratheatercobra.com/libs/lib-jitsi-meet.min.js"></script>
   <script src="static/config.js"></script>
   <script src="static/utils.js"></script>
   <script src="static/events.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-  
- 
-  <link rel="stylesheet" href="static/style.css"></link> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+    integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+    crossorigin="anonymous"></script>
+
+
+  <link rel="stylesheet" href="static/style.css">
+  </link>
 
   <script type="text/javascript" charset="utf-8">
 
 
-  $(document).ready( function(){
+    $(document).ready(function () {
 
-    let socketio    = io('/avatar');
-    let ownDisplayName  = null;
-    let meetingName     = null;
-    let meetingUrl      = null;
+      let socketio = io('/avatar');
+      let ownDisplayName = null;
+      let meetingName = null;
+      let meetingUrl = null;
 
-    let connection      = null;
-    let room            = null;
+      let connection = null;
+      let room = null;
 
-    let userList        = null;
-    let meetingDetails  = null;
-    let messageList     = null;
-    let eventSelector       = null;
+      let userList = null;
+      let meetingDetails = null;
+      let messageList = null;
+      let eventSelector = null;
 
-    addSocketCallbacks();
+      addSocketCallbacks();
 
-    function disconnect(){
-      if (socketio) {
-        socketio.disconnect();
-      }
-      if (connection) {
-        connection.disconnect();
-      }
+      function disconnect() {
+        if (socketio) {
+          socketio.disconnect();
+        }
+        if (connection) {
+          connection.disconnect();
+        }
         $("#main").html('<h1>Disconnected</h1>');
-    }
+      }
 
-    function startConference(){ 
+      function startConference() {
         console.info('Joining room...');
         room = connection.initJitsiConference(meetingName, config);
         room.setDisplayName(ownDisplayName);
-        room.on( JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined );
+        room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
         room.join();
-    }
+      }
 
-    function onConferenceJoined() {
-      console.info('Console Joined!');
-      addRoomCallbacks();
+      function onConferenceJoined() {
+        console.info('Console Joined!');
+        addRoomCallbacks();
 
-      userList       = new UserList($('#user-list'), room.getParticipants(), null, selectable=false );
-      meetingDetails = new AvatarDetails( $("#meeting-details"));
-      messageList    = new MessageList($('#messages-public'), $('#messages-private'), room.myUserId(), ownDisplayName);
+        userList = new UserList($('#user-list'), room.getParticipants(), null, selectable = false);
+        meetingDetails = new AvatarDetails($("#meeting-details"));
+        messageList = new MessageList($('#messages-public'), $('#messages-private'), room.myUserId(), ownDisplayName);
 
 
-    }
+      }
 
-    function addConnectionCallbacks(){
-      connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED, function () {
-        console.warn('onConnectionFailed');
-        disconnect();
-      });
+      function addConnectionCallbacks() {
+        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, function () {
+          console.warn('onConnectionFailed');
+          disconnect();
+        });
 
-      connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, function () {
-        console.info('disconnect');
-        disconnect();
-      });
-    
-      connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, function () {
-        console.info('onConnectionSuccess');
-        startConference();
-      });
-    }
+        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, function () {
+          console.info('disconnect');
+          disconnect();
+        });
 
-    function addRoomCallbacks(){
-      
-      room.on( JitsiMeetJS.events.conference.MESSAGE_RECEIVED, (uid, text, ts) => {
-        console.info('received_message', uid, text, ts);
-        messageList.addPublicMessage(uid,  userList.getDisplayName(uid), text);
-      });
+        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, function () {
+          console.info('onConnectionSuccess');
+          startConference();
+        });
+      }
 
-      room.on( JitsiMeetJS.events.conference.PRIVATE_MESSAGE_RECEIVED, (uid, text, ts) => {
+      function addRoomCallbacks() {
+
+        room.on(JitsiMeetJS.events.conference.MESSAGE_RECEIVED, (uid, text, ts) => {
+          console.info('received_message', uid, text, ts);
+          messageList.addPublicMessage(uid, userList.getDisplayName(uid), text);
+        });
+
+        room.on(JitsiMeetJS.events.conference.PRIVATE_MESSAGE_RECEIVED, (uid, text, ts) => {
           console.info('received_private_message', uid, text, ts);
-          messageList.addPrivateMessage(uid,  userList.getDisplayName(uid), text);
-      });
+          messageList.addPrivateMessage(uid, userList.getDisplayName(uid), text);
+        });
 
-      room.on( JitsiMeetJS.events.conference.USER_JOINED, function(id, user){
-        console.info('participants joined', id, user);
-        userList.addUser(user);
-      });
+        room.on(JitsiMeetJS.events.conference.USER_JOINED, function (id, user) {
+          console.info('participants joined', id, user);
+          userList.addUser(user);
+        });
 
-      room.on( JitsiMeetJS.events.conference.USER_LEFT, function(id, user){
-        console.info('participants left', id, user);
-        userList.removeUser(user);
-      });
+        room.on(JitsiMeetJS.events.conference.USER_LEFT, function (id, user) {
+          console.info('participants left', id, user);
+          userList.removeUser(user);
+        });
 
-      room.on(JitsiMeetJS.events.conference.TRACK_ADDED, function(track){
-        console.info('Track Added', track);
-        if (track.isLocal()) {
-          return;
-        }
-        if (userList.getDisplayName(track.getParticipantId()) != callConfig['operatorName'] ){
-          return;
-        }
-        if (track.getType() != 'video') {
-          return;
-        }
+        room.on(JitsiMeetJS.events.conference.TRACK_ADDED, function (track) {
 
-        track.attach($('#operator-video')[0]);
+          if (track.isLocal()) {
+            return;
+          }
+          if (userList.getDisplayName(track.getParticipantId()) != "Operator") {
+            return;
+          }
+          if (track.getType() != 'video') {
+            return;
+          }
+          console.info('Track Added', track, $('#operator-video'));
+          track.attach($('#operator-video')[0]);
 
-      });
+        });
 
-      room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, function(track){
+        room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, function (track) {
           console.log(`track removed!!!${track}`);
-      });
+        });
 
-    }
-
-
-    function addSocketCallbacks(){
-      socketio.on('connect', function() {
-        console.info('socket connected');
-      });
-
-      socketio.on('start_conference', function(data) {
-        console.info("data", data);
-
-        callConfig = JSON.parse(data);
-        ownDisplayName            = callConfig['displayName'];
-        meetingName               = callConfig['conference'].toLowerCase();
-
-        meetingUrl = 'https://' + config['hosts']['domain'] + '/' + meetingName;
-
-        JitsiMeetJS.init();
-        console.info("connecting...", config)
-
-        connection = new JitsiMeetJS.JitsiConnection(null, null, config);
-        addConnectionCallbacks();
-        connection.connect();
-      });
-
-      socketio.on('disconnect', function() {
-        console.info('socket disconnected');
-        disconnect();
-      });
-
-      socketio.on('connect_error', function(err) {
-        disconnect();
-      });
-
-      socketio.on('disconnect_now', function(data) {
-              console.info('disconnect signal received');
-              disconnect()
-      });
-
-    };
+      }
 
 
-       
+      function addSocketCallbacks() {
+        socketio.on('connect', function () {
+          console.info('socket connected');
+        });
 
-    //     function onConferenceJoined() {
+        socketio.on('start_conference', function (data) {
+          console.info("data", data);
 
+          callConfig = JSON.parse(data);
+          ownDisplayName = callConfig['displayName'];
+          meetingName = callConfig['conference'].toLowerCase();
 
-    //       // event callbacks
-    //       function setInteractionEngineIds(uids){
-    //         engine_socketio.emit('set_interaction_engine_ids',  {
-    //           'ids': uids,
-    //         }); 
-    //       }
+          meetingUrl = 'https://' + config['hosts']['domain'] + '/' + meetingName;
 
-    //       function setInteractionEngine(type){
-    //         engine_socketio.emit('set_interaction_engine',  {
-    //           'type': type,
-    //           'ids': userList.getSelectedIds(),
-    //         }); 
-    //       }
+          JitsiMeetJS.init();
+          console.info("connecting...", config)
 
+          connection = new JitsiMeetJS.JitsiConnection(null, null, config);
+          addConnectionCallbacks();
+          connection.connect();
+        });
 
-    //       // Jitsi callbacks
-    //       console.info('Console Joined!')
+        socketio.on('disconnect', function () {
+          console.info('socket disconnected');
+          disconnect();
+        });
 
-    //     }
+        socketio.on('connect_error', function (err) {
+          disconnect();
+        });
 
+        socketio.on('disconnect_now', function (data) {
+          console.info('disconnect signal received');
+          disconnect()
+        });
 
-    //     room.on( JitsiMeetJS.events.conference.CONFERENCE_JOINED,
-    //       onConferenceJoined,
-    //     );
-
-    //   }
+      };
 
 
 
-    //   connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED,
-    //     function () {
-    //       console.warn('onConnectionFailed');
-    //       disconnect();
-    //     }
-    //   );
 
-    //   connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
-    //     function () {
-    //       console.info('disconnect');
-    //       disconnect();
-    //     },
-    //   );
-    
-    //   connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
-    //     function () {
-    //       console.info('onConnectionSuccess');
-    //       startConference();
-    //     }
-    //   );
+      //     function onConferenceJoined() {
 
-    //   connection.connect();
-    // });
-  });
+
+      //       // event callbacks
+      //       function setInteractionEngineIds(uids){
+      //         engine_socketio.emit('set_interaction_engine_ids',  {
+      //           'ids': uids,
+      //         }); 
+      //       }
+
+      //       function setInteractionEngine(type){
+      //         engine_socketio.emit('set_interaction_engine',  {
+      //           'type': type,
+      //           'ids': userList.getSelectedIds(),
+      //         }); 
+      //       }
+
+
+      //       // Jitsi callbacks
+      //       console.info('Console Joined!')
+
+      //     }
+
+
+      //     room.on( JitsiMeetJS.events.conference.CONFERENCE_JOINED,
+      //       onConferenceJoined,
+      //     );
+
+      //   }
+
+
+
+      //   connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED,
+      //     function () {
+      //       console.warn('onConnectionFailed');
+      //       disconnect();
+      //     }
+      //   );
+
+      //   connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
+      //     function () {
+      //       console.info('disconnect');
+      //       disconnect();
+      //     },
+      //   );
+
+      //   connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
+      //     function () {
+      //       console.info('onConnectionSuccess');
+      //       startConference();
+      //     }
+      //   );
+
+      //   connection.connect();
+      // });
+    });
 
   </script>
-  
+
   <div id="main" class="avatar">
-      <div id="col-1", class="column">
-        <div id="messages-public"  class="column-block messages"></div>
+    <div id="col-1" , class="column">
+      <div id="messages-public" class="column-block messages"></div>
+    </div>
+    <!-- Col2 -->
+    <div id="col-2" , class="column">
+      <div id="meeting-details" class="column-block" style="height: 5vh"></div>
+      <div id="operator-video-div" class="column-block" style="height: 15vh">
+        <video autoplay='1' id='operator-video'></video>
       </div>
-      <!-- Col2 -->
-      <div id="col-2", class="column">
-        <div id="meeting-details"   class="column-block" style="height: 5vh"></div>
-        <div id="operator-video-div"class="column-block" style="height: 15vh">
-          <video autoplay='1' id='operator-video'></video>
-        </div>
-        <div id="user-list"         class="column-block" style="height: 40vh"></div>
-        <div id="messages-private"  class="column-block" style="height: 40vh"></div>
-      </div>
+      <div id="user-list" class="column-block" style="height: 40vh"></div>
+      <div id="messages-private" class="column-block" style="height: 40vh"></div>
+    </div>
   </div>
 
 </body>
 
 </html>
-

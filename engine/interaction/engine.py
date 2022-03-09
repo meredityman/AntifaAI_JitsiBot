@@ -18,6 +18,7 @@ class Engine():
         return [{ 'interface_id' : n, 'type' : str(type(i)) } for n, i in  self.interfaces.items()]
 
     def start(self, interface_type, **kwargs):
+        print(interface_type, INTERFACES)
         if interface_type in INTERFACES:
             new_id = str(uuid.uuid1())
             print("engine.start", kwargs)

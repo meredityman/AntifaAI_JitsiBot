@@ -82,13 +82,14 @@ class EventSelector{
 };
 
 class InteractionSelector{
-  constructor(element, interface_types, setInteractionEngine, closeInteractionEngine, postReplies, getUsers){
+  constructor(element, interface_types, setInteractionEngine, closeInteractionEngine, postReplies, relayMessage, getUsers){
     this.element      = element;
     this.element.empty();
 
     this.setInteractionEngine   = setInteractionEngine;
     this.postReplies            = postReplies;
     this.getUsers               = getUsers;
+    this.relayMessage           = relayMessage;
     this.closeInteractionEngine = closeInteractionEngine;
 
     this.interaction_id = null;
@@ -108,6 +109,8 @@ class InteractionSelector{
             (data) => {
               if(data){
                 selector.interaction_id = data["interface_id"];
+                selector.commands       = data["commands"];
+                selector.setCommands();
                 selector.postReplies(data);
               } else {
                 console.warn(data);
@@ -130,28 +133,39 @@ class InteractionSelector{
       // if (interactionName == engineConfig["type"]){
       //   button.addClass('selected');  
       // }
-
       buttons.push(button);
       this.element.append(button);
     });
 
-    this.element.append($('<br/>'));
+    this.element.append($('<div id="commands"></div>'));
 
     // let commands = engineConfig["commands"];
 
-    // if (commands) {
-    //   commands.forEach( (command) => {
 
-    //     var cbutton = $('<button/>', {
-    //       text: command, 
-    //       id: 'btn-' + engineConfig['type'] + '-' + command,
-    //       click: function () { 
-    //         sendEngineCommand(command);        }
-    //     });
-    //     this.element.append(cbutton);
-    //   });  
-    // }
   }
+
+  setCommands(){
+    if (this.commands) {
+      var selector = this;
+      $('#commands').empty()
+      
+      this.commands.forEach( (command) => {  
+        var cbutton = $('<button/>', {
+          text: command, 
+          id: 'btn-' + '-' + command,
+          click: function () { 
+            selector.relayMessage(
+              selector.interaction_id,
+              {'user' : "Bot", 'message' : command, 'channel' : 'public'},
+              selector.postReplies        
+              );       
+          }
+        });
+        $('#commands').append(cbutton);
+      });  
+    }
+  }
+
 
   close(){
     if( this.interaction_id){
@@ -285,7 +299,7 @@ class UserList {
   }
 
   setSelectedIds(uids){
-    self.selectedUids = uids;
+    this.selectedUids = uids;
 
     this.listEl.find("button").each( (i, button) => {
       if( $(button).attr("name") in uids){

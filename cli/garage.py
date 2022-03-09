@@ -2,13 +2,15 @@ import requests
 import argparse
 
 from prompts import prompt_option
+from colorama import init, Fore, Back, Style
+init(autoreset=True)
+
 
 USE_API = True
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--user', type=str, required = True)
 parser.add_argument('--users', type=str, nargs='+')
-parser.add_argument('--id', type=str)
 
 
 args = parser.parse_args()
@@ -18,8 +20,9 @@ INTERFACE_PORT = 5001
 
 TYPES = [
     "Hatespeech",
-    "Telegram",
-    "Twitter"
+    "Telegram Rating",
+    "Twitter Rating",
+    "Incidents"
 ]
 
 def StartInterface(interaction_type, users):
@@ -28,7 +31,6 @@ def StartInterface(interaction_type, users):
             f'http://{INTERFACE_IP}:{INTERFACE_PORT}/engine-start/{interaction_type}', 
             json = {"users" : users}
         )
-        print(r.status_code)
         return r.json()
     else:
         raise
@@ -50,49 +52,53 @@ def StopInterface(interface_id):
     else:
         raise
 
-def printMessages(ret):
-    print("___________")
-    for msg in ret["messages"]:
-        print(f">> {msg['channel']}:{msg['user']} -> '{msg['message']}'")
+def printMessages(ret, debug = False):
+    if debug:
+        for msg in ret["messages"]:
+            print(f">> {msg['channel']}:{msg['user']} -> '{msg['message']}'")
+    else:
+        for msg in ret["messages"]:
+            print(f"{Fore.RESET}{msg['message']}\n")
+
 
 if __name__ == '__main__':
-    print("Engine types:\n\t{0}\n".format("\n\t".join(TYPES)))
-
-    selected_type = None
-    while not selected_type:
-
-        print("Engine types:\n\t{0}\n".format("\n\t".join(TYPES)))
-
-        t = input("Select: ")
-        selected_type, response = prompt_option(t, TYPES)
-
-        print(response)
- 
-    if args.id is None:
-        print(f"Starting session: {selected_type}")
-        ret = StartInterface(selected_type, users=args.users)
-        printMessages(ret)
-        interface_id = ret["interface_id"]
-        print(f"Created session: {interface_id }")
-    else:
-        interface_id = args.id
-        print(f"Joining session: {interface_id}")
 
     while True:
-        try:
-            message = input()
+        selected_type = None
+        while not selected_type:
+            text = "\n\t".join([ f"{i+1}: {o}" for i, o in enumerate(TYPES)])
+            print("What interactions would you like to try?:\n\t{0}\n".format(text))
 
-            data = {
-                "user"    : args.user,
-                "message" : message,
-                "channel" : "private"
-            }
 
-            ret = MessageInterface(interface_id, data)
-            print(ret)
-            printMessages(ret)
-        except KeyboardInterrupt:
-            break
+            t = input(f"Select: {Fore.GREEN}")
+            selected_type, response = prompt_option(t, TYPES)
+            if selected_type:
+                print(f"{Fore.GREEN}{response}\n")
+            else:
+                print(f"{Fore.RED}{response}\n")
+    
+        ret = StartInterface(selected_type, users=args.users)
+        interface_id = ret["interface_id"]
 
-    ret = StopInterface(interface_id)
-    printMessages(ret)
+        printMessages(ret)
+
+
+        finished = False
+        while not finished:
+            try:
+                message = input(f"{Fore.GREEN}>> ")
+
+                data = {
+                    "user"    : args.user,
+                    "message" : message,
+                    "channel" : "private"
+                }
+
+                ret = MessageInterface(interface_id, data)
+                print("\n")
+                printMessages(ret)
+            except KeyboardInterrupt:
+                break
+
+        ret = StopInterface(interface_id)
+        printMessages(ret)

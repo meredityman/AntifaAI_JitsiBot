@@ -368,3 +368,118 @@ class Twitter(MultiUserGenerator):
 
 
 
+
+class LTwitter(Twitter):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+
+    def generatorFunc(self):
+
+        self.replies  += [ {"message" : self.intro, "user" : self.last_user, "channel" : "public" } ]
+
+        running = True
+        while running:
+        
+            # Get a hashtag
+            hashtags = get_trending_hashtags()
+            message = self.hashtag_question + "\n"
+            message += '\n'.join([f"{i+1}). {hashtag}" for i, hashtag in enumerate(hashtags)])
+            message += f"\n1-{len(hashtags)}: "
+            self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
+            yield
+
+            while True:
+                isPublic = self.last_data["channel"] == "public"
+                user_message = self.last_data["message"]
+  
+                if user_message:
+                    hashtag, response = prompt_option(user_message, hashtags)
+                
+                if response:#
+                    self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
+                    
+                if hashtag:
+                    break
+                else:
+                    self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
+                    yield
+
+
+            # Get users
+            suspicious_users = set([])
+            users = get_users_for_trend(hashtag)
+            message  = self.users_question.format(num_users = self.num_users)
+            message += "\n"
+            message += "\n".join([ f"{i+1}). {user}" for i, user in enumerate(users)])
+            message += f"\n\n1-{len(users)}: "
+            self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
+            yield
+
+            while True:
+                isPublic = self.last_data["channel"] == "public"
+                user_message = self.last_data["message"]
+                if user_message:
+                    user, response = prompt_option(user_message, users)
+
+                if response:#
+                    self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
+
+                if user:
+                    if user in suspicious_users:
+                        message = self.picked.format(user = user)
+                        self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
+                    else:
+                        suspicious_users.add(user)
+                        if(len(suspicious_users) >= self.num_users):
+                            break
+                yield
+
+            # Vote on users
+            self.votes = defaultdict(dict)
+
+            for suspicious_user in suspicious_users:
+                message = self.get_user_summmary(suspicious_user)
+                self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
+                self.replies  += [ {"message" : self.question, "user" : user, "channel" : "private" } for user in self.users]  
+                yield
+                while True:
+                    isPublic = self.last_data["channel"] == "public"
+                    user_message = self.last_data["message"]
+                    if  isPublic:
+                        if( user_message == "ESCAPE"):
+                            break
+                        else:
+                            yield
+                    else:
+                        if user_message:
+                            vote, response = prompt_choice(user_message)
+
+                        if response:
+                            self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "private" } ]
+
+                        if vote is not None:
+                            self.votes[suspicious_user][self.last_user] = vote
+
+                        if set(self.users) <= set(self.votes[suspicious_user].keys()):
+                            print(self.users, self.votes[suspicious_user].keys() )
+                            break
+     
+                        print(self.users, self.votes[suspicious_user].keys() )
+                        yield
+
+            message, confirmed_users = self.get_results(self.votes)
+            self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]   
+            self.replies  += [ {"message" : self.calculating, "user" : self.last_user, "channel" : "public" } ]   
+
+            self.save_data(confirmed_users)
+            try:
+                plot_twitter()
+            except:
+                pass
+
+            self.replies  += [ {"message" : self.outro, "user" : self.last_user, "channel" : "public" } ]
+            self.replies  += [ {"message" : "Check the results here.\nhttp://192.168.0.207:5001/twitter.html", "user" : self.last_user, "channel" : "public" } ]
+            yield

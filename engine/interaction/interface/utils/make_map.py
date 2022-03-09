@@ -12,15 +12,15 @@ BASE_MAP_PATH    = "resources/horror-base.png"
 MASK_MAP_PATH    = "resources/horror-mask.png"
 
 all_stations = {
-    "Questionaire"  : (1038,  630),
-    "Embodiment"    : ( 794,  633),
-    "Garage"        : ( 776,  325),
-    "Memorial"      : ( 890,  180),
-    "Playstation"   : ( 600,  500),
-    "Fountain"      : ( 484,  364),  
-    "Map"           : ( 285,  456),
-    "Drum"          : ( 480,  182),
-    "Inflatable"    : ( 407,   63)
+    "Questionaire"  : (711, 373),
+    "Embodiment"    : (725, 231),
+    "Garage"        : (948, 451),
+    "Memorial"      : (883, 132),
+    "Playstation"   : (852, 220),
+    "Fountain"      : (766, 373),  
+    "Map"           : (805, 403),
+    "Drum"          : (508, 132),
+    "Inflatable"    : (976, 190)
 }
 
 

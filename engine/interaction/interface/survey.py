@@ -116,8 +116,8 @@ class Survey(MultiUserGenerator):
         #route = self.getRoute()
         route = [
             "Drum",
-            "Garage",
-            "Map"
+            "Map",
+            "Garage"
         ]
 
 

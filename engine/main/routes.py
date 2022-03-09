@@ -66,6 +66,14 @@ def interfaces():
     else:
         return { 'success' : False, 'error' : "Not a GET request!"}, 404
 
+@main.route('/telegram.html')
+def get_telegram():
+    return send_from_directory('static/var', 'TelegramRatingScatter.html')
+
+
+@main.route('/twitter.html')
+def get_twitter():
+    return send_from_directory('static/var', 'NaziTwitterBubble.html')
 
 
 @main.route('/map.jpg')

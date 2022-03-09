@@ -64,48 +64,48 @@ def get_asset(name):
 def get_meetings():
     return render_template('meetings.html')
 
-@main.route('/map.jpg')
-def get_route():
-    return send_from_directory('static/var', 'map_latest.jpg')
+# @main.route('/map.jpg')
+# def get_route():
+#     return send_from_directory('static/var', 'map_latest.jpg')
 
 
-@main.route('/telegram.html')
-def get_telegram():
-    return send_from_directory('static/var', 'TelegramRatingScatter.html')
+# @main.route('/telegram.html')
+# def get_telegram():
+#     return send_from_directory('static/var', 'TelegramRatingScatter.html')
 
 
-@main.route('/twitter.html')
-def get_twitter():
-    return send_from_directory('static/var', 'NaziTwitterBubble.html')
+# @main.route('/twitter.html')
+# def get_twitter():
+#     return send_from_directory('static/var', 'NaziTwitterBubble.html')
 
-@main.route('/map-data.json')
-def get_map_data():
-    data = {}
-    data['type'] = "FeatureCollection"
-    data['features'] = []
-    data["crs"] = {
-        "type": "name",
-        "properties": {
-            "name": ""
-        }
-    }
+# @main.route('/map-data.json')
+# def get_map_data():
+#     data = {}
+#     data['type'] = "FeatureCollection"
+#     data['features'] = []
+#     data["crs"] = {
+#         "type": "name",
+#         "properties": {
+#             "name": ""
+#         }
+#     }
 
-    for path in Path(MAP_DATA_PATH).glob('*.json'):
-        with open(path, 'r') as p:
-            properties = json.load(p)
+#     for path in Path(MAP_DATA_PATH).glob('*.json'):
+#         with open(path, 'r') as p:
+#             properties = json.load(p)
 
-        if 'coordinates' in properties:
-            coordinates = properties.pop('coordinates')
+#         if 'coordinates' in properties:
+#             coordinates = properties.pop('coordinates')
 
-            data['features'].append(
-                {
-                    "type": "Feature",
-                    "properties": properties,
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": coordinates
-                    }
-                }
-            )
+#             data['features'].append(
+#                 {
+#                     "type": "Feature",
+#                     "properties": properties,
+#                     "geometry": {
+#                         "type": "Point",
+#                         "coordinates": coordinates
+#                     }
+#                 }
+#             )
 
-    return data
+#     return data

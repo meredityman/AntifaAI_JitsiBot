@@ -61,6 +61,8 @@ class MultiUserGenerator(Interface):
             next(self.generator)
         except StopIteration:
             print("Generator Complete")   
+        except ValueError as e:
+            print(str(e)) 
 
     # def _onSetIds(self):
     #     self.text = None

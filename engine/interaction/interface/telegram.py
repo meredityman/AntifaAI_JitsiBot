@@ -138,14 +138,15 @@ class Telegram(MultiUserGenerator):
 
             response = self.saveScores(scores, message_id, channel)
             self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
-            
+ 
             try:
                 plot_telegram()
             except:
-                raise
+                pass
+
+            self.replies  += [ {"message" : self.outro, "user" : user, "channel" : "private" } for user in self.users]
 
 
-        self.replies  += [ {"message" : self.outro, "user" : user, "channel" : "private" } for user in self.users]
 
     def saveScores(self, scores, message_id, channel):
         response = f"{self.thankyou}"
@@ -196,3 +197,78 @@ class Telegram(MultiUserGenerator):
 
         return message, message_id, channel
 
+class LTelegram(Telegram):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def generatorFunc(self):
+        while True:
+            number = 0
+            running = True
+            while running:
+                print("Telegram.generatorFunc", "Last data:", self.last_data)
+                if self.last_data == None:
+                    yield
+                    continue   
+
+
+                message, message_id, channel = self.getRandomMessage()
+                message = ("-" * 20) + "\n" + message + "\n" + ("-" * 20)
+
+                self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
+
+                scores = defaultdict(lambda: defaultdict(list))
+                
+                for name, metric in self.metrics.items():
+                    self.replies  += [ {"message" : metric['prompt'], "user" : self.last_user, "channel" : "public" } ]
+                    self.replies  += [ {"message" : metric['hint'], "user" : user, "channel" : "private" } for user in self.users]
+                    yield
+                    
+                    while True:
+
+                        isPublic = self.last_data["channel"] == "public"
+                        user_message = self.last_data["message"]
+
+                        if  isPublic:
+                            if( user_message == "ESCAPE"):
+                                break
+                            else:
+                                yield
+                        else:
+                            if user_message is not None:
+                                rating, response = prompt_rating(user_message, 0.0, 10.0)
+
+                            if response is not None:
+                                self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "private" } ]
+
+
+                            if rating is not None:
+                                scores[name][self.last_user].append(rating)
+                            else:
+                                self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "private" } ]
+                                self.replies  += [ {"message" : metric['hint'], "user" : self.last_user, "channel" : "private" } ]
+
+                            if set(self.users) <= scores[name].keys():
+                                print(scores)
+                                break
+                            else:
+                                print(scores)
+                                yield
+
+
+                response = self.saveScores(scores, message_id, channel)
+                self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
+                
+                number += 1
+                if(number > 3.0):
+                    running = False
+
+            try:
+                plot_telegram()
+            except:
+                pass
+
+            self.replies  += [ {"message" : self.outro, "user" : user, "channel" : "private" } for user in self.users]
+            self.replies  += [ {"message" : "Check the results here.\nhttp://192.168.0.207:5001/telegram.html", "user" : self.last_user, "channel" : "public" } ]
+            yield
