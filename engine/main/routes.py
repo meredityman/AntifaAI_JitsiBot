@@ -11,7 +11,7 @@ import json
 
 @main.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', engines=engine.get_interfaces())
 
 # @main.route('/cue', methods=['POST'])
 # def cue():

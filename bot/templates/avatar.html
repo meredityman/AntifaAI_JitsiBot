@@ -59,7 +59,7 @@
         if (connection) {
           connection.disconnect();
         }
-        $("#main").html('<h1>Disconnected</h1>');
+        $("#main").html('<button onClick="window.location.reload();">Reload</button>');
       }
 
       function startConference() {

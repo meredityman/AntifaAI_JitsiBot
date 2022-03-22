@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Antif Jitsi Bot</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+
+<body>
+  <!-- Content -->
+  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://meet.cobratheatercobra.com/libs/lib-jitsi-meet.min.js"></script>
+  <script src="../bot/static/config.js"></script>
+  <script src="../bot/static/utils.js"></script>
+  <script src="../bot/static/events.js"></script>
+ 
+  <link rel="stylesheet" href="../bot/static/style-bot.css"></link> 
+
+  <script type="text/javascript" charset="utf-8">
+
+
+  $(document).ready( function(){
+
+    let ownDisplayName  = null;
+    let meetingName     = null;
+    let meetingUrl      = null;
+
+    let connection      = null;
+    let room            = null;
+
+
+    let messageList     = null;
+    let userList = null
+
+    function disconnect(){
+      if (connection) {
+        connection.disconnect();
+      }
+        $("#main").html('<h1>Bot Disconnected</h1><button onClick="window.location.reload();">Refresh Page</button>');
+    }
+
+    function startConference(){ 
+        console.info('Joining room...');
+        room = connection.initJitsiConference(meetingName, config);
+        room.setDisplayName(ownDisplayName);
+        room.on( JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined );
+        room.join();
+    }
+
+    function onConferenceJoined() {
+      console.info('Console Joined!');
+      messageList    = new MessageList($('#messages-public'), $('#messages-private'), room.myUserId(), ownDisplayName);
+      userList       = new UserList($('#user-list'), room.getParticipants(), null );
+      addRoomCallbacks();
+    }
+
+    function addConnectionCallbacks(){
+      connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED, function () {
+        console.warn('onConnectionFailed');
+        disconnect();
+      });
+
+      connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, function () {
+        console.info('disconnect');
+        disconnect();
+      });
+    
+      connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, function () {
+        console.info('onConnectionSuccess');
+        startConference();
+      });
+    }
+
+    function addRoomCallbacks(){
+
+      
+      room.on( JitsiMeetJS.events.conference.MESSAGE_RECEIVED, (uid, text, ts) => {
+        console.info('received_message', uid, text, ts);
+        messageList.addPublicMessage(uid,  userList.getDisplayName(uid), text);
+      });
+
+      room.on( JitsiMeetJS.events.conference.PRIVATE_MESSAGE_RECEIVED, (uid, text, ts) => {
+          messageList.addPrivateMessage(uid,  userList.getDisplayName(uid), text);
+          console.info('received_private_message', uid, text, ts);
+      });
+
+      room.on( JitsiMeetJS.events.conference.USER_JOINED, function(id, user){
+        console.info('participants joined', id, user);
+        userList.addUser(user);
+      });
+
+      room.on( JitsiMeetJS.events.conference.USER_LEFT, function(id, user){
+        console.info('participants left', id, user);
+        userList.removeUser(user);
+      });
+    }
+
+    callConfig = {
+        'displayName': 'Audience Member',
+        // 'conference' : 'bd64426ed1af11ebbece907841cadd93'
+    };
+    ownDisplayName            = callConfig['displayName'];
+
+    const queryString = window.location.search;
+    console.log(queryString);
+    const urlParams = new URLSearchParams(queryString);
+
+
+    meetingName               = urlParams.get('meeting');
+    meetingUrl = 'https://' + config['hosts']['domain'] + '/' + meetingName;
+
+
+    JitsiMeetJS.init();
+    console.info("connecting...", config)
+
+    connection = new JitsiMeetJS.JitsiConnection(null, null, config);
+    addConnectionCallbacks();
+    connection.connect();
+  });
+
+  </script>
+  
+  <div id="main" class="bot">
+    <div id="row1" class="row">
+      <div class="col-md-4">
+        <div id="event-list"></div>
+        <div id="interaction-selector"></div>
+      </div>
+    </div>
+    <div id="row1" class="row">
+      <div class="col-md-12">
+        <h2>Chat</h2>
+        <div id="messages-scroll">
+          <div id="messages-public"></div>
+          <div id="messages-private"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
+

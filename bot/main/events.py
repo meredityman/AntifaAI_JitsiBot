@@ -2,6 +2,7 @@ from bot.main.routes import bot
 import time
 import json
 from flask import request
+import qrcode 
 
 from .. import socketio, conferenceName, botName, avatarName, operatorName
 
@@ -41,6 +42,11 @@ def handle_bot_connect():
         'displayName'        : botName,
         'conference'         : conferenceName,
     }
+
+    webRoot = "file:///media/hdrive/data/work/production/AntifAI-German-Horror-Show/Code/AntifaAI_JitsiBot/viewer"
+    audienceUrl = f"{webRoot}/index.html?meeting={conferenceName}"
+    img = qrcode.make(audienceUrl)
+    img.save(f"bot/static/var/qr.png")
 
     print('Starting Conference "{}"'.format(message))
     socketio.emit('start_conference', json.dumps(message), namespace='/bot', json=True)

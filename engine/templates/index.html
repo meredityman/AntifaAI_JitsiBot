@@ -24,8 +24,8 @@
     <div class="col-md-12">
       <div id="links">
         <ul id="navigation">
-          {% for item in links %}
-              <li><a href="{{ item.href }}" target="_blank">{{ item.text }}</a></li>
+          {% for e in engines %}
+              <li>{{e['interface_id']}} - {{e['type']}}</li>
           {% endfor %}
           </ul>
       </div>

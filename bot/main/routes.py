@@ -42,10 +42,10 @@ def index():
     ]
     return render_template('index.html', links = links)
 
-@main.route('/cue', methods=['POST'])
-def cue():
-    if requests.method == 'POST':
-        return send_cue('name', data)
+# @main.route('/cue', methods=['POST'])
+# def cue():
+#     if requests.method == 'POST':
+#         return send_cue('name', data)
 
 
 @main.route('/bot')
@@ -63,6 +63,11 @@ def get_asset(name):
 @main.route('/meetings')
 def get_meetings():
     return render_template('meetings.html')
+
+
+@main.route('/qrcode')
+def get_qr():
+    return send_from_directory('static/var', 'qr.png')
 
 # @main.route('/map.jpg')
 # def get_route():

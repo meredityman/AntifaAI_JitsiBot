@@ -92,52 +92,54 @@ class Telegram(MultiUserGenerator):
                 else:
                     yield
 
-            message, message_id, channel = self.getRandomMessage()
-            message = ("-" * 20) + "\n" + message + "\n" + ("-" * 20)
+            if running:
 
-            self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
+                message, message_id, channel = self.getRandomMessage()
+                message = ("-" * 20) + "\n" + message + "\n" + ("-" * 20)
 
-            scores = defaultdict(lambda: defaultdict(list))
-            
-            for name, metric in self.metrics.items():
-                self.replies  += [ {"message" : metric['prompt'], "user" : self.last_user, "channel" : "public" } ]
-                self.replies  += [ {"message" : metric['hint'], "user" : user, "channel" : "private" } for user in self.users]
-                yield
+                self.replies  += [ {"message" : message, "user" : self.last_user, "channel" : "public" } ]
+
+                scores = defaultdict(lambda: defaultdict(list))
                 
-                while True:
+                for name, metric in self.metrics.items():
+                    self.replies  += [ {"message" : metric['prompt'], "user" : self.last_user, "channel" : "public" } ]
+                    self.replies  += [ {"message" : metric['hint'], "user" : user, "channel" : "private" } for user in self.users]
+                    yield
+                    
+                    while True:
 
-                    isPublic = self.last_data["channel"] == "public"
-                    user_message = self.last_data["message"]
+                        isPublic = self.last_data["channel"] == "public"
+                        user_message = self.last_data["message"]
 
-                    if  isPublic:
-                        if( user_message == "ESCAPE"):
-                            break
+                        if  isPublic:
+                            if( user_message == "ESCAPE"):
+                                break
+                            else:
+                                yield
                         else:
-                            yield
-                    else:
-                        if user_message is not None:
-                            rating, response = prompt_rating(user_message, 0.0, 10.0)
+                            if user_message is not None:
+                                rating, response = prompt_rating(user_message, 0.0, 10.0)
 
-                        if response is not None:
-                            self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "private" } ]
+                            if response is not None:
+                                self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "private" } ]
 
 
-                        if rating is not None:
-                            scores[name][self.last_user].append(rating)
-                        else:
-                            self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "private" } ]
-                            self.replies  += [ {"message" : metric['hint'], "user" : self.last_user, "channel" : "private" } ]
+                            if rating is not None:
+                                scores[name][self.last_user].append(rating)
+                            else:
+                                self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "private" } ]
+                                self.replies  += [ {"message" : metric['hint'], "user" : self.last_user, "channel" : "private" } ]
 
-                        if set(self.users) <= scores[name].keys():
-                            print(scores)
-                            break
-                        else:
-                            print(scores)
-                            yield
+                            if set(self.users) <= scores[name].keys():
+                                print(scores)
+                                break
+                            else:
+                                print(scores)
+                                yield
 
 
-            response = self.saveScores(scores, message_id, channel)
-            self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
+                response = self.saveScores(scores, message_id, channel)
+                self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : "public" } ]
  
             try:
                 plot_telegram()
