@@ -30,7 +30,7 @@ def index():
     params = [ f'{k}="{v}"' for k, v in params.items()]
     params = "&".join(params)
 
-
+    audienceUrl = f"http://show.cobratheatercobra.com/?meeting={conferenceName}"
     operator_link = f"https://meet.cobratheatercobra.com/{conferenceName}#{params}"
     link = f"https://meet.cobratheatercobra.com/{conferenceName}"
 
@@ -38,6 +38,7 @@ def index():
         {'href' : link         , 'text' : '🎪 Participant' },
         {'href' : "bot"        , 'text' : '🤖 Bot'         },
         {'href' : "avatar"     , 'text' : '📹 Avatar'      },
+        {'href' : audienceUrl  , 'text' : '🧝🏻‍♀️ Audience'    },   
         {'href' : operator_link, 'text' : '🎬 Operator'    },
     ]
     return render_template('index.html', links = links)
@@ -56,9 +57,9 @@ def bot():
 def avatar():
     return render_template('avatar.html')
 
-@main.route('/assets/<path:name>')
+@main.route('/resources/<path:name>')
 def get_asset(name):
-    return send_from_directory('static', name)
+    return send_from_directory('../resources', name)
 
 @main.route('/meetings')
 def get_meetings():

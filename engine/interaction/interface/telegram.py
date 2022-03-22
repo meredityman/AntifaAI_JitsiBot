@@ -34,7 +34,7 @@ def plot_telegram():
     overlay = hv.NdOverlay({channel: hv.Scatter(np.clip(np.asarray(data).reshape([-1,2]), 0.0, 1.0), 'Hatefullness' , 'Galvanizing')
                             for channel, data in data_groups.items()})
 
-    overlay.opts( opts.NdOverlay(legend_position='right', width=1000, height=700), opts.Scatter(color = hv.Cycle('RdGy'), alpha=0.8,  marker='s', size=6))
+    overlay.opts( opts.NdOverlay(legend_position='right', width=512, height=512), opts.Scatter(color = hv.Cycle('RdGy'), alpha=0.8,  marker='s', size=6))
 
     print("Saving...")
     hv.save(overlay, 'engine/static/var/TelegramRatingScatter.html')

@@ -43,8 +43,7 @@ def handle_bot_connect():
         'conference'         : conferenceName,
     }
 
-    webRoot = "file:///media/hdrive/data/work/production/AntifAI-German-Horror-Show/Code/AntifaAI_JitsiBot/viewer"
-    audienceUrl = f"{webRoot}/index.html?meeting={conferenceName}"
+    audienceUrl = f"http://show.cobratheatercobra.com/?meeting={conferenceName}"
     img = qrcode.make(audienceUrl)
     img.save(f"bot/static/var/qr.png")
 

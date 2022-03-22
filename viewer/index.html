@@ -16,13 +16,16 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://meet.cobratheatercobra.com/libs/lib-jitsi-meet.min.js"></script>
-  <script src="../bot/static/config.js"></script>
-  <script src="../bot/static/utils.js"></script>
-  <script src="../bot/static/events.js"></script>
+  <script src="../resources/config.js"></script>
+  <script src="../resources/utils.js"></script>
+  <script src="../resources/events.js"></script>
  
   <link rel="stylesheet" href="../bot/static/style-bot.css"></link> 
 
   <script type="text/javascript" charset="utf-8">
+
+
+
 
 
   $(document).ready( function(){
@@ -37,6 +40,36 @@
 
     let messageList     = null;
     let userList = null
+
+    const privateForm = document.getElementById('message-public-form');
+    const publicForm  = document.getElementById('message-private-form');
+
+
+    function  onSendPublicMessage(event){
+        console.info("Public submit: ", event);
+        form = event.target;
+        sendPublicMessage(form.elements["message"].value);
+        form.elements["message"].value = ""
+        event.preventDefault();
+    }
+  
+    function  onSendPrivateMessage(event){
+        console.info("Private submit: ", event);
+        form = event.target;
+        sendPrivateMessage(userList.getUID("Bot"), form.elements["message"].value);
+        form.elements["message"].value = ""
+        event.preventDefault();
+    }
+    function sendPublicMessage(message){
+        console.info("Send public message: ", message);
+        room.sendTextMessage(message);
+    }
+
+    function sendPrivateMessage(uid, message){
+      console.info("Send private message: ", uid, message);
+      room.sendPrivateTextMessage(uid, message);
+      messageList.addPrivateReply(uid, message);
+    }
 
     function disconnect(){
       if (connection) {
@@ -57,6 +90,10 @@
       console.info('Console Joined!');
       messageList    = new MessageList($('#messages-public'), $('#messages-private'), room.myUserId(), ownDisplayName);
       userList       = new UserList($('#user-list'), room.getParticipants(), null );
+
+      privateForm.addEventListener('submit', onSendPublicMessage);
+      publicForm.addEventListener('submit', onSendPrivateMessage);
+
       addRoomCallbacks();
     }
 
@@ -115,35 +152,37 @@
     meetingName               = urlParams.get('meeting');
     meetingUrl = 'https://' + config['hosts']['domain'] + '/' + meetingName;
 
+    if(meetingName){
+        JitsiMeetJS.init();
+        console.info("connecting...", config)
 
-    JitsiMeetJS.init();
-    console.info("connecting...", config)
+        connection = new JitsiMeetJS.JitsiConnection(null, null, config);
+        addConnectionCallbacks();
+        connection.connect();
+    }
 
-    connection = new JitsiMeetJS.JitsiConnection(null, null, config);
-    addConnectionCallbacks();
-    connection.connect();
   });
 
   </script>
   
   <div id="main" class="bot">
-    <div id="row1" class="row">
-      <div class="col-md-4">
-        <div id="event-list"></div>
-        <div id="interaction-selector"></div>
-      </div>
+    <div id="messages-scroll">
+        <div id="messages-public"></div>
+        <div id="messages-private"></div>
     </div>
-    <div id="row1" class="row">
-      <div class="col-md-12">
-        <h2>Chat</h2>
-        <div id="messages-scroll">
-          <div id="messages-public"></div>
-          <div id="messages-private"></div>
-        </div>
 
-      </div>
-    </div>
+    ​<form id="message-public-form" action="javascript:void(0);">
+        <input type="text" name="message">
+        <input type="submit">📢
+    </form>
+
+    ​<form id="message-private-form" action="javascript:void(0);">
+        <input type="text" name="message">
+        <input type="submit">🤖
+    </form>
+      
   </div>
+ 
 
 </body>
 

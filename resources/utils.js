@@ -252,14 +252,6 @@ class UserList {
     return Array.from(this.selectedUids);
   }
 
-  getDisplayName(uid){
-    if( uid in this.participants){
-      return this.participants._displayName;
-    } else {
-      return "Unknown"
-    }
-  }
-
   addButton(element, selected){
     let uid = element._id
     let text = element._displayName + " (" + uid + ")";
@@ -317,6 +309,7 @@ class UserList {
     user['selected'] = selected;
     this.participants[user._id] = user;
 
+
     if(selected){
       this.selectedUids.add(user._id);
     }
@@ -357,6 +350,13 @@ class UserList {
     } else {
       return null
     }
+  }
+
+  getUID(name){
+    console.info(this.participants);
+    let ret =  Object.keys(this.participants).find(key => this.participants[key]._displayName === name);
+    console.info(ret);
+    return ret
   }
 
 };

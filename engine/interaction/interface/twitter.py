@@ -57,7 +57,7 @@ def plot_twitter():
 
 
     hv.extension('bokeh')
-    hv.output(size=254)
+    hv.output(size=512)
 
     links = pd.DataFrame(links_data)
  
