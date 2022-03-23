@@ -169,14 +169,14 @@
     <!-- <div id="private-div" class="messages-block"></div> -->
 
     <div id="message-forms" class="block" style="height: 20vh;">
-      ​<form id="public-message-form" action="javascript:void(0);">
-        <input type="text" name="message">
-        <button name="send" value="value" type="submit">📢</button>
+      ​<form id="public-message-form" class="message-form public" action="javascript:void(0);">
+        <input type="text" class="message-form public" name="message">
+        <button name="send" class="message-form public" value="value" type="submit">📢</button>
       </form>
 
-      ​<form id="private-message-form" action="javascript:void(0);">
-          <input type="text" name="message">
-          <button name="send" value="value" type="submit">🤖</button>
+      ​<form id="private-message-form" class="message-form private" action="javascript:void(0);">
+          <input type="text" class="message-form private" name="message">
+          <button name="send" class="message-form private" value="value" type="submit">🤖</button>
       </form>
     </div>
 

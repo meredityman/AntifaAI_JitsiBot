@@ -12,7 +12,7 @@ div#main {
 }
 
 div#main.display {
-    font-size: 2.5em;
+    font-size: 3.0em;
 }
 
 
@@ -168,4 +168,41 @@ div.message-list {
 /* Messages Bot */ 
 div.bot.message-list {
     width: 20vw;
+}
+
+
+/* Viewer Forms */ 
+
+
+
+input.message-form {
+    float: left;
+    width : 80%;
+    background-color: #3d3d3d;
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-left: 20px;
+    margin-right:0;
+    margin-bottom: 0.5em;
+    border: 0px;
+}
+
+input.message-form.public {
+    color: greenyellow;
+}
+
+input.message-form.private {
+    color: red;
+}
+
+
+button.message-form {
+    float: left;
+    width: 10%;
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0.5em;
+    border: 0px;
 }
