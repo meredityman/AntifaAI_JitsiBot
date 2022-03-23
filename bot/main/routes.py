@@ -31,15 +31,20 @@ def index():
     params = "&".join(params)
 
     audienceUrl = f"http://show.cobratheatercobra.com/?meeting={conferenceName}"
+    audienceUrlLocal = f"file://{Path('./viewer').absolute()}/index.html/?meeting={conferenceName}"
     operator_link = f"https://meet.cobratheatercobra.com/{conferenceName}#{params}"
     link = f"https://meet.cobratheatercobra.com/{conferenceName}"
 
+file:///media/hdrive/data/work/production/AntifAI-German-Horror-Show/Code/AntifaAI_JitsiBot/viewer/index.html
+file:///media/hdrive/data/work/production/AntifAI-German-Horror-Show/Code/AntifaAI_JitsiBot/viewer/index.html/?meeting=bd64426ed1af11ebbece907841cadd93
     links = [
-        {'href' : link         , 'text' : '🎪 Participant' },
-        {'href' : "bot"        , 'text' : '🤖 Bot'         },
-        {'href' : "avatar"     , 'text' : '📹 Avatar'      },
-        {'href' : audienceUrl  , 'text' : '🧝🏻‍♀️ Audience'    },   
-        {'href' : operator_link, 'text' : '🎬 Operator'    },
+        {'href' : "bot"           , 'text' : '🤖 Bot'             },
+        {'href' : "avatar"        , 'text' : '📹 Avatar'          },
+#        {'href' : "display"       , 'text' : '🖥️ Display Chat'    },
+        {'href' : audienceUrl     , 'text' : '🧝🏻‍♀️ Audience'        },
+        {'href' : audienceUrlLocal, 'text' : '🧝🏻‍♀️ Audience (local)'}, 
+        {'href' : link            , 'text' : '🍿 Remote Audience' }, 
+        {'href' : operator_link   , 'text' : '🎬 Operator'        },
     ]
     return render_template('index.html', links = links)
 

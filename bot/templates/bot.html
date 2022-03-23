@@ -15,13 +15,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <script src="https://meet.cobratheatercobra.com/libs/lib-jitsi-meet.min.js"></script>
-  <script src="../resources/config.js"></script>
-  <script src="../resources/utils.js"></script>
-  <script src="../resources/events.js"></script>
+  <script src="resources/config.js"></script>
+  <script src="resources/utils.js"></script>
+  <script src="resources/events.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
   
  
-  <link rel="stylesheet" href="static/style-bot.css"></link> 
+  <link rel="stylesheet" href="resources/style.css"></link> 
 
   <script type="text/javascript" charset="utf-8">
 
@@ -115,7 +115,6 @@
     let room            = null;
 
     let userList        = null;
-    let meetingDetails  = null;
     let messageList     = null;
     let interactionSelector = null;
     let eventSelector       = null;
@@ -179,7 +178,6 @@
 
       messageList    = new MessageList($('#messages-public'), $('#messages-private'), room.myUserId(), ownDisplayName);
       userList       = new UserList($('#user-list'), room.getParticipants(), setInteractionEngineIds );
-      meetingDetails = new MeetingDetails( $("#meeting-details"), meetingUrl);
       interactionSelector = new InteractionSelector(
         $("#interaction-selector"), 
         interface_types,
@@ -291,9 +289,6 @@
   <div id="main" class="bot">
     <div id="row1" class="row">
       <div class="col-md-4">
-        <div id="meeting-details">
-          <a id="meeting-link" href="" target="_blank">Meeting Link</a>
-        </div>
       </div>
       <div class="col-md-4">
         <h2>Users</h2>

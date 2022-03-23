@@ -39,17 +39,6 @@ function showTime(){
 
 }
 
-class MeetingDetails{
-  constructor(element, meetingUrl){
-    this.element      = element;
-    this.uptime = null;
-
-    this.element.find("#meeting-link").attr("href", meetingUrl)
-
-  }
-
-}
-
 class AvatarDetails{
   constructor(element){
     this.element      = element;
@@ -179,8 +168,9 @@ class MessageList {
   constructor(element_public, element_private, ownUid, displayName){
     this.element_public      = element_public;
     this.element_private     = element_private;
-    this.ownUid = ownUid;
-    this.displayName = displayName;
+    this.ownUid              = ownUid;
+    this.displayName         = displayName;
+
     this.publicMessages = [];
     this.privateMessages = {};
 

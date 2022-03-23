@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Antif Jitsi Bot</title>
+  <title>AntifaAI</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
@@ -16,11 +16,11 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://meet.cobratheatercobra.com/libs/lib-jitsi-meet.min.js"></script>
-  <script src="../resources/config.js"></script>
-  <script src="../resources/utils.js"></script>
-  <script src="../resources/events.js"></script>
+  <script src="../../resources/config.js"></script>
+  <script src="../../resources/utils.js"></script>
+  <script src="../../resources/events.js"></script>
  
-  <link rel="stylesheet" href="../bot/static/style-bot.css"></link> 
+  <link rel="stylesheet" href="../../resources/style.css"></link> 
 
   <script type="text/javascript" charset="utf-8">
 
@@ -165,21 +165,24 @@
 
   </script>
   
-  <div id="main" class="bot">
-    <div id="messages-scroll">
-        <div id="messages-public"></div>
-        <div id="messages-private"></div>
+  <div id="main" class="viewer">
+    <div id="messages-scroll" class="messages-block">
+        <div id="messages-public"   class="message-list" ></div>
+        <div id="messages-private"  class="message-list" ></div>
     </div>
 
-    ​<form id="message-public-form" action="javascript:void(0);">
+    <div id="message-forms">
+      ​<form id="message-public-form" action="javascript:void(0);">
         <input type="text" name="message">
-        <input type="submit">📢
-    </form>
+        <button name="send" value="value" type="submit">📢</button>
+      </form>
 
-    ​<form id="message-private-form" action="javascript:void(0);">
-        <input type="text" name="message">
-        <input type="submit">🤖
-    </form>
+      ​<form id="message-private-form" action="javascript:void(0);">
+          <input type="text" name="message">
+          <button name="send" value="value" type="submit">🤖</button>
+      </form>
+    </div>
+
       
   </div>
  
