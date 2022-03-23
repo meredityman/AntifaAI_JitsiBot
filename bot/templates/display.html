@@ -16,11 +16,11 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://meet.cobratheatercobra.com/libs/lib-jitsi-meet.min.js"></script>
-  <script src="../../resources/config.js"></script>
-  <script src="../../resources/utils.js"></script>
-  <script src="../../resources/events.js"></script>
+  <script src="resources/config.js"></script>
+  <script src="resources/utils.js"></script>
+  <script src="resources/events.js"></script>
  
-  <link rel="stylesheet" href="../../resources/style.css"></link> 
+  <link rel="stylesheet" href="resources/style.css"></link> 
 
   <script type="text/javascript" charset="utf-8">
 
@@ -37,12 +37,6 @@
 
     let messageList     = null;
     let userList = null
-
-    const privateForm = document.getElementById('public-message-form');
-    const publicForm  = document.getElementById('private-message-form');
-
-    $('#messages-block').css("height","80vh");
-    $('#message-forms').css("height","20vh");
 
     function  onSendPublicMessage(event){
         console.info("Public submit: ", event);
@@ -89,10 +83,6 @@
       console.info('Console Joined!');
       messageList    = new MessageList( room.myUserId(), ownDisplayName, true);
       userList       = new UserList($('#user-list'), room.getParticipants(), null );
-
-      privateForm.addEventListener('submit', onSendPublicMessage);
-      publicForm.addEventListener('submit', onSendPrivateMessage);
-
       addRoomCallbacks();
     }
 
@@ -138,7 +128,7 @@
     }
 
     callConfig = {
-        'displayName': 'Audience Member',
+        'displayName': 'Scribe',
         // 'conference' : 'bd64426ed1af11ebbece907841cadd93'
     };
     ownDisplayName            = callConfig['displayName'];
@@ -164,23 +154,8 @@
 
   </script>
   
-  <div id="main" class="viewer">
-    <div id="public-div" class="messages-block" style="height: 80vh;"></div>
-    <!-- <div id="private-div" class="messages-block"></div> -->
-
-    <div id="message-forms" class="block" style="height: 20vh;">
-      ​<form id="public-message-form" action="javascript:void(0);">
-        <input type="text" name="message">
-        <button name="send" value="value" type="submit">📢</button>
-      </form>
-
-      ​<form id="private-message-form" action="javascript:void(0);">
-          <input type="text" name="message">
-          <button name="send" value="value" type="submit">🤖</button>
-      </form>
-    </div>
-
-      
+  <div id="main" class="display">
+    <div id="public-div" class="messages-block" style="height: 100vh;"></div>
   </div>
  
 

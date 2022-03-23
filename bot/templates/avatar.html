@@ -181,71 +181,13 @@
 
       };
 
-
-
-
-      //     function onConferenceJoined() {
-
-
-      //       // event callbacks
-      //       function setInteractionEngineIds(uids){
-      //         engine_socketio.emit('set_interaction_engine_ids',  {
-      //           'ids': uids,
-      //         }); 
-      //       }
-
-      //       function setInteractionEngine(type){
-      //         engine_socketio.emit('set_interaction_engine',  {
-      //           'type': type,
-      //           'ids': userList.getSelectedIds(),
-      //         }); 
-      //       }
-
-
-      //       // Jitsi callbacks
-      //       console.info('Console Joined!')
-
-      //     }
-
-
-      //     room.on( JitsiMeetJS.events.conference.CONFERENCE_JOINED,
-      //       onConferenceJoined,
-      //     );
-
-      //   }
-
-
-
-      //   connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_FAILED,
-      //     function () {
-      //       console.warn('onConnectionFailed');
-      //       disconnect();
-      //     }
-      //   );
-
-      //   connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
-      //     function () {
-      //       console.info('disconnect');
-      //       disconnect();
-      //     },
-      //   );
-
-      //   connection.addEventListener( JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
-      //     function () {
-      //       console.info('onConnectionSuccess');
-      //       startConference();
-      //     }
-      //   );
-
-      //   connection.connect();
-      // });
     });
 
   </script>
 
   <div id="main" class="avatar">
     <div id="col-1" , class="column">
-      <div id="messages-public" class="column-block messages"></div>
+      <div id="public-div" class="messages-block" style="height: 100vh;"></div>
     </div>
     <!-- Col2 -->
     <div id="col-2" , class="column">
@@ -254,7 +196,7 @@
         <video autoplay='1' id='operator-video'></video>
       </div>
       <div id="user-list" class="column-block" style="height: 40vh"></div>
-      <div id="messages-private" class="column-block" style="height: 40vh"></div>
+      <div id="private-div" class="messages-block" style="height: 40vh"></div>
     </div>
   </div>
 

@@ -31,16 +31,15 @@ def index():
     params = "&".join(params)
 
     audienceUrl = f"http://show.cobratheatercobra.com/?meeting={conferenceName}"
+    scribeUrl = f"display?meeting={conferenceName}"
     audienceUrlLocal = f"file://{Path('./viewer').absolute()}/index.html/?meeting={conferenceName}"
     operator_link = f"https://meet.cobratheatercobra.com/{conferenceName}#{params}"
     link = f"https://meet.cobratheatercobra.com/{conferenceName}"
 
-file:///media/hdrive/data/work/production/AntifAI-German-Horror-Show/Code/AntifaAI_JitsiBot/viewer/index.html
-file:///media/hdrive/data/work/production/AntifAI-German-Horror-Show/Code/AntifaAI_JitsiBot/viewer/index.html/?meeting=bd64426ed1af11ebbece907841cadd93
     links = [
         {'href' : "bot"           , 'text' : '🤖 Bot'             },
         {'href' : "avatar"        , 'text' : '📹 Avatar'          },
-#        {'href' : "display"       , 'text' : '🖥️ Display Chat'    },
+        {'href' : scribeUrl       , 'text' : '🖥️ Display Chat'    },
         {'href' : audienceUrl     , 'text' : '🧝🏻‍♀️ Audience'        },
         {'href' : audienceUrlLocal, 'text' : '🧝🏻‍♀️ Audience (local)'}, 
         {'href' : link            , 'text' : '🍿 Remote Audience' }, 
@@ -57,6 +56,10 @@ file:///media/hdrive/data/work/production/AntifAI-German-Horror-Show/Code/Antifa
 @main.route('/bot')
 def bot():
     return render_template('bot.html')
+
+@main.route('/display')
+def display():
+    return render_template('display.html')
 
 @main.route('/avatar')
 def avatar():

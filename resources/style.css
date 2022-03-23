@@ -6,10 +6,15 @@ body {
     font-family: system-ui;
 }
 
-div.main {
+div#main {
     width: 100%;
     overflow: hidden;
 }
+
+div#main.display {
+    font-size: 2.5em;
+}
+
 
 a {
     color: purple;
@@ -21,11 +26,27 @@ li.list-group-item {
     width : 100%
 }
 
+input {
+    border: 0;
+}
+
+button {
+    color: greenyellow;
+    background: black;
+    border: 1;
+    border-color: greenyellow;
+}
+
 button.selected {
     background-color: red;
 }
 
 /* Structure */
+
+div.block {
+    width : 100%;
+    float: left;
+}
 
 div.column {
     width: 50%;
@@ -60,8 +81,6 @@ video#operator-video {
     height: 100%; 
     width: 100%;
     margin: 4px;
-    padding: -2px;
-    border: 1px dotted;
 }
 
 
@@ -70,7 +89,12 @@ video#operator-video {
     overflow-y: scroll;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+} 
+
+#user-list-ul {
+    padding-left: 0;
 }
+
 
 #user-list::-webkit-scrollbar {
     display: none;
@@ -78,8 +102,6 @@ video#operator-video {
 
 button.user-btn {
     padding: 0; 
-    color: greenyellow;
-    background: black;
     outline: 0;
     margin : 0;
     width : 100%
@@ -88,9 +110,6 @@ button.user-btn {
 
 
 /* Messages */ 
-.avatar#messages-private {
-    overflow-y: scroll;
-}
 
 span.user-name {
     font-style:italic;
@@ -100,29 +119,6 @@ span.user-name {
 div.messages {
     overflow:hidden;
     width: 100%;
-}
-
-#messages-public {
-    float: left;
-}
-#messages-private {
-    float: left;
-}
-
-div.message-list {
-    float: left;
-    padding:4px;
-    height:  100vh;
-    width: 100%; /* width: 20vw; */
-    overflow-x: auto;
-    overflow-y: scroll;
-    text-align:left;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-
-div.bot.message-list {
-    width: 20vw;
 }
 
 div.message-list::-webkit-scrollbar {
@@ -137,9 +133,39 @@ p.message {
     border-bottom: 1px dotted;
 }
 
+p.message.public-message {
+    color: greenyellow;
+}
 
-#messages-scroll{   
+p.message.private-message {
+    color: red;
+}
+
+
+div.message-block{   
     overflow-x: scroll;
     overflow-y: auto ;
 }
 
+div.message-list {
+    float: left;
+    padding:4px;
+    height:  100%;
+    width: 100%; /* width: 20vw; */
+    overflow-x: auto;
+    overflow-y: scroll;
+    text-align:left;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+
+/* Messages Avatar */ 
+.avatar#messages-private {
+    overflow-y: scroll;
+}
+
+/* Messages Bot */ 
+div.bot.message-list {
+    width: 20vw;
+}

@@ -165,18 +165,19 @@ class InteractionSelector{
 };
 
 class MessageList {
-  constructor(element_public, element_private, ownUid, displayName){
-    this.element_public      = element_public;
-    this.element_private     = element_private;
+  constructor(ownUid, displayName, combine = false){
     this.ownUid              = ownUid;
     this.displayName         = displayName;
+    this.combine             = combine;
 
     this.publicMessages = [];
     this.privateMessages = {};
 
-
-    this.publicMessageElement  = $(`<div id="public-messages", class="message-list"</div>`).appendTo(element_public);
-    this.privateMessageElement = $(`<div id="private-messages", class="messages"></div>`).appendTo(element_private);
+    $('#public-div').append('<div id="public-messages" , class="message-list"></div>');
+    $('#public-messages').css("height", $('#public-div').height());
+    console.info($('public-div'))
+    if( !this.combine)
+      $('#private-div').append('<div id="private-messages", class="messages"    ></div>');
   };
 
   addPublicMessage(uid, displayName, message){
@@ -186,32 +187,39 @@ class MessageList {
         'uid'  : uid,
         'text' : message
       });
-  
-      this.publicMessageElement.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
+
       
-      this.publicMessageElement.scrollTop(this.publicMessageElement[0].scrollHeight);
+      let publicMessages = $('#public-messages')  
+
+      publicMessages.append(`<p class="message public-message"><span class="user-name">${displayName}</span> - ${message}</p>`);    
+      publicMessages.scrollTop(publicMessages[0].scrollHeight);
     }
   };
 
   addPrivateMessage(uid, displayName, message){
     if (message) {
       message = message.replace(/\n/g, "<br />");
-      
+    
       if(!(uid in this.privateMessages)){
         this.privateMessages[uid] = [];
       }
-
       this.privateMessages[uid].push( {
         'uid'  : uid,
         'text' : message
       });
 
-      let messageEl = $('#private-messages-' + uid);
-      if(!messageEl.length){
-        messageEl = $(`<div id="${'private-messages-' + uid}", class="message-list"></div>`).appendTo(this.privateMessageElement);
-      }
-      messageEl.append(`<p class="message"><span class="user-name">${displayName}</span> - ${message}</p>`);
-      messageEl.scrollTop(messageEl[0].scrollHeight);
+      if( this.combine){
+        let messageEl = $('#public-messages')  
+        messageEl.append(`<p class="message private-message"><span class="user-name">${displayName}</span> - ${message}</p>`);    
+        messageEl.scrollTop(messageEl[0].scrollHeight);
+      } else {
+        let messageEl = $('#private-messages-' + uid);
+        if(!messageEl.length){
+          messageEl = $('#private-messages').append(`<div id="${'private-messages-' + uid}", class="message-list"></div>`);
+        }
+        messageEl.append(`<p class="message private-message"><span class="user-name">${displayName}</span> - ${message}</p>`);
+        messageEl.scrollTop(messageEl[0].scrollHeight);
+      };
     }
   };
 
