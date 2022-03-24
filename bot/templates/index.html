@@ -27,7 +27,13 @@
           {% for item in links %}
               <li><a href="{{ item.href }}" target="_blank">{{ item.text }}</a></li>
           {% endfor %}
-          </ul>
+        </ul>
+
+          {% for item in embed %}
+            <iframe src="{{ item.href }}" title="{{ item.text }}" width="{{item.w}}" height="{{item.h}}"></iframe>
+          {% endfor %}
+        </ul>
+
       </div>
     </div>
   </div>

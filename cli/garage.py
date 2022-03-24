@@ -1,6 +1,8 @@
+from pexpect import TIMEOUT
 import requests
 import argparse
 import os
+import readline
 from prompts import prompt_option
 from colorama import init, Fore, Back, Style
 init(autoreset=True)
@@ -18,6 +20,8 @@ args = parser.parse_args()
 INTERFACE_IP = "GoodOmen.local"
 INTERFACE_PORT = 5001
 
+TIMEOUT = 10
+
 TYPES = [
     "Hatespeech",
     "Telegram Rating",
@@ -29,7 +33,8 @@ def StartInterface(interaction_type, users):
     if USE_API:
         r = requests.post(
             f'http://{INTERFACE_IP}:{INTERFACE_PORT}/engine-start/{interaction_type}', 
-            json = {"users" : users}
+            json = {"users" : users},
+            timeout=TIMEOUT
         )
         return r.json()
     else:
@@ -39,7 +44,8 @@ def MessageInterface(interface_id, data):
     if USE_API:
         r = requests.post(
             f'http://{INTERFACE_IP}:{INTERFACE_PORT}/engine-message/{interface_id}',
-            json = data
+            json = data,
+            timeout=TIMEOUT
         )
         return r.json()
     else:
@@ -47,7 +53,10 @@ def MessageInterface(interface_id, data):
 
 def StopInterface(interface_id):
     if USE_API:
-        r = requests.post(f'http://{INTERFACE_IP}:{INTERFACE_PORT}/engine-stop/{interface_id}')
+        r = requests.post(
+                f'http://{INTERFACE_IP}:{INTERFACE_PORT}/engine-stop/{interface_id}',
+                timeout=TIMEOUT
+        )
         return r.json()
     else:
         raise
@@ -84,6 +93,9 @@ if __name__ == '__main__':
 
         printMessages(ret)
 
+        for msg in ret["messages"]:
+            print(f">> {msg['channel']}:{msg['user']} -> '{msg['message']}'")
+
 
         finished = False
         while not finished:
@@ -97,8 +109,12 @@ if __name__ == '__main__':
                 }
 
                 ret = MessageInterface(interface_id, data)
+
+
                 print("\n")
                 printMessages(ret)
+                if ret['complete']:
+                    break
             except KeyboardInterrupt:
                 break
         

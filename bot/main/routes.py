@@ -30,11 +30,11 @@ def index():
     params = [ f'{k}="{v}"' for k, v in params.items()]
     params = "&".join(params)
 
-    audienceUrl = f"http://show.cobratheatercobra.com/?meeting={conferenceName}"
-    scribeUrl = f"display?meeting={conferenceName}"
+    audienceUrl      = f"http://show.cobratheatercobra.com/?meeting={conferenceName}"
+    scribeUrl        = f"display?meeting={conferenceName}"
     audienceUrlLocal = f"file://{Path('./viewer').absolute()}/index.html/?meeting={conferenceName}"
-    operator_link = f"https://meet.cobratheatercobra.com/{conferenceName}#{params}"
-    link = f"https://meet.cobratheatercobra.com/{conferenceName}"
+    operator_link    = f"https://meet.cobratheatercobra.com/{conferenceName}#{params}"
+    link             = f"https://meet.cobratheatercobra.com/{conferenceName}"
 
     links = [
         {'href' : "bot"           , 'text' : '🤖 Bot'             },
@@ -45,7 +45,17 @@ def index():
         {'href' : link            , 'text' : '🍿 Remote Audience' }, 
         {'href' : operator_link   , 'text' : '🎬 Operator'        },
     ]
-    return render_template('index.html', links = links)
+
+
+    root = "http://127.0.0.1:5001"
+
+    embed = [
+        {'href' : f"{root}/telegram.html" , 'text' : 'Telegram', 'w' : 720 , 'h' : 720  },
+        {'href' : f"{root}/twitter.html"  , 'text' : 'Twitter' , 'w' : 720 , 'h' : 720  },
+        {'href' : f"{root}/map.jpg"       , 'text' : 'Map'     , 'w' : 1280 , 'h' : 720  },
+    ]
+
+    return render_template('index.html', links = links, embed=embed)
 
 # @main.route('/cue', methods=['POST'])
 # def cue():

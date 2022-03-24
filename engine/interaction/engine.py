@@ -62,7 +62,8 @@ class Engine():
 
         return {
             'success' : True,
-            'messages'  : msgs
+            'messages'  : msgs,
+            'complete' : interface.complete
         }
 
 # class Engine():

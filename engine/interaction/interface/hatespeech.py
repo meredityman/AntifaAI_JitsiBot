@@ -47,17 +47,18 @@ class Hatespeech(MultiUserGenerator):
         self.commands     = self.data['commands']
         self.final_prompt = self.data['final-prompt']
         self.result       = self.data['result']
+        self.all_prompts_seen = {}
 
     def _getResponse(self, id, text, isPublic):
         self.isPublic = isPublic
         self.id   = id
         self.text = text
 
-
         self.iterateGenerator()
 
     def generatorFunc(self):
-        while True:
+        running = True
+        while running:
             if self.last_data == None:
                 yield
                 continue
@@ -70,6 +71,12 @@ class Hatespeech(MultiUserGenerator):
                 self.replies  += [ {"message" : response, "user" : self.last_user, "channel" : self.last_data["channel"] } ]
                 if(isPrivate):
                     self.replies  += [ {"message" : self.get_prompt_for_user(self.last_user), "user" : self.last_user, "channel" : "private" } ]
+            
+
+            if( len(self.prompts_seen[self.last_user]) ==  len(self.prompts)):
+                self.replies  += [ {"message" : "Thank you for participating! ❤️\n[THE END]", "user" : self.last_user, "channel" : "private" } ]
+                running = False
+
             yield
 
     def getPrediction(self, text):

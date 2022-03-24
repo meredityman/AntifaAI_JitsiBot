@@ -57,7 +57,7 @@ def plot_twitter():
 
 
     hv.extension('bokeh')
-    hv.output(size=512)
+    hv.output(size=100)
 
     links = pd.DataFrame(links_data)
  
@@ -69,8 +69,12 @@ def plot_twitter():
             edge_cmap='RdGy', 
             edge_color=dim('source').str(), 
             labels='name', 
-            node_color=dim('index').str()
+            node_color=dim('index').str(),
+            width=720, height=720
             ))
+
+    setattr(chord, 'plot_width', 720)
+    setattr(chord, 'plot_height', 720)
 
     hv.save(chord, 'engine/static/var/NaziTwitterBubble.html')
 
@@ -93,6 +97,7 @@ api = tweepy.API(auth,wait_on_rate_limit=True)
 woeids = {
     "hamburg" : 656958,
     "bochum"  : 639679,
+    "halle"   : 656853
 #stuttgart : ,
 #halle :
 }
@@ -481,5 +486,7 @@ class LTwitter(Twitter):
                 pass
 
             self.replies  += [ {"message" : self.outro, "user" : self.last_user, "channel" : "public" } ]
-            self.replies  += [ {"message" : "Check the results here.\nhttp://192.168.0.207:5001/twitter.html", "user" : self.last_user, "channel" : "public" } ]
+            self.replies  += [ {"message" : "Check the results here.\nhttp://192.168.0.195:5001/twitter.html", "user" : self.last_user, "channel" : "public" } ]
+            
+            running = False
             yield

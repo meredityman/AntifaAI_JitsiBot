@@ -33,7 +33,8 @@ class Incidents(MultiUserGenerator):
         return super().start()
 
     def generatorFunc(self):
-        while True:
+        running = True
+        while running:
             for question in self.questions:
                 self.replies  += [ {"message" : question['text'], "user" : self.last_user, "channel" : "private" } ]
                 self.replies  += [ {"message" : question['hint'], "user" : self.last_user, "channel" : "private" } ]
@@ -69,10 +70,9 @@ class Incidents(MultiUserGenerator):
                 if response:
                     self.replies  += [ {"message" : response , "user" : self.last_user, "channel" : "private" } ]
 
-                if selected is True:
-                    break
-                else:
-                    yield
+                    if not selected:
+                        running = False
+                    break 
 
 
 

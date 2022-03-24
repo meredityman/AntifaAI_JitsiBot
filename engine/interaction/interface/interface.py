@@ -27,6 +27,7 @@ class MultiUserGenerator(Interface):
         self.last_user = None
         self.last_data = None
         self.dirty     = False
+        self.complete  =  False
         self.replies   = []
 
     def message(self, user : str, data : dict) -> list:
@@ -60,7 +61,8 @@ class MultiUserGenerator(Interface):
         try:
             next(self.generator)
         except StopIteration:
-            print("Generator Complete")   
+            print("Generator Complete")  
+            self.complete = True
         except ValueError as e:
             print(str(e)) 
 
