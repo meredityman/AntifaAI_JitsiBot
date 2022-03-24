@@ -318,7 +318,7 @@
             ]
         },
         {
-            "name": "Playstation",
+            "name": "Memorial",
             "active": true,
             "score": [
                 0.1,
@@ -331,6 +331,18 @@
         },
         {
             "name": "Fountain",
+            "active": true,
+            "score": [
+                0.9,
+                0.2,
+                0.5,
+                0.1,
+                0.4,
+                0.3
+            ]
+        },
+        {
+            "name": "Playstation",
             "active": true,
             "score": [
                 0.9,

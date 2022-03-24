@@ -4,7 +4,7 @@ from numpy.lib.function_base import select
 from .utils.make_map import draw_map
 from .utils.cuemanager import send_cue
 from .utils.prompts import prompt_option
-
+import random
 from .interface import MultiUserGenerator
 
 
@@ -114,11 +114,9 @@ class Survey(MultiUserGenerator):
     def finalizeAllQuestions(self):
         # Dirty deceitful hack
         #route = self.getRoute()
-        route = [
-            "Drum",
-            "Map",
-            "Garage"
-        ]
+        end = [ "Map", "Garage" ]
+        random.shuffle(end)
+        route = ["Drum"] + end
 
 
         message = "🗺️" * 8 + "\n"        
@@ -135,7 +133,7 @@ class Survey(MultiUserGenerator):
         return message
 
 
-    def getRoute(self, number = 6):
+    def getRoute(self, number = 5):
 
         scores = { m["name"] : 0.0 for m in self.metrics }
         for qIndex, response in self.responses.items():

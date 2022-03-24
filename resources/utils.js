@@ -84,15 +84,34 @@ class InteractionSelector{
     this.interaction_id = null;
 
     let buttons = [];
+
+    var selector = this;
+    var button = $('<button/>', {
+      text: "Close", 
+      id: 'btn-' + "close",
+      click: function () { 
+        selector.close()
+        buttons.forEach( item => {
+          if(item.attr('id') == $(this).attr('id') ){
+            item.addClass('selected');
+          } else {
+            item.removeClass('selected');
+          }
+        })
+      }
+    });
+
+    buttons.push(button);
+    this.element.append(button);
+
+
     interface_types.forEach( (interactionName) => {
       var selector = this;
       var button = $('<button/>', {
         text: interactionName, 
         id: 'btn-' + interactionName,
         click: function () { 
-
           selector.close()
-
           setInteractionEngine(
             interactionName, 
             (data) => {
@@ -107,9 +126,7 @@ class InteractionSelector{
             },
             selector.getUsers()
           );
-          
           buttons.forEach( item => {
-
             if(item.attr('id') == $(this).attr('id') ){
               item.addClass('selected');
             } else {
@@ -119,9 +136,6 @@ class InteractionSelector{
         }
       });
 
-      // if (interactionName == engineConfig["type"]){
-      //   button.addClass('selected');  
-      // }
       buttons.push(button);
       this.element.append(button);
     });
@@ -159,6 +173,7 @@ class InteractionSelector{
   close(){
     if( this.interaction_id){
       this.closeInteractionEngine(this.interaction_id);
+      this.interaction_id = null;
     }
   }
   

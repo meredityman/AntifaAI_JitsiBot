@@ -1,6 +1,6 @@
 import requests
 import argparse
-
+import os
 from prompts import prompt_option
 from colorama import init, Fore, Back, Style
 init(autoreset=True)
@@ -66,6 +66,8 @@ if __name__ == '__main__':
     while True:
         selected_type = None
         while not selected_type:
+            os.system('clear')
+
             text = "\n\t".join([ f"{i+1}: {o}" for i, o in enumerate(TYPES)])
             print("What interactions would you like to try?:\n\t{0}\n".format(text))
 
@@ -99,6 +101,9 @@ if __name__ == '__main__':
                 printMessages(ret)
             except KeyboardInterrupt:
                 break
-
-        ret = StopInterface(interface_id)
-        printMessages(ret)
+        
+        try:
+            ret = StopInterface(interface_id)
+            printMessages(ret)
+        except Exception as e:
+            print(e)
