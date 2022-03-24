@@ -3,6 +3,7 @@ import requests
 import argparse
 import os
 import readline
+import subprocess
 from prompts import prompt_option
 from colorama import init, Fore, Back, Style
 init(autoreset=True)
@@ -101,7 +102,8 @@ def runInterface(type, args):
         print(e)
 
 def runGame(type, args):
-    pass
+    p = subprocess.Popen(["python3", "engine/game/vaccinateTheHate.py"])
+    p.wait()
 
 TYPES = {
     "Hatespeech"     : runInterface,

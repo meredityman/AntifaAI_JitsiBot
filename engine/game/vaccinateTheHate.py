@@ -19,6 +19,7 @@ import random
 
 from time import sleep
 
+data_root = "engine/data/game"
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 800
@@ -39,15 +40,15 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Init Mixer
 pygame.mixer.init()
-pygame.mixer.music.load("sounds/E2-new.ogg")
+pygame.mixer.music.load(f"{data_root}/sounds/E2-new.ogg")
 pygame.mixer.music.play(loops=-1)
 pygame.mixer.music.set_volume(0.9)
 
 
-move_up_sound = pygame.mixer.Sound("sounds/highend.ogg")
-move_down_sound = pygame.mixer.Sound("sounds/lowend.ogg")
-collission_sound = pygame.mixer.Sound("sounds/injectionSnd.ogg")
-afd_hits_you_sound = pygame.mixer.Sound("sounds/explosion.wav")
+move_up_sound = pygame.mixer.Sound(f"{data_root}/sounds/highend.ogg")
+move_down_sound = pygame.mixer.Sound(f"{data_root}/sounds/lowend.ogg")
+collission_sound = pygame.mixer.Sound(f"{data_root}/sounds/injectionSnd.ogg")
+afd_hits_you_sound = pygame.mixer.Sound(f"{data_root}/sounds/explosion.wav")
 
 
 move_up_sound.set_volume(0.1)
@@ -61,7 +62,7 @@ afd_hits_you_sound.set_volume(1.0)
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        self.surf = pygame.image.load("images/faust.png").convert()
+        self.surf = pygame.image.load(f"{data_root}/images/faust.png").convert()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect()
 
@@ -89,7 +90,7 @@ class Player(pygame.sprite.Sprite):
 class bullet(pygame.sprite.Sprite):
     def __init__(self):
         super(bullet, self).__init__()
-        self.surf = pygame.image.load("images/vaccine.png")
+        self.surf = pygame.image.load(f"{data_root}/images/vaccine.png")
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect()
 
@@ -120,7 +121,7 @@ class bullet(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super(Enemy, self).__init__()
-        self.surf = pygame.image.load("images/AFD.png").convert()
+        self.surf = pygame.image.load(f"{data_root}/images/AFD.png").convert()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect(center=(
             random.randint(SCREEN_WIDTH+20, SCREEN_WIDTH+100),
@@ -138,7 +139,7 @@ class Enemy(pygame.sprite.Sprite):
 class Cloud(pygame.sprite.Sprite):
     def __init__(self):
         super(Cloud, self).__init__()
-        self.surf = pygame.image.load("images/hildmann.png").convert()
+        self.surf = pygame.image.load(f"{data_root}/images/hildmann.png").convert()
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.surf.get_rect(
             center=(
