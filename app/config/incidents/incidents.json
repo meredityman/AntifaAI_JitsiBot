@@ -1,43 +1,43 @@
 {
-    "intro"   : "Would you like to report an incident? YOu can use the private channel to answer the bot's questions.",
-    "thankyou": "Thankyou for sharing you story. Your response has been added to our database.",
-    "more"    : "Would you like to submit another incident?",
+    "intro"   : "Möchtest du einen Vorfall berichten? Drücke Enter um das Programm zu starten.",
+    "thankyou": "Danke, dass du uns davon berichtet hast. Deine Vorfall wurde in unseren Daten gespeichert und wird zur Karte hinzugefügt.",
+    "more"    : "Willst du einen weiteren Vorfall mit uns teilen?",
     "questions" : [
         {
-            "text"           : "What year did the incident happen?",
-            "hint"           : "Enter the years as a number, e.g. 1997",
+            "text"           : "In Welchem Jahr geschah dieser Vorfall?",
+            "hint"           : "Gib das Jahr als Nummer ein z.B.: 1997",
             "compulsory"     : true,
             "field"          : "year",
             "validator"      : "validators.integer",
             "validator-args" : { "minimum" : 1900, "maximum" : 2021 }
         },
         {
-            "text"           : "What month did the incident happen?",
-            "hint"           : "Enter the month as a number, e.g. '3' for March",
+            "text"           : "In welchem Monat?",
+            "hint"           : "Gib den Monat als Nummer ein z.B. '3' für März",
             "compulsory"     : true,
             "field"          : "month",
             "validator"      : "validators.integer",
             "validator-args" : { "minimum" : 1, "maximum" : 12 }
         },
         {
-            "text"           : "What day did the incident happen?",
-            "hint"           : "Enter the day",
+            "text"           : "An welchem Tag geschah es?",
+            "hint"           : "Gib den Tag ein?",
             "compulsory"     : false,
             "field"          : "day",
             "validator"      : "validators.integer",
             "validator-args" : { "minimum" : 0, "maximum" : 31 }
         },
         {
-            "text"           : "Where did the incident happen?",
-            "hint"           : "Write the address as precisely as you can",
+            "text"           : "Wo passierte der Vorfall?",
+            "hint"           : "Schreibe die Adresse so genau wie möglich. Wenn du bspw. nur eine Stadt erinnerst, genügt das auch. (Bsp.: Straße, Postleizahl, Stadt)",
             "compulsory"     : true,
             "field"          : "location",
             "validator"      : "validators.string",
             "validator-args" : { }
         },
         {
-            "text"           : "What happened?",
-            "hint"           : "Write between 50-150 words",
+            "text"           : "Was ist passiert?",
+            "hint"           : "Beschreibe den Vorfall knapp in 50-150 Wörtern.",
             "compulsory"     : true,
             "field"          : "description",
             "validator"      : "validators.string",
