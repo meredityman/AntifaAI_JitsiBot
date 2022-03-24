@@ -22,7 +22,7 @@ class Incidents(MultiUserGenerator):
     def start(self) -> list:
 
         self.responses = {}
-        self.config = json.load(open("engine/data/incidents/data/incidents.json", "r"))
+        self.config = json.load(open("engine/config/incidents/incidents.json", "r"))
         self.questions = self.config["questions"]
         self.intro     = self.config["intro"]
         self.thankyou  = self.config["thankyou"]
