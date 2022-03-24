@@ -50,15 +50,16 @@ def index():
     root = "http://127.0.0.1:5001"
 
     embed = [
-        {'href' : f"{root}/telegram.html" , 'text' : 'Telegram', 'w' : 720 , 'h' : 720  },
-        {'href' : f"{root}/twitter.html"  , 'text' : 'Twitter' , 'w' : 720 , 'h' : 720  },
-        {'href' : f"{root}/map.jpg"       , 'text' : 'Map'     , 'w' : 1280 , 'h' : 720  },
+        {'href' : f"{root}/telegram.html" , 'text' : 'Telegram', 'w' : 720 , 'h' : 720     },
+        {'href' : f"{root}/twitter.html"  , 'text' : 'Twitter' , 'w' : 720 , 'h' : 720     },
+        {'href' : f"{root}/map.jpg"       , 'text' : 'Map'     , 'w' : 1280, 'h' : 720    },
+        {'href' : f"./qrcode"       , 'text' : 'Map'  , 'w' : 450 , 'h' : 450     },
     ]
 
     return render_template('index.html', links = links, embed=embed)
 
 # @main.route('/cue', methods=['POST'])
-# def cue():
+# def cue():a
 #     if requests.method == 'POST':
 #         return send_cue('name', data)
 

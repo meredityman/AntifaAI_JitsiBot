@@ -65,13 +65,15 @@ def plot_twitter():
     chord = hv.Chord((links, nodes))
     chord.opts(
         opts.Chord(
-            cmap='RdGy', 
+            cmap='RdGy',    
             edge_cmap='RdGy', 
             edge_color=dim('source').str(), 
             labels='name', 
             node_color=dim('index').str(),
-            width=720, height=720
+            width=720, height=720,
+            # label_text_font_size='10pt'
             ))
+#    chord.opts(label_text_font_size='12pt')
 
     setattr(chord, 'plot_width', 720)
     setattr(chord, 'plot_height', 720)
@@ -103,10 +105,11 @@ woeids = {
 }
 
 def get_trending_hashtags():
-    trends = []
-    woeid = woeids['hamburg']
+    available_areas = api.closest_trends("51.4734671","11.9602335")
 
-    ret = api.get_place_trends(id = woeid)
+    trends = []
+
+    ret = api.get_place_trends(id = available_areas[0]['woeid'])
 
     for value in ret:
         for trend in value['trends']:
@@ -330,48 +333,6 @@ class Twitter(MultiUserGenerator):
                 message += self.is_not_nazi.format(user=user, votes_for=votes_for, votes_against=votes_against) + "\n"
 
         return  message, confirmed_users
-
-
-# def main_loop():
-
-#     trends = get_trending_hashtags()
-#     if len(trends) > 0:
-#         selected_trend = prompt_option("Select a trend \n", trends)
-
-#         if selected_trend:
-#             users = get_users_for_trend(selected_trend)
-
-#             while True:
-#                 suspicous_user = prompt_option("\n Kommt dir ein Name verdächtig vor? Welcher Name kommt dir verdächtig vor \n ", users, nota = True)
-
-#                 if suspicous_user:                
-#                     check_user(suspicous_user)
-
-#                 if prompt_continue("\n Select another users?"):
-#                     pass
-#                 else:
-#                     break
-
-        
-#     input('\n press Enter to continue')
-
-# def main():
-
-#     # Main program loop
-#     while True:
-#         try:
-#             if prompt_continue('\nThis programm will guide you through! Read carefully. Do you want to start?\n'):
-#                 main_loop()
-#         except KeyboardInterrupt:
-#             break
-
-#     print("Exiting..")
-
-# if __name__ == "__main__":
-#     main()
-
-
-
 
 
 class LTwitter(Twitter):

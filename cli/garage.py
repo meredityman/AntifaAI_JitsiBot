@@ -22,12 +22,7 @@ INTERFACE_PORT = 5001
 
 TIMEOUT = 10
 
-TYPES = [
-    "Hatespeech",
-    "Telegram Rating",
-    "Twitter Rating",
-    "Incidents"
-]
+
 
 def StartInterface(interaction_type, users):
     if USE_API:
@@ -69,6 +64,52 @@ def printMessages(ret, debug = False):
         for msg in ret["messages"]:
             print(f"{Fore.RESET}{msg['message']}\n")
 
+def runInterface(type, args):
+    ret = StartInterface(type, users=args.users)
+    interface_id = ret["interface_id"]
+
+    printMessages(ret)
+
+    for msg in ret["messages"]:
+        print(f">> {msg['channel']}:{msg['user']} -> '{msg['message']}'")
+
+
+    finished = False
+    while not finished:
+        try:
+            message = input(f"{Fore.GREEN}>> ")
+
+            data = {
+                "user"    : args.user,
+                "message" : message,
+                "channel" : "private"
+            }
+
+            ret = MessageInterface(interface_id, data)
+
+            print("\n")
+            printMessages(ret)
+            if ret['complete']:
+                break
+        except KeyboardInterrupt:
+            break
+    
+    try:
+        ret = StopInterface(interface_id)
+        printMessages(ret)
+    except Exception as e:
+        print(e)
+
+def runGame(type, args):
+    pass
+
+TYPES = {
+    "Hatespeech"     : runInterface,
+    "Telegram Rating": runInterface,
+    "Twitter Rating" : runInterface,
+    "Incidents"      : runInterface,
+    "Game"           : runGame
+}
 
 if __name__ == '__main__':
 
@@ -77,49 +118,18 @@ if __name__ == '__main__':
         while not selected_type:
             os.system('clear')
 
-            text = "\n\t".join([ f"{i+1}: {o}" for i, o in enumerate(TYPES)])
+            text = "\n\t".join([ f"{i+1}: {o}" for i, o in enumerate(TYPES.keys())])
             print("What interactions would you like to try?:\n\t{0}\n".format(text))
 
 
             t = input(f"Select: {Fore.GREEN}")
-            selected_type, response = prompt_option(t, TYPES)
+            selected_type, response = prompt_option(t, list(TYPES.keys()))
             if selected_type:
                 print(f"{Fore.GREEN}{response}\n")
             else:
                 print(f"{Fore.RED}{response}\n")
     
-        ret = StartInterface(selected_type, users=args.users)
-        interface_id = ret["interface_id"]
 
-        printMessages(ret)
-
-        for msg in ret["messages"]:
-            print(f">> {msg['channel']}:{msg['user']} -> '{msg['message']}'")
+        TYPES[selected_type](selected_type, args)
 
 
-        finished = False
-        while not finished:
-            try:
-                message = input(f"{Fore.GREEN}>> ")
-
-                data = {
-                    "user"    : args.user,
-                    "message" : message,
-                    "channel" : "private"
-                }
-
-                ret = MessageInterface(interface_id, data)
-
-
-                print("\n")
-                printMessages(ret)
-                if ret['complete']:
-                    break
-            except KeyboardInterrupt:
-                break
-        
-        try:
-            ret = StopInterface(interface_id)
-            printMessages(ret)
-        except Exception as e:
-            print(e)
