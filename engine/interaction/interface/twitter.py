@@ -348,6 +348,14 @@ class LTwitter(Twitter):
 
         running = True
         while running:
+
+            while True:
+                if self.last_data:
+                    break
+                else:
+                    yield
+
+            
         
             # Get a hashtag
             hashtags = get_trending_hashtags()

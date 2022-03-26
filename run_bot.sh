@@ -5,4 +5,4 @@
 # flask run
 
 #python3 launch_bot.py
-python3 launch_bot.py --name "19"
+python3 launch_bot.py --name "23"

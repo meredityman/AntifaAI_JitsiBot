@@ -211,6 +211,11 @@ class LTelegram(Telegram):
         running = True
         while running:
 
+            if self.last_data == None:
+                yield
+                continue   
+
+
             message, message_id, channel = self.getRandomMessage()
             message = ("-" * 20) + "\n" + message + "\n" + ("-" * 20)
 
@@ -268,5 +273,5 @@ class LTelegram(Telegram):
             pass
 
         self.replies  += [ {"message" : self.outro, "user" : user, "channel" : "private" } for user in self.users]
-        self.replies  += [ {"message" : "Check the results here.\nhttp://192.168.0.195:5001/telegram.html", "user" : self.last_user, "channel" : "public" } ]
+        self.replies  += [ {"message" : "Check the results here.\nhttp://192.168.0.207:5001/telegram.html", "user" : self.last_user, "channel" : "public" } ]
         yield

@@ -114,7 +114,7 @@ class Survey(MultiUserGenerator):
     def finalizeAllQuestions(self):
         # Dirty deceitful hack
         #route = self.getRoute()
-        end = [ "Map", "Garage", "Playstation" if random.random() > 0.5 else "Memorial"]
+        end = [ "Map", "Garage", "Playstation" ]
         random.shuffle(end)
         route = ["Drum"] + end
 
